@@ -4,6 +4,9 @@ Created on 2023-09-10
 @author: wf
 '''
 from nicegui import ui
+import sys
+import traceback
+from typing import Optional
 
 class NiceGuiWebserver(object):
     '''
@@ -14,6 +17,22 @@ class NiceGuiWebserver(object):
         '''
         Constructor
         '''
+        self.log_view=None
+        
+    def handle_exception(self, e: BaseException, trace: Optional[bool] = False):
+        """Handles an exception by creating an error message.
+
+        Args:
+            e (BaseException): The exception to handle.
+            trace (bool, optional): Whether to include the traceback in the error message. Default is False.
+        """
+        if trace:
+            self.error_msg = str(e) + "\n" + traceback.format_exc()
+        else:
+            self.error_msg = str(e)
+        if self.log_view:
+            self.log_view.push(self.error_msg)
+        print(self.error_msg,file=sys.stderr)
         
     def link_button(self, name: str, target: str, icon_name: str,new_tab:bool=True):
         """
