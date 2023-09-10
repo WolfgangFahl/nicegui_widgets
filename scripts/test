@@ -1,0 +1,9 @@
+#!/bin/bash
+# WF 2020-06-03
+#python3 -m unittest discover
+pip list | egrep "^green " 
+if [ $? -ne 0 ]
+then
+  pip install green
+fi
+green tests -s 1
