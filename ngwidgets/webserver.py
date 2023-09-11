@@ -4,9 +4,12 @@ Created on 2023-09-10
 @author: wf
 '''
 from nicegui import ui
+import os
 import sys
 import traceback
 from typing import Optional
+import requests
+
 
 class NiceGuiWebserver(object):
     '''
@@ -71,4 +74,42 @@ class NiceGuiWebserver(object):
         icon_button=ui.button("",icon=icon, color='primary').tooltip(tooltip).on("click",handler=handler)  
         icon_button.toggle_icon=toggle_icon
         return icon_button   
+    
+    def toggle_icon(self,button:ui.button):
+        """
+        toggle the icon of the given button
+        
+        Args:
+            ui.button: the button that needs the icon to be toggled
+        """
+        if hasattr(button,"toggle_icon"):
+            # exchange icon with toggle icon
+            toggle_icon=button._props["icon"]
+            icon=button.toggle_icon
+            button._props["icon"]=icon
+            button.toggle_icon=toggle_icon
+        button.update()
+    
+    def do_read_input(self, input_str: str)->str:
+        """Reads the given input.
+
+        Args:
+            input_str (str): The input string representing a URL or local path.
+            
+        Returns:
+            str: the input content as a string
+        """
+        if input_str.startswith('http://') or input_str.startswith('https://'):
+            response = requests.get(input_str)
+            if response.status_code == 200:
+                return response.text
+            else:
+                raise Exception(f'Unable to retrieve data from URL: {input_str}')
+        else:
+            if os.path.exists(input_str):
+                with open(input_str, 'r') as file:
+                    return file.read()
+            else:
+                raise Exception(f'File does not exist: {input_str}')
+    
         
