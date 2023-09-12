@@ -9,18 +9,28 @@ import sys
 import traceback
 from typing import Optional
 import requests
+from dataclasses import dataclass
+from ngwidgets.version import Version
 
-
+@dataclass
+class WebserverConfig:
+    copy_right:str="(c) 2023 Wolfgang Fahl"
+    version:Version=None
+    
 class NiceGuiWebserver(object):
     '''
     a basic NiceGuiWebserver
     '''
 
-    def __init__(self):
+    def __init__(self,config:WebserverConfig=None):
         '''
         Constructor
         '''
         self.log_view=None
+        self.do_trace=True
+        if config is None:
+            config=WebserverConfig()
+        self.config=config
         
     def handle_exception(self, e: BaseException, trace: Optional[bool] = False):
         """Handles an exception by creating an error message.
@@ -112,4 +122,12 @@ class NiceGuiWebserver(object):
             else:
                 raise Exception(f'File does not exist: {input_str}')
     
+    async def setup_footer(self):
+        """
+        setup the footer
+        """
+        with ui.footer() as self.footer:
+            ui.label(self.config.copy_right)
+            ui.link("Powered by nicegui","https://nicegui.io/").style("color: #fff") 
+
         
