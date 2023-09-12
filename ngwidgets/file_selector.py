@@ -33,6 +33,33 @@ class FileSelector():
         # create the ui.tree object
         self.tree=ui.tree([self.tree_structure], label_key='label', on_select=self.select_file)
    
+    def get_path_items(self, path: str) -> List[str]:
+        """
+        Get sorted list of items in a specified directory path, filtering out non-relevant files like `._` files.
+    
+        Args:
+            path (str): The directory path to list items from.
+    
+        Returns:
+            List[str]: A sorted list of relevant items from the directory. 
+                       Returns an empty list if an error occurs.
+    
+        """
+        items = []
+        
+        try:
+            all_items = os.listdir(path)
+            
+            for item in all_items:
+                if not item.startswith('._'):
+                    items.append(item)
+            
+            items.sort()
+        except BaseException:
+            pass
+    
+        return items
+        
     def get_dir_tree(self, path: str, extensions: dict, id_path: List[int] = [1]) -> Optional[Dict[str, Union[str, List[Dict]]]]:
         """
         Recursive function to construct a directory tree.
@@ -48,11 +75,7 @@ class FileSelector():
         """
         path = os.path.abspath(path)
         id_string = '.'.join(map(str, id_path))
-        try:
-            items = os.listdir(path)
-            items=sorted(items)
-        except BaseException:
-            items = []
+        items=self.get_path_items(path)
         children = []
         item_counter = 1  # counter for generating child id
     
