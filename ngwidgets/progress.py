@@ -20,13 +20,20 @@ class NiceguiProgressbar():
         self.progress.visible = False
         
     def set_description(self,desc:str):
+        """
+        set the description of the progress bar
+        """
         self.progress.visible=True
         pass
         
     def update(self,step):
+        """
+        update the progress bar
+        """
         self.value+=1
         self.progress.visible=True
-        self.progress.value=self.value/self.total*100
+        percent=self.value/self.total
+        self.progress.value=percent  #round(percent*100)
         pass
     
 class Progressbar():
