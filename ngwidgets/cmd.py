@@ -6,6 +6,7 @@ Created on 10.09.2023
 import sys
 import traceback
 import webbrowser
+from ngwidgets.webserver import WebserverConfig
 from argparse import ArgumentParser
 from argparse import RawDescriptionHelpFormatter
 
@@ -14,11 +15,12 @@ class WebserverCmd(object):
     Baseclass for command line handling of Webservers
     '''
     
-    def __init__(self,version,webserver_cls,debug:bool=False):
+    def __init__(self,config:WebserverConfig,webserver_cls,debug:bool=False):
         """
         constructor
         """
-        self.version=version
+        self.config=config
+        self.version=config.version
         self.debug=debug
         self.webserver_cls=webserver_cls
         self.exit_code=0
@@ -45,7 +47,7 @@ class WebserverCmd(object):
     
         parser.add_argument("--host", default="localhost",
                                 help="the host to serve / listen from [default: %(default)s]")
-        parser.add_argument("--port",type=int,default=9859,help="the port to serve from [default: %(default)s]")
+        parser.add_argument("--port",type=int,default=self.config.default_port,help="the port to serve from [default: %(default)s]")
         parser.add_argument("-s","--serve", action="store_true", help="start webserver [default: %(default)s]")
         parser.add_argument("-V", "--version", action='version', version=version_msg)
         return parser

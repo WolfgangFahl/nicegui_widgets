@@ -6,6 +6,7 @@ Created on 2023-09-12
 import os
 from ngwidgets.webserver import NiceGuiWebserver,WebserverConfig
 from ngwidgets.local_filepicker import LocalFilePicker
+from ngwidgets.color_schema import ColorSchema
 from nicegui import ui
 
 class InputWebserver(NiceGuiWebserver):
@@ -87,6 +88,7 @@ class InputWebserver(NiceGuiWebserver):
     def setup_menu(self):
         """Adds a link to the project's GitHub page in the web server's menu."""
         version=self.config.version
+        self.config.color_schema.apply()
         with ui.header() as self.header:
             self.link_button("home","/","home")
             self.link_button("settings","/settings","settings")

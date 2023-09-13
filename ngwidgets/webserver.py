@@ -11,11 +11,17 @@ from typing import Optional
 import requests
 from dataclasses import dataclass
 from ngwidgets.version import Version
+from ngwidgets.color_schema import ColorSchema
 
 @dataclass
 class WebserverConfig:
+    """
+    configuration of a webserver
+    """
     copy_right:str="(c) 2023 Wolfgang Fahl"
+    default_port:int=9860
     version:Version=None
+    color_schema:ColorSchema=ColorSchema.indigo()
     
 class NiceGuiWebserver(object):
     '''
@@ -130,5 +136,3 @@ class NiceGuiWebserver(object):
         with ui.footer() as self.footer:
             ui.label(self.config.copy_right)
             ui.link("Powered by nicegui","https://nicegui.io/").style("color: #fff") 
-
-        
