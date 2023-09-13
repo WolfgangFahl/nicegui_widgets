@@ -109,9 +109,16 @@ class InputWebserver(NiceGuiWebserver):
         Generates the settings page 
         """
         self.setup_menu()
+        ui.checkbox('debug', value=self.debug).bind_value(self, "debug")
         ui.checkbox('debug with trace', value=True).bind_value(self, "do_trace")
         ui.checkbox('render on load',value=self.render_on_load).bind_value(self,"render_on_load")
+        self.configure_settings()
         self.setup_footer()
+        
+    def configure_settings(self):
+        """
+        overrideable settings configuration
+        """
         
     def configure_menu(self):
         """
@@ -133,6 +140,7 @@ class InputWebserver(NiceGuiWebserver):
             args (list): The command line arguments.
         """
         self.args=args
+        self.debug=args.debug
         self.input=args.input
         self.is_local=args.local
         self.root_path=os.path.abspath(args.root_path) 

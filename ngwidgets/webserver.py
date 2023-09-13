@@ -26,6 +26,7 @@ class NiceGuiWebserver(object):
         '''
         Constructor
         '''
+        self.debug=False
         self.log_view=None
         self.do_trace=True
         if config is None:
