@@ -5,19 +5,30 @@ Created on 2023-09-12
 '''
 from tqdm import tqdm
 from nicegui import ui
+from dataclasses import dataclass
 
-class NiceguiProgressbar():
+@dataclass
+class Progressbar():
+    """
+    generic progress bar 
+    """
+    total: int
+    desc: str
+    unit: str
+  
+class NiceguiProgressbar(Progressbar):
     """
     nicegui progess bar wrapper
     """
 
     def __init__(self,total,desc,unit):
-        self.total=total
+        Progressbar.__init__(self,total,desc,unit)
         self.value=0
-        self.desc=desc
-        self.unit=unit
         self.progress = ui.linear_progress(value=0).props('instant-feedback')
         self.progress.visible = False
+        
+    def reset(self):
+        self.progress.set_value(0)
         
     def set_description(self,desc:str):
         """
@@ -36,7 +47,7 @@ class NiceguiProgressbar():
         self.progress.value=percent  #round(percent*100)
         pass
     
-class Progressbar():
+class TqdmProgressbar(Progressbar):
     """
     tqdm progress bar wrapper
     """
@@ -45,7 +56,11 @@ class Progressbar():
         """
         constructor
         """
-        self.progress=tqdm(total=total, desc=desc, unit=unit)
+        Progressbar.__init__(self,total,desc,unit)
+        self.reset()
+        
+    def reset(self):
+        self.progress=tqdm(total=self.total, desc=self.desc, unit=self.unit)
         
     def set_description(self,desc:str):
         self.progress.set_description(desc)

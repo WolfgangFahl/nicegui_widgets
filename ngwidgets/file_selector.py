@@ -13,7 +13,7 @@ class FileSelector():
     """
     nicegui FileSelector
     """
-    def __init__(self,path:str,extensions: dict=None,handler:Callable=None):
+    def __init__(self,path:str,extensions: dict=None,handler:Callable=None,filter_func: Callable[[str], bool] = None):
         """
         constructor
         
@@ -21,12 +21,14 @@ class FileSelector():
             path (str): The path to the directory to start building the tree from.
             extensions(dict): the extensions to filter for as a dictionary with name as key and extension as value
             handler(Callable): handler function to call on selection
+            filter_func(Callable): optional filter function
         """   
         self.path=path
         if extensions is None:
             extensions = {"srt": ".SRT", "gpx": ".gpx"}
         self.extensions=extensions 
         self.handler=handler
+        self.filter_func=filter_func
         # generate the tree structure
         self.tree_structure = self.get_dir_tree(self.path, self.extensions)
 
@@ -52,7 +54,8 @@ class FileSelector():
             
             for item in all_items:
                 if not item.startswith('._'):
-                    items.append(item)
+                    if not self.filter_func or self.filter_func(item):
+                        items.append(item)
             
             items.sort()
         except BaseException:
