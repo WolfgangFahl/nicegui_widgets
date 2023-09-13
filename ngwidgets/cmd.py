@@ -37,8 +37,8 @@ class WebserverCmd(object):
         parser = ArgumentParser(description=description, formatter_class=RawDescriptionHelpFormatter)
         parser.add_argument("-a","--about",help="show about info [default: %(default)s]",action="store_true")
         parser.add_argument("-c","--client", action="store_true", help="start client [default: %(default)s]")
-        parser.add_argument("-d", "--debug", dest="debug", action="store_true", help="show debug info [default: %(default)s]")
-        parser.add_argument("-l", "--local", dest="local", action="store_true", help="run with local file system access [default: %(default)s]")
+        parser.add_argument("-d", "--debug", action="store_true", help="show debug info [default: %(default)s]")
+        parser.add_argument("-l", "--local", action="store_true", help="run with local file system access [default: %(default)s]")
         parser.add_argument("-i", "--input", help="input file")
         
         parser.add_argument("-rol","--render_on_load", action="store_true", help="render on load [default: %(default)s]")

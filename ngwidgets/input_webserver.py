@@ -104,7 +104,7 @@ class InputWebserver(NiceGuiWebserver):
             with_render=self.render_on_load
             await self.read_and_optionally_render(self.args.input,with_render=with_render)
  
-    def settings(self):
+    async def settings(self):
         """
         Generates the settings page 
         """
@@ -113,12 +113,13 @@ class InputWebserver(NiceGuiWebserver):
         ui.checkbox('debug with trace', value=True).bind_value(self, "do_trace")
         ui.checkbox('render on load',value=self.render_on_load).bind_value(self,"render_on_load")
         self.configure_settings()
-        self.setup_footer()
+        await self.setup_footer()
         
     def configure_settings(self):
         """
         overrideable settings configuration
         """
+        pass
         
     def configure_menu(self):
         """
