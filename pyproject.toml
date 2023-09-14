@@ -53,4 +53,5 @@ only-include = ["ngwidgets"]
 
 [project.scripts]
 ngdemo = "ngwidgets.ngwidgets_cmd:main"
+niceuser = "ngwidgets.users:main"
 
