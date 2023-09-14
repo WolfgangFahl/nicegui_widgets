@@ -6,7 +6,6 @@ Created on 2023-09-12
 import os
 from ngwidgets.webserver import NiceGuiWebserver,WebserverConfig
 from ngwidgets.local_filepicker import LocalFilePicker
-from ngwidgets.color_schema import ColorSchema
 from nicegui import ui
 
 class InputWebserver(NiceGuiWebserver):
@@ -61,6 +60,8 @@ class InputWebserver(NiceGuiWebserver):
         reload the input file
         """
         input_str=self.input
+        if not input_str:
+            return
         if os.path.exists(input_str):
             input_str=os.path.abspath(input_str)
         allowed=self.is_local
