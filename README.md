@@ -9,6 +9,9 @@ nicegui widgets
 [![GitHub closed issues](https://img.shields.io/github/issues-closed/WolfgangFahl/nicegui_widgets.svg)](https://github.com/WolfgangFahl/nicegui_widgets/issues/?q=is%3Aissue+is%3Aclosed)
 [![License](https://img.shields.io/github/license/WolfgangFahl/nicegui_widgets.svg)](https://www.apache.org/licenses/LICENSE-2.0)
 
-
 ## Docs and Tutorials
 [Wiki](https://wiki.bitplan.com/index.php/nicegui_widgets)
+
+
+## Demos
+* [nicepdf](http://nicepdf.bitplan.com)
