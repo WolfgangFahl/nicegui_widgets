@@ -15,3 +15,4 @@ nicegui widgets
 
 ## Demos
 * [nicepdf](http://nicepdf.bitplan.com)
+* [nicetrack](http://nicetrack.bitplan.com)
