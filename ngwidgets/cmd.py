@@ -72,7 +72,7 @@ class WebserverCmd(object):
         program_version_message = f'{program_name} ({program_version},{program_build_date})'
     
         try:
-            parser=self.getArgParser(description=self.version.license,version_msg=program_version_message)
+            parser=self.getArgParser(description=self.version.description,version_msg=program_version_message)
             self.args = parser.parse_args(argv)
             if len(argv) < 1:
                 parser.print_usage()
