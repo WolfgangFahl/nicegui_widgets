@@ -22,13 +22,20 @@ class NiceguiProgressbar(Progressbar):
     """
 
     def __init__(self,total,desc,unit):
+        """
+        construct the progress bar
+        """
         Progressbar.__init__(self,total,desc,unit)
         self.value=0
         self.progress = ui.linear_progress(value=0).props('instant-feedback')
         self.progress.visible = False
         
     def reset(self):
-        self.progress.set_value(0)
+        """
+        reset the progress bar
+        """
+        self.value=0
+        self.progress.value=0
         
     def set_description(self,desc:str):
         """
@@ -41,9 +48,9 @@ class NiceguiProgressbar(Progressbar):
         """
         update the progress bar
         """
-        self.value+=1
+        self.value+=step
         self.progress.visible=True
-        percent=self.value/self.total
+        percent=round(self.value/self.total,2) # rounded to two digits
         self.progress.value=percent  #round(percent*100)
         pass
     
