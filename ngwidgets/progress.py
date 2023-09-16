@@ -27,7 +27,12 @@ class NiceguiProgressbar(Progressbar):
         """
         Progressbar.__init__(self,total,desc,unit)
         self.value=0
+        self.desc=desc
         self.progress = ui.linear_progress(value=0).props('instant-feedback')
+        with self.progress:
+            self.label = ui.label().classes('text-lg text-black absolute-center') 
+            self.label.bind_text_from(self, 'value', backward=lambda v: f'{self.desc} {v:.1%}')
+   
         self.progress.visible = False
         
     def reset(self):
@@ -41,6 +46,7 @@ class NiceguiProgressbar(Progressbar):
         """
         set the description of the progress bar
         """
+        self.desc=desc
         self.progress.visible=True
         pass
         
