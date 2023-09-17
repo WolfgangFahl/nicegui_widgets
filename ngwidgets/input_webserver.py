@@ -147,7 +147,10 @@ class InputWebserver(NiceGuiWebserver):
         self.debug=args.debug
         self.input=args.input
         self.is_local=args.local
-        self.root_path=os.path.abspath(args.root_path) 
+        if hasattr(args, "root_path"):
+            self.root_path=os.path.abspath(args.root_path) 
+        else:
+            self.root_path=None
         self.render_on_load=args.render_on_load
         # allow app specific configuration steps
         self.configure_run()
