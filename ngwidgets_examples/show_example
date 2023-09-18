@@ -1,0 +1,16 @@
+#!/bin/bash
+
+# Start a simple HTTP server
+python -m http.server 8000 &
+
+# Store the server process ID
+SERVER_PID=$!
+
+# Give the server a moment to start
+sleep 2
+
+# Open the browser
+open "http://localhost:8000/pdfviewer.html"
+
+# Trap the exit signal and kill the server process
+trap "kill $SERVER_PID" EXIT

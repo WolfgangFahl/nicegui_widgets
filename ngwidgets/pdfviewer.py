@@ -14,7 +14,7 @@ class pdfviewer(ui.element, component='pdfviewer.js'):
     see https://mozilla.github.io/pdf.js/
     """
 
-    def __init__(self, version="2.10.377") -> None:
+    def __init__(self) -> None:
         super().__init__()
         ui.add_head_html(f'<link href="https://mozilla.github.io/pdf.js/build/pdf_viewer.css" rel="stylesheet"/>')
         ui.add_head_html(f'<script src="https://mozilla.github.io/pdf.js/build/pdf.js"></script>')
