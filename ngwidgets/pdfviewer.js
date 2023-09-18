@@ -1,12 +1,24 @@
 export default {
-  template: "<div></div>",
+  // outer div is container - inner div is viewer
+  template: "<div class='pdfViewerContainer'><div></div></div>",
   mounted() {
+	// my container
     const container = this.$el;
+    
+    // check the library is available
+    if (!pdfjsLib.getDocument || !pdfjsViewer.PDFViewer) {
+	}
+
+	const eventBus = new pdfjsViewer.EventBus();
 
     // Loading PDF.js and the viewer
-    const pdfLinkService = new pdfjsViewer.PDFLinkService();
+    // (Optionally) enable hyperlinks within PDF files.
+	const pdfLinkService = new pdfjsViewer.PDFLinkService({
+	  eventBus,
+	});
     const pdfViewer = new pdfjsViewer.PDFViewer({
-      container: container,
+      container,
+      eventBus,
       linkService: pdfLinkService,
     });
     pdfLinkService.setViewer(pdfViewer);
@@ -18,9 +30,15 @@ export default {
     load_pdf(pdf_url) {
       // Loading the PDF document
       const loadingTask = window.pdfjsLib.getDocument(pdf_url);
-      loadingTask.promise.then((pdfDocument) => {
+      loadingTask.promise.then(
+		(pdfDocument) => {
         this.pdfViewer.setDocument(pdfDocument);
-      });
+      	},
+      	 // Error function
+        (exception) => {
+			console.error(exception);
+		}
+      );
     },
     set_page(page_number) {
       this.pdfViewer.currentPageNumber = page_number;
