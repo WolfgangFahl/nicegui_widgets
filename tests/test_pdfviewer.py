@@ -3,9 +3,10 @@ Created on 2023-09-18
 
 @author: wf
 '''
+import unittest
 from tests.basetest import Basetest
 from ngwidgets.pdfviewer import pdfjs_urls
-from urllib import request, error
+from urllib import request
 
 class TestPdfViewer(Basetest):
     """
@@ -51,6 +52,7 @@ class TestPdfViewer(Basetest):
         self.assertTrue(self.check_content_type(index,urls.url["js_lib"], "js"))
         self.assertTrue(self.check_content_type(index,urls.url["js_viewer"], "js"))
 
+    @unittest.skipIf(Basetest.inPublicCI(), "unreliable in public CI")
     def test_cdns(self):
         """
         test content delivery networks
