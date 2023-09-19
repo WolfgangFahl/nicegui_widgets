@@ -15,7 +15,10 @@ class TestPdfViewer(Basetest):
     def setUp(self, debug=True, profile=True):
         Basetest.setUp(self, debug=debug, profile=profile)
     
-    def check_content_type(self,index,url: str, expected_type: str,timeout:float=1.6) -> bool:
+    def check_content_type(self,index,url: str, expected_type: str,timeout:float=3.2) -> bool:
+        """
+        check the content type
+        """
         result=False
         debug=self.debug
         status_code=0
