@@ -5,7 +5,7 @@ Created on 2023-09-18
 '''
 from tests.basetest import Basetest
 from ngwidgets.pdfviewer import pdfjs_urls
-import urllib3
+from urllib import request, error
 
 class TestPdfViewer(Basetest):
     """
@@ -14,7 +14,6 @@ class TestPdfViewer(Basetest):
     
     def setUp(self, debug=True, profile=True):
         Basetest.setUp(self, debug=debug, profile=profile)
-        self.http = urllib3.PoolManager()
     
     def check_content_type(self,index,url: str, expected_type: str,timeout:float=1.6) -> bool:
         result=False
@@ -25,13 +24,13 @@ class TestPdfViewer(Basetest):
             "js": ["function","/* Copyright"]
         }
         try:
-            response = self.http.request("GET",url,timeout=timeout)
-            status_code=response.status
-            if status_code == 200:
-                text=response.data.decode('utf-8')
-                for check in checks[expected_type]:
-                    if check in text:
-                        result=True
+            with request.urlopen(url, timeout=timeout) as response:
+                status_code = response.getcode()
+                if status_code == 200:
+                    text = response.read().decode('utf-8')
+                    for check in checks[expected_type]:
+                        if check in text:
+                            result=True
             symbol = "✔" if result else "❌"
         except Exception as _ex:
             symbol="⚠️"
