@@ -33,6 +33,7 @@ class pdfjs_urls:
             self.base_url="https://raw.githubusercontent.com/mozilla/pdf.js/master"
             l=c
             v=c
+            # no minimized version available
             dot_min=""
             js="pdfjs"
         elif self.cdn=="cdnjs":
@@ -44,6 +45,9 @@ class pdfjs_urls:
             self.base_url=f"https://cdn.jsdelivr.net/npm/pdfjs-dist@{version}"
             v=c
         elif self.cdn=="unpkg":
+            # no minimized version available
+            dot_min=""
+            v=c
             self.base_url =f"https://unpkg.com/pdfjs-dist@{version}"
         else:
             raise ValueError(f"unknown cdn {self.cdn}")

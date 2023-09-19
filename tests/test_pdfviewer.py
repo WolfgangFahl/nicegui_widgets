@@ -5,7 +5,7 @@ Created on 2023-09-18
 '''
 from tests.basetest import Basetest
 from ngwidgets.pdfviewer import pdfjs_urls
-import requests
+import urllib3
 
 class TestPdfViewer(Basetest):
     """
@@ -14,8 +14,9 @@ class TestPdfViewer(Basetest):
     
     def setUp(self, debug=True, profile=True):
         Basetest.setUp(self, debug=debug, profile=profile)
+        self.http = urllib3.PoolManager()
     
-    def check_content_type(self,url: str, expected_type: str,timeout:float=1.6) -> bool:
+    def check_content_type(self,index,url: str, expected_type: str,timeout:float=1.6) -> bool:
         result=False
         debug=self.debug
         status_code=0
@@ -24,10 +25,10 @@ class TestPdfViewer(Basetest):
             "js": ["function","/* Copyright"]
         }
         try:
-            response = requests.get(url,timeout=timeout)
-            status_code=response.status_code
-            if response.status_code == 200:
-                text=response.text
+            response = self.http.request("GET",url,timeout=timeout)
+            status_code=response.status
+            if status_code == 200:
+                text=response.data.decode('utf-8')
                 for check in checks[expected_type]:
                     if check in text:
                         result=True
@@ -35,27 +36,29 @@ class TestPdfViewer(Basetest):
         except Exception as _ex:
             symbol="⚠️"
         if debug:
-            print(f"{status_code}:{expected_type}:{symbol}:{url}")
+            print(f"{index:3}:{expected_type:3}:{symbol}:{status_code}-{url}")
         return result
     
-    def check_cdn(self,cdn,version,debug):
+    def check_cdn(self,index,cdn,version,debug):
         """
         check the content delivery network
         """
         urls=pdfjs_urls(cdn,version,debug)
         urls.configure()
-        self.assertTrue(self.check_content_type(urls.url["css"], "css"))
-        self.assertTrue(self.check_content_type(urls.url["js_lib"], "js"))
-        self.assertTrue(self.check_content_type(urls.url["js_viewer"], "js"))
+        self.assertTrue(self.check_content_type(index,urls.url["css"], "css"))
+        self.assertTrue(self.check_content_type(index,urls.url["js_lib"], "js"))
+        self.assertTrue(self.check_content_type(index,urls.url["js_viewer"], "js"))
 
     def test_cdns(self):
         """
         test content delivery networks
         """
+        index=0
         for version in ["3.9.179","3.10.111"]:
             # unpkg is not tested due to unreliability see
             # https://github.com/mjackson/unpkg/issues/330
-            for cdn in ["github","jsdelivr","cdnjs"]:
+            for cdn in ["github","jsdelivr","cdnjs","unpkg"]:
                 for debug in [False,True]:
                     with self.subTest(version=version, cdn=cdn, debug=debug):
-                        self.check_cdn(cdn, version, debug)
+                        index+=1
+                        self.check_cdn(index,cdn, version, debug)
