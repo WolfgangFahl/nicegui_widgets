@@ -6,6 +6,7 @@ Created on 2023-09-12
 import os
 from ngwidgets.webserver import NiceGuiWebserver,WebserverConfig
 from ngwidgets.local_filepicker import LocalFilePicker
+from ngwidgets.widgets import About
 from nicegui import ui
 
 class InputWebserver(NiceGuiWebserver):
@@ -97,6 +98,16 @@ class InputWebserver(NiceGuiWebserver):
             self.link_button("github",version.cm_url,"bug_report")
             self.link_button("chat",version.chat_url,"chat")
             self.link_button("help",version.doc_url,"help")
+            self.link_button("about","/about","information")
+            
+    async def about(self):
+        """
+        show about
+        """
+        self.setup_menu()
+        with ui.element("div").classes("w-full h-full"):
+            self.about_div=About(self.config.version)
+        await self.setup_footer()
 
     async def setup_footer(self):
         self.log_view = ui.log(max_lines=20).classes('w-full h-40')        

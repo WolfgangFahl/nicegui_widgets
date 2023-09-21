@@ -51,6 +51,24 @@ class WebserverCmd(object):
         parser.add_argument("-s","--serve", action="store_true", help="start webserver [default: %(default)s]")
         parser.add_argument("-V", "--version", action='version', version=version_msg)
         return parser
+    
+    def handle_args(self)->bool:
+        handled=False
+        if self.args.about:
+            print(self.program_version_message)
+            print(f"see {self.version.doc_url}")
+            webbrowser.open(self.version.doc_url)
+            handled=True
+        if self.args.client:
+            url=f"http://{self.args.host}:{self.args.port}"
+            webbrowser.open(url)
+            handled=True
+        if self.args.serve:
+            # instantiate the webserver
+            ws=self.webserver_cls()
+            ws.run(self.args)
+            handled=True
+        return handled
 
     def cmd_main(self,argv:list=None)->int: 
         """
@@ -69,26 +87,15 @@ class WebserverCmd(object):
         program_name = self.version.name
         program_version =f"v{self.version.version}" 
         program_build_date = str(self.version.date)
-        program_version_message = f'{program_name} ({program_version},{program_build_date})'
+        self.program_version_message = f'{program_name} ({program_version},{program_build_date})'
     
         try:
-            parser=self.getArgParser(description=self.version.description,version_msg=program_version_message)
+            parser=self.getArgParser(description=self.version.description,version_msg=self.program_version_message)
             self.args = parser.parse_args(argv)
             if len(argv) < 1:
                 parser.print_usage()
                 sys.exit(1)
-            if self.args.about:
-                print(program_version_message)
-                print(f"see {self.version.doc_url}")
-                webbrowser.open(self.version.doc_url)
-            if self.args.client:
-                url=f"http://{self.args.host}:{self.args.port}"
-                webbrowser.open(url)
-            if self.args.serve:
-                # instantiate the webserver
-                ws=self.webserver_cls()
-                ws.run(self.args)
-            
+            self.handle_args()
         except KeyboardInterrupt:
             ### handle keyboard interrupt ###
             self.exit_code=1
