@@ -12,8 +12,8 @@ nicegui widgets
 ## Docs and Tutorials
 [Wiki](https://wiki.bitplan.com/index.php/nicegui_widgets)
 
-
 ## Demos
+* [nicegui widgets](http://ngdemo.bitplan.com)
 * [nicepdf](http://nicepdf.bitplan.com)
 * [nicetrack](http://nicetrack.bitplan.com)
 * [nicescad](http://nicescad.bitplan.com)

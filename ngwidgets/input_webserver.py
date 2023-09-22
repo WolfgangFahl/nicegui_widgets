@@ -7,7 +7,7 @@ import os
 from ngwidgets.webserver import NiceGuiWebserver,WebserverConfig
 from ngwidgets.local_filepicker import LocalFilePicker
 from ngwidgets.widgets import About
-from nicegui import ui
+from nicegui import ui, Client
 
 class InputWebserver(NiceGuiWebserver):
     """
@@ -21,6 +21,18 @@ class InputWebserver(NiceGuiWebserver):
         NiceGuiWebserver.__init__(self,config=config)
         self.is_local=False
         self.input=""
+        
+        @ui.page('/')
+        async def home(client: Client):
+            return await self.home(client)
+        
+        @ui.page('/settings')
+        async def settings():
+            return await self.settings()
+        
+        @ui.page('/about')
+        async def about():
+            return await self.about()
         
     def input_changed(self,cargs):
         """
@@ -87,7 +99,7 @@ class InputWebserver(NiceGuiWebserver):
                 await self.read_and_optionally_render(input_file,with_render=with_render)          
     pass
 
-    def setup_menu(self):
+    def setup_menu(self,detailed:bool=True):
         """Adds a link to the project's GitHub page in the web server's menu."""
         version=self.config.version
         self.config.color_schema.apply()
@@ -95,11 +107,19 @@ class InputWebserver(NiceGuiWebserver):
             self.link_button("home","/","home")
             self.link_button("settings","/settings","settings")
             self.configure_menu()
-            self.link_button("github",version.cm_url,"bug_report")
-            self.link_button("chat",version.chat_url,"chat")
-            self.link_button("help",version.doc_url,"help")
-            # work around https://github.com/zauberzeug/nicegui/issues/1664
+            if detailed:
+                self.link_button("github",version.cm_url,"bug_report")
+                self.link_button("chat",version.chat_url,"chat")
+                self.link_button("help",version.doc_url,"help")
             self.link_button("about","/about","info")
+            
+    async def home(self,_client:Client):
+        '''
+        provide the main content page
+        
+        '''
+        self.setup_menu()
+        await self.setup_footer()
             
     async def about(self):
         """
