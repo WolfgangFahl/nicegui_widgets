@@ -34,7 +34,6 @@ class ColorSchema:
             info=self.info,
             warning=self.warning
         )
-
             
     @classmethod
     def indigo(cls):

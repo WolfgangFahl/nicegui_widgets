@@ -110,7 +110,7 @@ class NiceGuiWebserver(object):
             button.toggle_icon=toggle_icon
         button.update()
 
-    def add_select(self, title: str, selection: Union[List[Any], Dict[str, Any]]) -> Any:
+    def add_select(self, title: str, selection: Union[List[Any], Dict[str, Any]],background_color:str="#e6e6e6") -> Any:
         """
         Add a select widget.
     
@@ -124,7 +124,11 @@ class NiceGuiWebserver(object):
             Any: The created select widget.
         """
         with ui.element('div').style("display: flex; align-items: center;"):
-            ui.label(title).style("margin-right:10px;")  # add some space between label and select
+            if background_color:
+                background_style=f"background-color:{background_color};"
+            else:
+                background_style=""
+            ui.label(title).classes("rounded p-2").style(f"margin-right:10px;{background_style}")  # add some space between label and select
             s = ui.select(selection)
             return s
        
