@@ -3,17 +3,18 @@ Created on 2023-09-10
 
 @author: wf
 '''
-import unittest
-from ngwidgets.widgets import Widgets
+from tests.basetest import Basetest
+from ngwidgets.widgets import Link
 
-class TestNiceGuiWidgets(unittest.TestCase):
+class TestNiceGuiWidgets(Basetest):
     """
     test nice gui widgets
     """
     
     def test_widgets(self):
-        widgets=Widgets()
+        link_html=Link.create("http://nicegui.io", "nicegui", "nicegui")
+        if self.debug:
+            print(link_html)
+        expected="<a href='http://nicegui.io' title='nicegui'>nicegui</a>"
+        self.assertEqual(expected,link_html)
 
-# This is the standard boilerplate to run the tests when the script is executed
-if __name__ == '__main__':
-    unittest.main()

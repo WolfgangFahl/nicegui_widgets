@@ -3,7 +3,6 @@ Created on 2023-09-18
 
 @author: wf
 '''
-import unittest
 from tests.basetest import Basetest
 from ngwidgets.pdfviewer import pdfjs_urls
 from urllib import request
