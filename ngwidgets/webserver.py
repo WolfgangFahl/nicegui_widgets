@@ -7,7 +7,7 @@ from nicegui import ui
 import os
 import sys
 import traceback
-from typing import Optional
+from typing import Optional, Union, Any, Dict, List
 import requests
 from dataclasses import dataclass
 from ngwidgets.version import Version
@@ -109,7 +109,25 @@ class NiceGuiWebserver(object):
             button._props["icon"]=icon
             button.toggle_icon=toggle_icon
         button.update()
+
+    def add_select(self, title: str, selection: Union[List[Any], Dict[str, Any]]) -> Any:
+        """
+        Add a select widget.
     
+        Args:
+            title (str): The title/label for the select widget.
+            selection (Union[List[Any], Dict[str, Any]]): The options available for selection.
+                It can either be a list of options or a dictionary with option labels as keys
+                and values as the corresponding values.
+    
+        Returns:
+            Any: The created select widget.
+        """
+        with ui.element('div').style("display: flex; align-items: center;"):
+            ui.label(title).style("margin-right:10px;")  # add some space between label and select
+            s = ui.select(selection)
+            return s
+       
     def do_read_input(self, input_str: str)->str:
         """Reads the given input.
 
