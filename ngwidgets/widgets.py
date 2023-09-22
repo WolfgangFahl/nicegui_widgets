@@ -16,7 +16,7 @@ class Lang:
     """
     
     @classmethod
-    def get_language_dict(cls) -> dict[str, str]:
+    def get_language_dict(cls) -> dict:
         """
         Get a dictionary of supported languages.
         
