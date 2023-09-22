@@ -40,7 +40,7 @@ class About(ui.element):
         """
         construct an about Div for the given version
         """
-        super().__init__(self,**kwargs)
+        super().__init__(tag='div',**kwargs)
         with self: 
             ui.label(f"{version.description}")
             ui.label(f"version: {version.version}")

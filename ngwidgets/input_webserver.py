@@ -98,7 +98,8 @@ class InputWebserver(NiceGuiWebserver):
             self.link_button("github",version.cm_url,"bug_report")
             self.link_button("chat",version.chat_url,"chat")
             self.link_button("help",version.doc_url,"help")
-            self.link_button("about","/about","information")
+            # work around https://github.com/zauberzeug/nicegui/issues/1664
+            self.link_button("about","/about","info")
             
     async def about(self):
         """

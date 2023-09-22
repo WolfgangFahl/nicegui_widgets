@@ -66,6 +66,9 @@ class NiceGuiWebserver(object):
     
         Returns:
             The button object.
+            
+            
+        see https://fonts.google.com/icons?icon.set=Material+Icons for potential icon names
         """
         with ui.button(name,icon=icon_name) as button:
             button.on("click",lambda: (ui.open(target,new_tab=new_tab)))
