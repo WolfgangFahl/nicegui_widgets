@@ -12,6 +12,7 @@ import requests
 from dataclasses import dataclass
 from ngwidgets.version import Version
 from ngwidgets.color_schema import ColorSchema
+from pydevd_file_utils import setup_client_server_paths
 
 @dataclass
 class WebserverConfig:
@@ -38,6 +39,42 @@ class NiceGuiWebserver(object):
         if config is None:
             config=WebserverConfig()
         self.config=config
+        
+    @classmethod    
+    def optionalDebug(self,args):   
+        '''
+        start the remote debugger if the arguments specify so
+        
+        Args:
+            args(): The command line arguments
+        '''
+        if args.debugServer:
+            import pydevd
+            print (f"remotePath: {args.debugRemotePath} localPath:{args.debugLocalPath}",flush=True)
+            if args.debugRemotePath and args.debugLocalPath:
+                MY_PATHS_FROM_ECLIPSE_TO_PYTHON = [
+                    (args.debugRemotePath, args.debugLocalPath),
+                ]
+                setup_client_server_paths(MY_PATHS_FROM_ECLIPSE_TO_PYTHON)
+                    #os.environ["PATHS_FROM_ECLIPSE_TO_PYTHON"]='[["%s", "%s"]]' % (remotePath,localPath)
+                    #print("trying to debug with PATHS_FROM_ECLIPSE_TO_PYTHON=%s" % os.environ["PATHS_FROM_ECLIPSE_TO_PYTHON"]);
+         
+            pydevd.settrace(args.debugServer, port=args.debugPort,stdoutToServer=True, stderrToServer=True)
+            print(f"command line args are: {str(sys.argv)}")
+        
+    def run(self, args):
+        """
+        Runs the UI of the web server.
+
+        Args:
+            args (list): The command line arguments.
+        """
+        self.args=args
+        self.debug=args.debug
+        self.optionalDebug(args)
+        # allow app specific configuration steps
+        self.configure_run()
+        ui.run(title=self.config.version.name, host=args.host, port=args.port, show=args.client,reload=False)
         
     def handle_exception(self, e: BaseException, trace: Optional[bool] = False):
         """Handles an exception by creating an error message.

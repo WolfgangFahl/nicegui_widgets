@@ -175,8 +175,6 @@ class InputWebserver(NiceGuiWebserver):
         Args:
             args (list): The command line arguments.
         """
-        self.args=args
-        self.debug=args.debug
         self.input=args.input
         self.is_local=args.local
         if hasattr(args, "root_path"):
@@ -184,6 +182,4 @@ class InputWebserver(NiceGuiWebserver):
         else:
             self.root_path=None
         self.render_on_load=args.render_on_load
-        # allow app specific configuration steps
-        self.configure_run()
-        ui.run(title=self.config.version.name, host=args.host, port=args.port, show=args.client,reload=False)
+        super().run(args)
