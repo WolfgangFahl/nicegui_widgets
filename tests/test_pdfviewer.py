@@ -3,6 +3,7 @@ Created on 2023-09-18
 
 @author: wf
 '''
+import unittest
 from tests.basetest import Basetest
 from ngwidgets.pdfviewer import pdfjs_urls
 from urllib import request
@@ -56,11 +57,15 @@ class TestPdfViewer(Basetest):
         """
         test content delivery networks
         """
+        cdns=["github","jsdelivr"]
+        if not super().inPublicCI():
+            cdns.append("cdnjs")
+            cdns.append("unpkg")
         index=0
         for version in ["3.9.179","3.10.111"]:
             # unpkg is not tested due to unreliability see
             # https://github.com/mjackson/unpkg/issues/330
-            for cdn in ["github","jsdelivr","cdnjs","unpkg"]:
+            for cdn in cdns:
                 for debug in [False,True]:
                     with self.subTest(version=version, cdn=cdn, debug=debug):
                         index+=1
