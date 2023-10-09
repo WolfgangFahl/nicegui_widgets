@@ -17,7 +17,7 @@ dependencies = [
     "nicegui",
     # for debugging
 	# https://pypi.org/project/pydevd/
-	pydevd
+	"pydevd"
 ]
 
 requires-python = ">=3.8"
