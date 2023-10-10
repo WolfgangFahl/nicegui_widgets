@@ -15,9 +15,13 @@ license= "Apache-2.0"
 dependencies = [
 	# https://nicegui.io/
     "nicegui",
+	# https://pypi.org/project/tqdm/
+	# progress bar
+	"tdqm",
     # for debugging
 	# https://pypi.org/project/pydevd/
 	"pydevd"
+	
 ]
 
 requires-python = ">=3.8"
