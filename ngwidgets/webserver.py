@@ -8,7 +8,7 @@ import os
 import sys
 import traceback
 from typing import Optional, Union, Any, Dict, List
-import requests
+import urllib.request
 from dataclasses import dataclass
 from ngwidgets.version import Version
 from ngwidgets.color_schema import ColorSchema
@@ -185,11 +185,9 @@ class NiceGuiWebserver(object):
             str: the input content as a string
         """
         if input_str.startswith('http://') or input_str.startswith('https://'):
-            response = requests.get(input_str)
-            if response.status_code == 200:
-                return response.text
-            else:
-                raise Exception(f'Unable to retrieve data from URL: {input_str}')
+            with urllib.request.urlopen(input_str) as response:
+                text= response.read().decode('utf-8')
+                return text
         else:
             if os.path.exists(input_str):
                 with open(input_str, 'r') as file:
