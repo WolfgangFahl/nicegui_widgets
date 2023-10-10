@@ -75,8 +75,27 @@ class WebserverCmd(object):
             ws.run(self.args)
             handled=True
         return handled
+    
+    def cmd_parse(self,argv:list=None):
+        """
+        parse the argument lists and prepare
+        
+        Args:
+            argv(list): list of command line arguments
+  
+        """
+        if argv is None:
+            argv=sys.argv[1:]
+        self.argv=argv
+        self.program_name = self.version.name
+        self.program_version =f"v{self.version.version}" 
+        self.program_build_date = str(self.version.date)
+        self.program_version_message = f'{self.program_name} ({self.program_version},{self.program_build_date})'
+        self.parser=self.getArgParser(description=self.version.description,version_msg=self.program_version_message)
+        self.args = self.parser.parse_args(argv)
+        return self.args
 
-    def cmd_main(self,argv:list=None)->int: 
+    def cmd_main(self,argv:None)->int: 
         """
         main program as an instance
         
@@ -86,20 +105,10 @@ class WebserverCmd(object):
         Returns:
             int: exit code - 0 of all went well 1 for keyboard interrupt and 2 for exceptions
         """
-    
-        if argv is None:
-            argv=sys.argv[1:]
-            
-        program_name = self.version.name
-        program_version =f"v{self.version.version}" 
-        program_build_date = str(self.version.date)
-        self.program_version_message = f'{program_name} ({program_version},{program_build_date})'
-    
         try:
-            parser=self.getArgParser(description=self.version.description,version_msg=self.program_version_message)
-            self.args = parser.parse_args(argv)
-            if len(argv) < 1:
-                parser.print_usage()
+            self.cmd_parse(argv)
+            if len(self.argv) < 1:
+                self.parser.print_usage()
                 sys.exit(1)
             self.handle_args()
         except KeyboardInterrupt:
@@ -108,8 +117,8 @@ class WebserverCmd(object):
         except Exception as e:
             if self.debug:
                 raise(e)
-            indent = len(program_name) * " "
-            sys.stderr.write(program_name + ": " + repr(e) + "\n")
+            indent = len(self.program_name) * " "
+            sys.stderr.write(self.program_name + ": " + repr(e) + "\n")
             sys.stderr.write(indent + "  for help use --help")
             if self.args.debug:
                 print(traceback.format_exc())

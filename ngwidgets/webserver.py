@@ -3,7 +3,7 @@ Created on 2023-09-10
 
 @author: wf
 '''
-from nicegui import ui
+from nicegui import ui, globals
 import os
 import sys
 import traceback
@@ -39,6 +39,7 @@ class NiceGuiWebserver(object):
         if config is None:
             config=WebserverConfig()
         self.config=config
+        self.app=globals.app
         
     @classmethod    
     def optionalDebug(self,args):   
@@ -75,6 +76,11 @@ class NiceGuiWebserver(object):
         # allow app specific configuration steps
         self.configure_run()
         ui.run(title=self.config.version.name, host=args.host, port=args.port, show=args.client,reload=False)
+ 
+    def stop(self):
+        """
+        stop the server
+        """       
         
     def handle_exception(self, e: BaseException, trace: Optional[bool] = False):
         """Handles an exception by creating an error message.
