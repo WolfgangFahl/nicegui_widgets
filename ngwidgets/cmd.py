@@ -44,7 +44,8 @@ class WebserverCmd(object):
                                  help="remote debug Server")
         parser.add_argument('--debugPort',type=int,
                                  help="remote debug Port",default=5678)
-        parser.add_argument('--debugPathMapping',nargs='+',help="remote debug Server path mapping - needs two arguments 1st: remotePath 2nd: local Path")
+        parser.add_argument('--debugRemotePath',help="remote debug Server path mapping - remotePath - path on debug server") 
+        parser.add_argument('--debugLocalPath',help="remote debug Server path mapping - localPath - path on machine where python runs")
 
         parser.add_argument("-l", "--local", action="store_true", help="run with local file system access [default: %(default)s]")
         parser.add_argument("-i", "--input", help="input file")
