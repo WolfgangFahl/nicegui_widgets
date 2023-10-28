@@ -13,7 +13,7 @@ class Version:
     """
     name = "ngwidgets"
     version = ngwidgets.__version__
-    date = '2023-09-10'
+    date = '2023-10-28'
     updated = '2023-10-20'
     description = 'NiceGUI widgets'
     
