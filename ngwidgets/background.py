@@ -3,8 +3,7 @@ Created on 2023-09-12
 
 @author: wf
 """
-import nicegui
-from nicegui import globals
+from nicegui import core,Client
 import asyncio
 import concurrent.futures
 import signal
@@ -73,8 +72,8 @@ class BackgroundTaskHandler:
 
     async def disconnect(self) -> None:
         """Disconnect all clients from current running server."""
-        for client in nicegui.globals.clients.keys():
-            await globals.sio.disconnect(client)
+        for client_id in Client.instances:
+            await core.sio.disconnect(client_id)
 
     def handle_sigint(self, signum: signal.Signals, frame: Union[None, Any]) -> None:
         """
