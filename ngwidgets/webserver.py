@@ -3,7 +3,7 @@ Created on 2023-09-10
 
 @author: wf
 '''
-from nicegui import ui, globals
+from nicegui import ui, core
 import os
 import sys
 import traceback
@@ -39,7 +39,7 @@ class NiceGuiWebserver(object):
         if config is None:
             config=WebserverConfig()
         self.config=config
-        self.app=globals.app
+        self.app=core.app
         
     @classmethod    
     def optionalDebug(self,args):   

@@ -14,7 +14,7 @@ readme = "README.md"
 license= "Apache-2.0"
 dependencies = [
 	# https://nicegui.io/
-    "nicegui",
+    "nicegui>=1.4.1",
 	# https://pypi.org/project/tqdm/
 	# progress bar
 	"tdqm",
