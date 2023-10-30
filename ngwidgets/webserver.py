@@ -75,7 +75,8 @@ class NiceGuiWebserver(object):
         self.optionalDebug(args)
         # allow app specific configuration steps
         self.configure_run()
-        ui.run(title=self.config.version.name, host=args.host, port=args.port, show=args.client,reload=False)
+        storage_secret=getattr(args, "storage_secret",None)
+        ui.run(title=self.config.version.name, host=args.host, port=args.port, show=args.client,reload=False,storage_secret=storage_secret)
  
     def stop(self):
         """
