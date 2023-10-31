@@ -31,14 +31,16 @@ class Webserver(InputWebserver):
 
         @ui.page('/')
         async def home(client: Client):
-            return await self.home(client)
-    
-    def setup_pdf_viewer(self):   
-        """
-        try pdf view
-        """
-        self.pdf_viewer = pdfviewer(debug=self.args.debug).classes('w-full h-96')
+            return await self.frame(client,self.home)
         
+        @ui.page('/pdfviewer')
+        async def show_pdf_viewer(client:Client):
+            return await self.frame(client,self.show_pdf_viewer)
+        
+        @ui.page('/grid')
+        async def show_grid(client:Client):
+            return await self.frame(client,self.show_grid)
+            
     async def load_pdf(self):
         self.pdf_viewer.load_pdf(self.pdf_url)
     #    slider = ui.slider(min=1, max=max_pages, value=1)  # PDF pages usually start from 1
@@ -46,26 +48,32 @@ class Webserver(InputWebserver):
     #def update_page(e):
     #    viewer.set_page(e.value)   
          
+    async def frame(self,_client:Client,content_func):
+        self.setup_menu()
+        await content_func()
+        await self.setup_footer()       
  
-    async def home(self,_client:Client):
+    async def show_pdf_viewer(self):
+        with ui.element("div").classes("w-full h-full"):
+            self.pdf_viewer = pdfviewer(debug=self.args.debug).classes('w-full h-96')
+            self.tool_button(tooltip="reload",icon="refresh",handler=self.load_pdf)
+            
+    async def show_grid(self):
+        lod=[
+            {'name': 'Alice', 'age': 18, 'parent': 'David'},
+            {'name': 'Bob', 'age': 21, 'parent': 'Eve'},
+            {'name': 'Carol', 'age': 42, 'parent': 'Frank'},
+        ]
+        self.lod_grid=ListOfDictsGrid(lod=lod)
+ 
+    async def home(self):
         """
         home page
         """    
-        self.setup_menu()
-        with ui.element("div").classes("w-full h-full"):
-            with ui.tabs().classes('w-full') as tabs:
-                pdf_tab = ui.tab('PdfViewer')
-                grid_tab = ui.tab('Grid')
-            with ui.tab_panels(tabs, value=pdf_tab).classes('w-full'):
-                with ui.tab_panel(pdf_tab):
-                    self.tool_button(tooltip="reload",icon="refresh",handler=self.load_pdf)
-                    self.setup_pdf_viewer()
-                with ui.tab_panel(grid_tab):
-                    lod=[
-                        {'name': 'Alice', 'age': 18, 'parent': 'David'},
-                        {'name': 'Bob', 'age': 21, 'parent': 'Eve'},
-                        {'name': 'Carol', 'age': 42, 'parent': 'Frank'},
-                    ]
-                    self.lod_grid=ListOfDictsGrid(lod=lod)
-        await self.setup_footer()
+        ui.html("""<ul>
+<li><a href='/grid'>grid</a>
+<li><a href='/pdfviewer'>pdfviewer</a>
+</ul>
+""")
+        pass
         
