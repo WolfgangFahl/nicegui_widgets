@@ -8,6 +8,7 @@ from ngwidgets.webserver import WebserverConfig
 from ngwidgets.version import Version
 from ngwidgets.pdfviewer import pdfviewer
 from nicegui import ui,Client
+from ngwidgets.lod_grid import ListOfDictsGrid
 
 class Webserver(InputWebserver):
     '''
@@ -32,12 +33,11 @@ class Webserver(InputWebserver):
         async def home(client: Client):
             return await self.home(client)
     
-    async def setup_pdf_viewer(self):   
+    def setup_pdf_viewer(self):   
         """
         try pdf view
         """
         self.pdf_viewer = pdfviewer(debug=self.args.debug).classes('w-full h-96')
-        await self.load_pdf()
         
     async def load_pdf(self):
         self.pdf_viewer.load_pdf(self.pdf_url)
@@ -53,7 +53,19 @@ class Webserver(InputWebserver):
         """    
         self.setup_menu()
         with ui.element("div").classes("w-full h-full"):
-            self.tool_button(tooltip="reload",icon="refresh",handler=self.load_pdf)          
-            await self.setup_pdf_viewer()
+            with ui.tabs().classes('w-full') as tabs:
+                pdf_tab = ui.tab('PdfViewer')
+                grid_tab = ui.tab('Grid')
+            with ui.tab_panels(tabs, value=pdf_tab).classes('w-full'):
+                with ui.tab_panel(pdf_tab):
+                    self.tool_button(tooltip="reload",icon="refresh",handler=self.load_pdf)
+                    self.setup_pdf_viewer()
+                with ui.tab_panel(grid_tab):
+                    lod=[
+                        {'name': 'Alice', 'age': 18, 'parent': 'David'},
+                        {'name': 'Bob', 'age': 21, 'parent': 'Eve'},
+                        {'name': 'Carol', 'age': 42, 'parent': 'Frank'},
+                    ]
+                    self.lod_grid=ListOfDictsGrid(lod=lod)
         await self.setup_footer()
         
