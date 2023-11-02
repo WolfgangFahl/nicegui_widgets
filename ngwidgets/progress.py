@@ -21,7 +21,7 @@ class NiceguiProgressbar(Progressbar):
     nicegui progess bar wrapper
     """
 
-    def __init__(self,total,desc,unit):
+    def __init__(self,total,desc:str,unit:str):
         """
         construct the progress bar
         """
@@ -30,8 +30,8 @@ class NiceguiProgressbar(Progressbar):
         self.desc=desc
         self.progress = ui.linear_progress(value=0).props('instant-feedback')
         with self.progress:
-            self.label = ui.label().classes('text-lg text-black absolute-center') 
-            self.label.bind_text_from(self, 'value', backward=lambda v: f'{self.desc} {v:.1%}')
+            self.label = ui.label().classes('text-lg text-white absolute-center') 
+            self.label.bind_text_from(self, 'value', backward=lambda v: f'{self.desc} {v}/{self.total}')
    
         self.progress.visible = False
         
