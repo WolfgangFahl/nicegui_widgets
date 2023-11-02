@@ -117,7 +117,7 @@ class ListOfDictsGrid:
         self.ag_grid.options["columnDefs"]=columnDefs
         self.ag_grid.options["rowData"]=lod
         self.update_index(lenient=self.lenient)
-        self.update()
         
     def update(self):
-        self.ag_grid.update()
+        if self.ag_grid:
+            self.ag_grid.update()
