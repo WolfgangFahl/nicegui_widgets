@@ -3,7 +3,7 @@ Created on 2023-11-02
 
 @author: wf
 '''
-from tests.basetest import Basetest
+from ngwidgets.basetest import Basetest
 from ngwidgets.lod_grid import ListOfDictsGrid
 
 class TestLodGrid(Basetest):

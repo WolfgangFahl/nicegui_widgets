@@ -3,7 +3,7 @@ Created on 2023-09-10
 
 @author: wf
 '''
-from tests.basetest import Basetest
+from ngwidgets.basetest import Basetest
 from ngwidgets.widgets import Link
 
 class TestNiceGuiWidgets(Basetest):

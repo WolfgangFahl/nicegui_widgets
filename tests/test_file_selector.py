@@ -3,7 +3,7 @@ Created on 2023-07-23
 
 @author: wf
 '''
-from tests.basetest import Basetest
+from ngwidgets.basetest import Basetest
 from ngwidgets.file_selector import FileSelector
 import json
 import os
