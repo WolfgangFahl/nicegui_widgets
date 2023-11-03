@@ -8,6 +8,26 @@ from fastapi.testclient import TestClient
 from ngwidgets.basetest import Basetest
 from nicegui.server import Server
 
+class ThreadedServerRunner:
+    """
+    run the Nicegui Server in a thread
+    """
+    def __init__(self, ws, args=None):
+        self.ws = ws
+        self.args = args  # args should be an argparse.Namespace or similar
+        self.thread = threading.Thread(target=self._run_server)
+        self.thread.daemon = True
+        
+    def _run_server(self):
+        # The run method will be called with the stored argparse.Namespace
+        self.ws.run(self.args)
+
+    def start(self):
+        self.thread.start()
+        
+    def stop(self):
+        self.thread.join()
+
 class WebserverTest(Basetest):
     """
     a webserver test environment
@@ -49,18 +69,18 @@ class WebserverTest(Basetest):
         args = self.cmd.cmd_parse(argv)  # Parse the command-line arguments with no arguments passed
 
         self.ws = server_class()  # Instantiate the server class
-        self.ws_thread = threading.Thread(target=self.ws.run, name="webservice", kwargs={'args': args})
-        self.ws_thread.start()  # Start the server in a separate thread
-
+        self.server_runner = ThreadedServerRunner(self.ws, args=args)
+        self.server_runner.start() # start server in separate thread
+  
         self.client = TestClient(self.ws.app)  # Instantiate the test client with the server's app
         
     def tearDown(self):
         """
         tear Down everything
         """
-        if hasattr(Server, "instance"):
-            # here we should shutdown the server
-            pass
+        super().tearDown()
+        # Stop the server using the ThreadedServerRunner
+        #self.server_runner.stop()
 
     def getHtml(self,path:str)->str:
         """
