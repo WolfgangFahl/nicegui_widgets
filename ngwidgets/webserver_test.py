@@ -58,7 +58,7 @@ class WebserverTest(Basetest):
         """
         tear Down everything
         """
-        if Server.instance:
+        if hasattr(Server, "instance"):
             # here we should shutdown the server
             pass
 
