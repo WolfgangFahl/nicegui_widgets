@@ -15,7 +15,7 @@ class TestDemoWebserver(WebserverTest):
     def setUp(self,debug=False, profile=True):
         server_class=Webserver
         cmd_class=WebserverCmd
-        WebserverTest.setUp(self, server_class, cmd_class, debug=debug, profile=profile)
+        WebserverTest.setUp(self, server_class, cmd_class, debug=debug, profile=profile) 
          
     def testDemoWebserver(self):
         """

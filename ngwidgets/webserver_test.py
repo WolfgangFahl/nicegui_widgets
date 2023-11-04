@@ -3,31 +3,86 @@ Created on 2023-11-03
 
 @author: wf
 """
+import time
 import threading
+import sys
 from fastapi.testclient import TestClient
 from ngwidgets.basetest import Basetest
+from typing import Any, Optional
 from nicegui.server import Server
+from argparse import Namespace
 
 class ThreadedServerRunner:
     """
     run the Nicegui Server in a thread
     """
-    def __init__(self, ws, args=None):
+
+    def __init__(self, ws: Any, args: Optional[Namespace] = None, shutdown_timeout: float = 5.0,debug:bool=False) -> None:
+        """
+        Initialize the ThreadedServerRunner with a web server instance, optional arguments, and a shutdown timeout.
+
+        Args:
+            ws: The web server instance to run.
+            args: Optional arguments to pass to the web server's run method.
+            shutdown_timeout: The maximum time in seconds to wait for the server to shutdown.
+            debug: sets the debugging mode
+        """
+        self.debug=debug
         self.ws = ws
-        self.args = args  # args should be an argparse.Namespace or similar
+        self.args = args
+        self.shutdown_timeout = shutdown_timeout
         self.thread = threading.Thread(target=self._run_server)
         self.thread.daemon = True
         
-    def _run_server(self):
+        
+    def _run_server(self) -> None:
+        """Internal method to run the server."""
         # The run method will be called with the stored argparse.Namespace
         self.ws.run(self.args)
 
-    def start(self):
+    def start(self) -> None:
+        """Start the web server thread."""
         self.thread.start()
         
-    def stop(self):
-        self.thread.join()
+    def warn(self,msg:str):
+        """
+        show the given warning message
+        """
+        if self.debug:
+            print(msg,file=sys.stderr)
 
+    def stop(self) -> None:
+        """
+        Stop the web server thread, signaling the server to exit if it is still running.
+        """
+        if self.thread.is_alive():
+            # Access the singleton instance directly from the Server class
+            if hasattr(Server, 'instance') and isinstance(Server.instance, Server):
+                Server.instance.should_exit = True
+            else:
+                self.warn("Error: Server instance not accessible or not of type Server.")
+            # Mark the start time of the shutdown
+            start_time = time.time()
+            # Initialize the timer for timeout
+            end_time = start_time + self.shutdown_timeout
+
+            # Wait for the server to shut down, but only as long as the timeout
+            while self.thread.is_alive() and time.time() < end_time:
+                time.sleep(0.1)  # Sleep to prevent busy waiting
+
+            # Calculate the total shutdown time
+            shutdown_time_taken = time.time() - start_time
+
+            if self.thread.is_alive():
+                # The server didn't shut down within the timeout, handle appropriately
+                if self.debug:
+                    self.warn(f"Warning: The server did not shut down gracefully within the timeout period. Shutdown attempt took {shutdown_time_taken:.2f} seconds.")
+            else:
+                # If shutdown was successful, report the time taken
+                if self.debug:
+                    self.warn(f"Server shutdown completed in {shutdown_time_taken:.2f} seconds.")
+
+        
 class WebserverTest(Basetest):
     """
     a webserver test environment
@@ -69,7 +124,7 @@ class WebserverTest(Basetest):
         args = self.cmd.cmd_parse(argv)  # Parse the command-line arguments with no arguments passed
 
         self.ws = server_class()  # Instantiate the server class
-        self.server_runner = ThreadedServerRunner(self.ws, args=args)
+        self.server_runner = ThreadedServerRunner(self.ws, args=args,debug=self.debug)
         self.server_runner.start() # start server in separate thread
   
         self.client = TestClient(self.ws.app)  # Instantiate the test client with the server's app
@@ -80,7 +135,7 @@ class WebserverTest(Basetest):
         """
         super().tearDown()
         # Stop the server using the ThreadedServerRunner
-        #self.server_runner.stop()
+        self.server_runner.stop()
 
     def getHtml(self,path:str)->str:
         """
