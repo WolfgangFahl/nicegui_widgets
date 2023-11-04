@@ -64,7 +64,7 @@ class Webserver(InputWebserver):
             {'name': 'Bob', 'age': 21, 'parent': 'Eve'},
             {'name': 'Carol', 'age': 42, 'parent': 'Frank'},
         ]
-        self.lod_grid=ListOfDictsGrid(lod=lod)
+        self.lod_grid=ListOfDictsGrid(lod=lod,key_col="name")
  
     async def home(self):
         """
