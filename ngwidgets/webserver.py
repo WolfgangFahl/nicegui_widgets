@@ -9,7 +9,7 @@ import sys
 import traceback
 from typing import Optional, Union, Any, Dict, List
 import urllib.request
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from ngwidgets.version import Version
 from ngwidgets.color_schema import ColorSchema
 from pydevd_file_utils import setup_client_server_paths
@@ -21,8 +21,9 @@ class WebserverConfig:
     """
     copy_right:str="(c) 2023 Wolfgang Fahl"
     default_port:int=9860
-    version:Version=None
-    color_schema:ColorSchema=ColorSchema.indigo()
+    version: Optional[Version] = None 
+    color_schema: ColorSchema = field(default_factory=ColorSchema.indigo)
+
     
 class NiceGuiWebserver(object):
     '''
