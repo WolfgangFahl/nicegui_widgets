@@ -11,6 +11,7 @@ from ngwidgets.basetest import Basetest
 from typing import Any, Optional
 from nicegui.server import Server
 from argparse import Namespace
+from nicegui import app
 
 class ThreadedServerRunner:
     """
@@ -56,19 +57,16 @@ class ThreadedServerRunner:
         Stop the web server thread, signaling the server to exit if it is still running.
         """
         if self.thread.is_alive():
-            # Access the singleton instance directly from the Server class
-            if hasattr(Server, 'instance') and isinstance(Server.instance, Server):
-                Server.instance.should_exit = True
-            else:
-                self.warn("Error: Server instance not accessible or not of type Server.")
             # Mark the start time of the shutdown
             start_time = time.time()
+            # call the shutdown see https://github.com/zauberzeug/nicegui/discussions/1957
+            app.shutdown()
             # Initialize the timer for timeout
             end_time = start_time + self.shutdown_timeout
 
             # Wait for the server to shut down, but only as long as the timeout
             while self.thread.is_alive() and time.time() < end_time:
-                time.sleep(0.1)  # Sleep to prevent busy waiting
+                time.sleep(0.05)  # Sleep to prevent busy waiting
 
             # Calculate the total shutdown time
             shutdown_time_taken = time.time() - start_time
@@ -81,7 +79,6 @@ class ThreadedServerRunner:
                 # If shutdown was successful, report the time taken
                 if self.debug:
                     self.warn(f"Server shutdown completed in {shutdown_time_taken:.2f} seconds.")
-
         
 class WebserverTest(Basetest):
     """
