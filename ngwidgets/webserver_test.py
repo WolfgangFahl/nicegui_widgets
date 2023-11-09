@@ -9,7 +9,6 @@ import sys
 from fastapi.testclient import TestClient
 from ngwidgets.basetest import Basetest
 from typing import Any, Optional
-from nicegui.server import Server
 from argparse import Namespace
 from nicegui import app
 
@@ -134,11 +133,30 @@ class WebserverTest(Basetest):
         # Stop the server using the ThreadedServerRunner
         self.server_runner.stop()
 
-    def getHtml(self,path:str)->str:
+    def get_html(self,path:str)->str:
         """
         get the html content for the given path
         """
         response=self.client.get(path)
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue(response.content is not None)
+        html=response.content.decode()
+        if self.debug:
+            print(html)
+        return html
+    
+    def getHtml(self,path:str)->str:
+        """
+        get the html content for the given path
+        """
+        html=self.get_html(path)
+        return html
+    
+    def get_html_for_post(self,path:str,data)->str:
+        """
+        get the html content for the given path by posting the given data
+        """
+        response=self.client.post(path,json=data)
         self.assertEqual(response.status_code, 200)
         self.assertTrue(response.content is not None)
         html=response.content.decode()
