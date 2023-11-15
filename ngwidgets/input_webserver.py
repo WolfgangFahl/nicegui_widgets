@@ -8,7 +8,7 @@ from ngwidgets.webserver import NiceGuiWebserver,WebserverConfig
 from ngwidgets.local_filepicker import LocalFilePicker
 from ngwidgets.widgets import About
 from nicegui import ui, Client
-from ngwidgets.log_view import LogElementHandler
+from ngwidgets.log_view import LogElementHandler, logger
 
 class InputWebserver(NiceGuiWebserver):
     """
@@ -139,7 +139,7 @@ class InputWebserver(NiceGuiWebserver):
             self.log_view = ui.log(max_lines=max_lines).classes(log_classes)        
             if handle_logging:
                 self.log_view_handler=LogElementHandler(self.log_view)
-                self.log_view.addHandler(self.log_view_handler)
+                logger.addHandler(self.log_view_handler)
         else:
             self.log_view=None
         await super().setup_footer()        
