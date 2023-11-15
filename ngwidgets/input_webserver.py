@@ -138,7 +138,8 @@ class InputWebserver(NiceGuiWebserver):
         if with_log:
             self.log_view = ui.log(max_lines=max_lines).classes(log_classes)        
             if handle_logging:
-                self.log_view.addHandler(LogElementHandler(self.log_view))
+                self.log_view_handler=LogElementHandler(self.log_view)
+                self.log_view.addHandler(self.log_view_handler)
         else:
             self.log_view=None
         await super().setup_footer()        
