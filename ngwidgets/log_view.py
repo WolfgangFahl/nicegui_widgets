@@ -6,8 +6,6 @@ Created on 15.11.2023
 import logging
 from nicegui import ui
 
-logger = logging.getLogger()
-
 class LogElementHandler(logging.Handler):
     """A logging handler that emits messages to a log element."""
 

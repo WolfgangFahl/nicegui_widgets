@@ -4,11 +4,12 @@ Created on 2023-09-12
 @author: wf
 '''
 import os
+import logging
 from ngwidgets.webserver import NiceGuiWebserver,WebserverConfig
 from ngwidgets.local_filepicker import LocalFilePicker
 from ngwidgets.widgets import About
 from nicegui import ui, Client
-from ngwidgets.log_view import LogElementHandler, logger
+from ngwidgets.log_view import LogElementHandler
 
 class InputWebserver(NiceGuiWebserver):
     """
@@ -22,6 +23,7 @@ class InputWebserver(NiceGuiWebserver):
         NiceGuiWebserver.__init__(self,config=config)
         self.is_local=False
         self.input=""
+        self.logger= logging.getLogger()
         
         @ui.page('/')
         async def home(client: Client):
@@ -139,7 +141,7 @@ class InputWebserver(NiceGuiWebserver):
             self.log_view = ui.log(max_lines=max_lines).classes(log_classes)        
             if handle_logging:
                 self.log_view_handler=LogElementHandler(self.log_view)
-                logger.addHandler(self.log_view_handler)
+                self.logger.addHandler(self.log_view_handler)
         else:
             self.log_view=None
         await super().setup_footer()        
