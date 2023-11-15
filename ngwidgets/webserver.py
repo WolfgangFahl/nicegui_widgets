@@ -155,27 +155,27 @@ class NiceGuiWebserver(object):
             button.toggle_icon=toggle_icon
         button.update()
 
-    def add_select(self, title: str, selection: Union[List[Any], Dict[str, Any]],background_color:str="#e6e6e6") -> Any:
+    def add_select(self, title: str, selection: Union[List[Any], Dict[str, Any]], background_color: str = "#e6e6e6", **kwargs) -> Any:
         """
-        Add a select widget.
+        Add a select widget with a given title, selection options, and optional styling.
     
         Args:
-            title (str): The title/label for the select widget.
+            title (str): The title or label for the select widget.
             selection (Union[List[Any], Dict[str, Any]]): The options available for selection.
-                It can either be a list of options or a dictionary with option labels as keys
-                and values as the corresponding values.
+                - If a List, each element represents an option.
+                - If a Dict, keys are option labels and values are the corresponding values.
+            background_color (str, optional): Hex color code for the background of the label. Defaults to "#e6e6e6".
+            **kwargs: Additional keyword arguments passed to the select widget creation.
     
         Returns:
-            Any: The created select widget.
+            Any: The created nicegui ui.select widget.
         """
         with ui.element('div').style("display: flex; align-items: center;"):
-            if background_color:
-                background_style=f"background-color:{background_color};"
-            else:
-                background_style=""
-            ui.label(title).classes("rounded p-2").style(f"margin-right:10px;{background_style}")  # add some space between label and select
-            s = ui.select(selection)
+            background_style = f"background-color: {background_color};" if background_color else ""
+            ui.label(title).classes("rounded p-2").style(f"margin-right: 10px; {background_style}")
+            s = ui.select(selection, **kwargs)
             return s
+
        
     def do_read_input(self, input_str: str)->str:
         """Reads the given input.
