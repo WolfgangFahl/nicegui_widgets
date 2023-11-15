@@ -8,6 +8,7 @@ from ngwidgets.webserver import NiceGuiWebserver,WebserverConfig
 from ngwidgets.local_filepicker import LocalFilePicker
 from ngwidgets.widgets import About
 from nicegui import ui, Client
+from ngwidgets.log_view import LogElementHandler
 
 class InputWebserver(NiceGuiWebserver):
     """
@@ -130,12 +131,16 @@ class InputWebserver(NiceGuiWebserver):
             self.about_div=About(self.config.version)
         await self.setup_footer()
 
-    async def setup_footer(self,max_lines:int=20,log_classes:str="w-full h-40"):
+    async def setup_footer(self,with_log:bool=True,handle_logging:bool=True,max_lines:int=20,log_classes:str="w-full h-40"):
         """
-        setup a footer with a log view
+        setup a footer with an optional log view
         """
-        self.log_view = ui.log(max_lines=max_lines).classes(log_classes)        
-        
+        if with_log:
+            self.log_view = ui.log(max_lines=max_lines).classes(log_classes)        
+            if handle_logging:
+                self.log_view.addHandler(LogElementHandler(self.log_view))
+        else:
+            self.log_view=None
         await super().setup_footer()        
         if self.args.input:
             #await client.connected()
