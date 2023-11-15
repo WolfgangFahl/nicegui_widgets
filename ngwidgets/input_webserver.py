@@ -130,8 +130,11 @@ class InputWebserver(NiceGuiWebserver):
             self.about_div=About(self.config.version)
         await self.setup_footer()
 
-    async def setup_footer(self):
-        self.log_view = ui.log(max_lines=20).classes('w-full h-40')        
+    async def setup_footer(self,max_lines:int=20,log_classes:str="w-full h-40"):
+        """
+        setup a footer with a log view
+        """
+        self.log_view = ui.log(max_lines=max_lines).classes(log_classes)        
         
         await super().setup_footer()        
         if self.args.input:
