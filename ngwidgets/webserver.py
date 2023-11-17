@@ -3,6 +3,7 @@ Created on 2023-09-10
 
 @author: wf
 """
+import asyncio
 from nicegui import ui, core
 import os
 import sys
@@ -254,23 +255,14 @@ class NiceGuiWebserver(object):
             ui.label(self.config.copy_right)
             ui.link("Powered by nicegui", "https://nicegui.io/").style("color: #fff")
 
-    async def setup_content_div(self, setup_content: Optional[Callable] = None) -> None:
+    async def setup_content_div(self, setup_content: Optional[Callable] = None, **kwargs):
         """
-        Sets up the content frame div of the web server's user interface. This includes setting up the menu, 
-        the main content as specified by the 'setup_content' callable (if provided), and the footer.
-    
-        The method orchestrates the layout and initialization of these UI components.
+        Sets up the content frame div of the web server's user interface.
     
         Args:
-            setup_content (Optional[Callable]): A callable that is responsible for setting up the main 
-                                                 content of the web server's UI. This could be a function 
-                                                 that adds widgets or other UI elements to the content area. 
-                                                 If None, no additional content setup is performed.
-                                                 Default is None.
-    
-        Returns:
-            None: This method does not return anything.
-    
+            setup_content (Optional[Callable]): A callable for setting up the main content.
+                                                 It can be a regular function or a coroutine.
+        
         Note:
             This method is asynchronous and should be awaited when called.
         """
@@ -278,11 +270,9 @@ class NiceGuiWebserver(object):
         self.setup_menu()
     
         with ui.element("div").classes("w-full h-full") as self.content_div:
-        
-            # If a content setup callable is provided, execute it to setup the main content
+            # Execute setup_content if provided
             if setup_content:
-                setup_content()
-    
-        # Setting up the footer
-        await self.setup_footer()
-
+                if asyncio.iscoroutinefunction(setup_content):
+                    await setup_content(**kwargs)
+                else:
+                    setup_content(**kwargs)
