@@ -106,6 +106,9 @@ class Link:
     '''
     a link
     '''
+    red_link="color: red;text-decoration: underline;"
+    blue_link="color: blue;text-decoration: underline;"
+
     @staticmethod
     def create(url,text,tooltip=None,target=None,style:str=None):
         '''
@@ -120,7 +123,7 @@ class Link:
         '''
         title="" if tooltip is None else f" title='{tooltip}'"
         target="" if target is None else f" target=' {target}'"
-        style="" if style is None else f" style='{style}'" 
+        style=Link.blue if style is None else f" style='{style}'" 
         link=f"<a href='{url}'{title}{target}{style}>{text}</a>"
         return link
     
