@@ -143,7 +143,9 @@ class Link:
         """
         title = "" if tooltip is None else f" title='{tooltip}'"
         target = "" if target is None else f" target=' {target}'"
-        style = Link.blue if style is None else f" style='{style}'"
+        if style is None:
+            style=Link.blue
+        style = f" style='{style}'"
         link = f"<a href='{url}'{title}{target}{style}>{text}</a>"
         return link
 

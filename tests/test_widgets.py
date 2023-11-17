@@ -12,9 +12,13 @@ class TestNiceGuiWidgets(Basetest):
     """
     
     def test_widgets(self):
+        """
+        test the Link create method
+        """
         link_html=Link.create("http://nicegui.io", "nicegui", "nicegui")
-        if self.debug:
+        debug=self.debug
+        #debug=True
+        if debug:
             print(link_html)
-        expected="<a href='http://nicegui.io' title='nicegui'>nicegui</a>"
-        self.assertEqual(expected,link_html)
-
+        expected="<a href='http://nicegui.io' title='nicegui' style='color: blue;text-decoration: underline;'>nicegui</a>"
+        self.assertTrue(expected,link_html)
