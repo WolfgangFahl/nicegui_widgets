@@ -29,7 +29,7 @@ class NiceGuiWidgetsDemoWebserver(InputWebserver):
         InputWebserver.__init__(self,config=NiceGuiWidgetsDemoWebserver.get_config())
         #pdf_url = "https://www.africau.edu/images/default/sample.pdf"
         self.pdf_url = "https://raw.githubusercontent.com/mozilla/pdf.js/ba2edeae/web/compressed.tracemonkey-pldi-09.pdf"
-        self.timeout=5.0
+        self.timeout=6.0
         
         @ui.page('/pdfviewer')
         async def show_pdf_viewer(client:Client):

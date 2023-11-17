@@ -66,7 +66,7 @@ class pdfviewer(ui.element, component='pdfviewer.js'):
     see https://mozilla.github.io/pdf.js/
     """
 
-    def __init__(self, version: str = '3.10.111',cdn="cdnjs",debug: bool = False) -> None:
+    def __init__(self, version: str = '3.11.174',cdn="cdnjs",debug: bool = False) -> None:
         """
         constructor
         """

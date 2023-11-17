@@ -59,9 +59,9 @@ class TestPdfViewer(Basetest):
         cdns=["github","jsdelivr"]
         if not super().inPublicCI():
             cdns.append("cdnjs")
-            cdns.append("unpkg")
+            # cdns.append("unpkg")
         index=0
-        for version in ["3.9.179","3.10.111"]:
+        for version in ["3.9.179","3.11.174"]:
             # unpkg is not tested due to unreliability see
             # https://github.com/mjackson/unpkg/issues/330
             for cdn in cdns:
