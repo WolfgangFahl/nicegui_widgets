@@ -26,6 +26,7 @@ class ListOfDictsGrid:
         theme: str = "ag-theme-material",
         classes: str = "h-80",
         lenient: bool = False,
+        with_buttons: bool=False,
         html_columns: List[int] = [],
         auto_size_columns: bool = True
     ) -> None:
@@ -50,8 +51,9 @@ class ListOfDictsGrid:
         self.ag_grid=ui.aggrid(options=options,html_columns=html_columns,auto_size_columns=auto_size_columns).classes(classes)
         self.ag_grid.theme=theme 
         self.setDefaultColDef()
-        ui.button("resize",on_click=self.onSizeColumnsToFit)
-        ui.button('Select all', on_click=lambda: self.ag_grid.call_api_method('selectAll'))
+        if with_buttons:
+            ui.button("resize",on_click=self.onSizeColumnsToFit)
+            ui.button('Select all', on_click=lambda: self.ag_grid.call_api_method('selectAll'))
         if lod is not None:
             self.load_lod(lod, column_defs)
      
