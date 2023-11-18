@@ -276,3 +276,5 @@ class NiceGuiWebserver(object):
                     await setup_content(**kwargs)
                 else:
                     setup_content(**kwargs)
+                    
+        await self.setup_footer()
