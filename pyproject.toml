@@ -25,8 +25,7 @@ dependencies = [
 	"tdqm",
     # for debugging
 	# https://pypi.org/project/pydevd/
-	
-	
+	"pydevd>=2.10.0"
 ]
 
 requires-python = ">=3.9"
