@@ -3,6 +3,7 @@ Created on 2023-11-03
 
 @author: wf
 """
+import json
 import time
 import threading
 import sys
@@ -183,5 +184,31 @@ class WebserverTest(Basetest):
         if self.debug:
             print(html)
         return html
+    
+    def get_json(self, path: str, expected_status_code: int = 200) -> Any:
+        """
+        Sends a GET request to a specified path, verifies the response status code, 
+        and returns the JSON content of the response.
 
-        
+        This method is useful for testing API endpoints that return JSON data. 
+        It ensures that the request to a given path returns the expected status code 
+        and then parses and returns the JSON response.
+
+        Args:
+            path (str): The URL path to which the GET request is sent.
+            expected_status_code (int): The expected HTTP status code for the response.
+                                        Defaults to 200.
+
+        Returns:
+            Any: The parsed JSON data from the response.
+
+        Raises:
+            AssertionError: If the response status code does not match the expected status code.
+            JSONDecodeError: If the response body cannot be parsed as JSON.
+        """
+        response = self.get_response(path, expected_status_code)
+        try:
+            json_data = response.json()
+            return json_data
+        except json.JSONDecodeError as e:
+            self.fail(f"Failed to decode JSON for request {path} from response: {str(e)}")
