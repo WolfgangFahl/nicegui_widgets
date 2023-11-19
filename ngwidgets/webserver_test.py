@@ -11,6 +11,7 @@ from ngwidgets.basetest import Basetest
 from typing import Any, Optional
 from argparse import Namespace
 from nicegui import app
+from starlette.responses import Response
 
 class ThreadedServerRunner:
     """
@@ -132,13 +133,32 @@ class WebserverTest(Basetest):
         super().tearDown()
         # Stop the server using the ThreadedServerRunner
         self.server_runner.stop()
+        
+    def get_response(self, path: str, expected_status_code: int = 200) -> Response:
+        """
+        Sends a GET request to a specified path and verifies the response status code.
+    
+        This method is used for testing purposes to ensure that a GET request to a 
+        given path returns the expected status code. It returns the response object 
+        for further inspection or testing if needed.
+    
+        Args:
+            path (str): The URL path to which the GET request is sent.
+            expected_status_code (int): The expected HTTP status code for the response. 
+                                        Defaults to 200.
+    
+        Returns:
+            Response: The response object from the GET request.
+        """
+        response = self.client.get(path)
+        self.assertEqual(response.status_code, expected_status_code)
+        return response
 
-    def get_html(self,path:str)->str:
+    def get_html(self,path:str,expected_status_code=200)->str:
         """
         get the html content for the given path
         """
-        response=self.client.get(path)
-        self.assertEqual(response.status_code, 200)
+        response=self.get_response(path, expected_status_code)
         self.assertTrue(response.content is not None)
         html=response.content.decode()
         if self.debug:
