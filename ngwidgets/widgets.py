@@ -9,7 +9,7 @@ common nicegui widgets and tools
 """
 import html
 from nicegui import ui
-
+from urllib.parse import quote
 
 class Lang:
     """
@@ -130,25 +130,31 @@ class Link:
     blue = "color: blue;text-decoration: underline;"
 
     @staticmethod
-    def create(url, text, tooltip=None, target=None, style: str = None):
+    def create(url, text, tooltip=None, target=None, style: str = None, url_encode=False):
         """
-        create a link for the given url and text
-
+        Create a link for the given URL and text, with optional URL encoding.
+    
         Args:
-            url(str): the url
-            text(str): the text
-            tooltip(str): an optional tooltip
-            target(str): e.g. _blank
-            style(str): any style to be applied
+            url (str): The URL.
+            text (str): The link text.
+            tooltip (str): An optional tooltip.
+            target (str): Target attribute, e.g., _blank for opening the link in a new tab.
+            style (str): CSS style to be applied.
+            url_encode (bool): Flag to indicate if the URL needs encoding. default: False
+    
+        Returns:
+            str: HTML anchor tag as a string.
         """
+        if url_encode:
+            url = quote(url)
+    
         title = "" if tooltip is None else f" title='{tooltip}'"
-        target = "" if target is None else f" target=' {target}'"
+        target = "" if target is None else f" target='{target}'"
         if style is None:
-            style=Link.blue
+            style = Link.blue
         style = f" style='{style}'"
         link = f"<a href='{url}'{title}{target}{style}>{text}</a>"
         return link
-
 
 class About(ui.element):
     """
