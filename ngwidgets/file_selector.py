@@ -96,17 +96,29 @@ class FileSelector():
                     item_counter += 1
     
         # Then iterating over files
+        # Check if an empty string is an allowed extension
+        allow_no_extension = "" in extensions.values()
         for name in items:
             item_path = os.path.join(path, name)
             child_id_path = id_path + [item_counter]
     
-            if name.endswith(tuple(extensions.values())) and not os.path.isdir(item_path):
-                children.append({
-                    'id': '.'.join(map(str, child_id_path)),
-                    'label': name,
-                    'value': item_path,
-                })
-                item_counter += 1
+            # make sure the item is a file
+            if not os.path.isdir(item_path):
+  
+                # Check if the item has an extension that matches the allowed extensions
+                has_allowed_extension = any(name.endswith(ext) for ext in extensions.values() if ext)
+
+                # Check if the item has no extension and no extension is allowed
+                is_no_extension_allowed = allow_no_extension and '.' not in name
+
+                # Proceed if the item either has an allowed extension or no extension is allowed
+                if has_allowed_extension or is_no_extension_allowed:
+                    children.append({
+                        'id': '.'.join(map(str, child_id_path)),
+                        'label': name,
+                        'value': item_path,
+                    })
+                    item_counter += 1
     
         if children:
             return {
