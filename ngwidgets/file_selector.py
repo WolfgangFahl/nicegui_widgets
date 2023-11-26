@@ -13,7 +13,7 @@ class FileSelector():
     """
     nicegui FileSelector
     """
-    def __init__(self,path:str,extensions: dict=None,handler:Callable=None,filter_func: Callable[[str], bool] = None):
+    def __init__(self,path:str,extensions: dict=None,handler:Callable=None,filter_func: Callable[[str], bool] = None,create_ui:bool=True):
         """
         constructor
         
@@ -22,6 +22,7 @@ class FileSelector():
             extensions(dict): the extensions to filter for as a dictionary with name as key and extension as value
             handler(Callable): handler function to call on selection
             filter_func(Callable): optional filter function
+            create_ui(bool): if True create the self.tree ui.tree nicegui component - allows for testing the structure without ui by setting to False
         """   
         self.path=path
         if extensions is None:
@@ -32,9 +33,10 @@ class FileSelector():
         # generate the tree structure
         self.tree_structure = self.get_dir_tree(self.path, self.extensions)
 
-        # create the ui.tree object
-        self.tree=ui.tree([self.tree_structure], label_key='label', on_select=self.select_file)
-   
+        if create_ui:
+            # create the ui.tree object
+            self.tree=ui.tree([self.tree_structure], label_key='label', on_select=self.select_file)       
+    
     def get_path_items(self, path: str) -> List[str]:
         """
         Get sorted list of items in a specified directory path, filtering out non-relevant files like `._` files.

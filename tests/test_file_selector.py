@@ -27,7 +27,7 @@ class TestFileSelector(Basetest):
         script_directory = os.path.dirname(os.path.abspath(__file__))
         extensions={"python": ".py"}
         # Instantiate FileSelector with the filter function
-        file_selector = FileSelector(script_directory, extensions=extensions,filter_func=self.filter_test_files)
+        file_selector = FileSelector(script_directory, extensions=extensions,filter_func=self.filter_test_files,create_ui=False)
         
         debug = self.debug
         #debug = True
