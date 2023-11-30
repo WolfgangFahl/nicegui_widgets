@@ -8,8 +8,10 @@ common nicegui widgets and tools
 
 """
 import html
-from nicegui import ui
 from urllib.parse import quote
+
+from nicegui import ui
+
 
 class Lang:
     """
@@ -130,10 +132,12 @@ class Link:
     blue = "color: blue;text-decoration: underline;"
 
     @staticmethod
-    def create(url, text, tooltip=None, target=None, style: str = None, url_encode=False):
+    def create(
+        url, text, tooltip=None, target=None, style: str = None, url_encode=False
+    ):
         """
         Create a link for the given URL and text, with optional URL encoding.
-    
+
         Args:
             url (str): The URL.
             text (str): The link text.
@@ -141,13 +145,13 @@ class Link:
             target (str): Target attribute, e.g., _blank for opening the link in a new tab.
             style (str): CSS style to be applied.
             url_encode (bool): Flag to indicate if the URL needs encoding. default: False
-    
+
         Returns:
             str: HTML anchor tag as a string.
         """
         if url_encode:
             url = quote(url)
-    
+
         title = "" if tooltip is None else f" title='{tooltip}'"
         target = "" if target is None else f" target='{target}'"
         if style is None:
@@ -155,6 +159,7 @@ class Link:
         style = f" style='{style}'"
         link = f"<a href='{url}'{title}{target}{style}>{text}</a>"
         return link
+
 
 class About(ui.element):
     """
@@ -222,3 +227,97 @@ class About(ui.element):
             html = add(html, "chat", disc_link)
             html = add(html, "source", cm_link)
             ui.html(html)
+
+
+class HideShow:
+    """
+    A class representing a hideable/showable section in a NiceGUI application.
+
+    Attributes:
+        TRIANGLE_LEFT (str): Icon representing the hidden state.
+        TRIANGLE_DOWN (str): Icon representing the shown state.
+        label_if_shown (str): Label to display when content is shown.
+        label_if_hidden (str): Label to display when content is hidden.
+        show_content (bool): Flag to indicate the current visibility state.
+        btn (Button): Button to toggle visibility.
+        content_div (Element): Div element containing the toggleable content.
+    """
+
+    TRIANGLE_LEFT = "◀"
+    TRIANGLE_DOWN = "▼"
+
+    def __init__(
+        self,
+        hide_show_label: tuple[str, str] = None,
+        show_content: bool = True,
+        **kwargs,
+    ):
+        """
+        Initialize the HideShow component.
+
+        Args:
+            hide_show_label (tuple[str, str]): A tuple containing labels for the shown and hidden states.
+            show_content (bool, optional): Initial visibility state of the content. Defaults to True.
+            **kwargs: Additional arguments to pass to the button element.
+        """
+        self.label_if_shown, self.label_if_hidden = hide_show_label
+        self.show_content: bool = show_content
+
+        # Create a button and a div container
+        self.btn = ui.button(
+            text=self._get_status_label(show_content),
+            on_click=self.toggle_hide_show,
+            **kwargs,
+        )
+        self.content_div = ui.element()
+
+        # Set initial visibility
+        self._set_show_content(show_content)
+
+    def _set_show_content(self, show_content: bool) -> None:
+        """
+        Set the visibility of the content.
+
+        Args:
+            show_content (bool): Desired visibility state.
+        """
+        self.show_content = show_content
+        self.content_div.set_visibility(show_content)
+        self.btn.set_text(self._get_status_label(show_content))
+
+    def _get_status_label(self, show_content: bool) -> str:
+        """
+        Get the label text based on the current visibility state.
+
+        Args:
+            show_content (bool): Current visibility state.
+
+        Returns:
+            str: The label text for the current state.
+        """
+        icon = self.TRIANGLE_DOWN if show_content else self.TRIANGLE_LEFT
+        label = (
+            self.label_if_shown
+            if show_content
+            else (
+                self.label_if_hidden
+                if self.label_if_hidden is not None
+                else self.label_if_shown
+            )
+        )
+        return f"{label} {icon}"
+
+    def toggle_hide_show(self, _=None) -> None:
+        """
+        Toggle the visibility of the content.
+        """
+        self._set_show_content(not self.show_content)
+
+    def add(self, widget) -> None:
+        """
+        Add a widget to the content div.
+
+        Args:
+            widget: A NiceGUI widget to be added.
+        """
+        self.content_div.add(widget)

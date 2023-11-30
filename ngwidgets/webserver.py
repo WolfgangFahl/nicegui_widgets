@@ -143,7 +143,7 @@ class NiceGuiWebserver(object):
         self, tooltip: str, icon: str, handler: callable = None, toggle_icon: str = None
     ) -> ui.button:
         """
-        Creates an  button with icon that triggers a specified function upon being clicked.
+        Creates a button with icon that triggers a specified function upon being clicked.
 
         Args:
             tooltip (str): The tooltip to be displayed.
