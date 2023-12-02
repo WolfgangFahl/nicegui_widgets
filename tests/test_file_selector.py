@@ -34,6 +34,7 @@ class TestFileSelector(Basetest):
         if debug:
             print(json.dumps(file_selector.tree_structure, indent=2))
             
+        self.assertTrue(file_selector.file_count>=7)    
         tree=file_selector.tree_structure
         found=False
         for child in tree["children"]:
