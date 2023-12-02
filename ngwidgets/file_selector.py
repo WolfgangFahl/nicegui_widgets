@@ -30,6 +30,8 @@ class FileSelector():
         self.extensions=extensions 
         self.handler=handler
         self.filter_func=filter_func
+        # Initialize the file_count property
+        self.file_count = 0
         # generate the tree structure
         self.tree_structure = self.get_dir_tree(self.path, self.extensions)
 
@@ -118,6 +120,8 @@ class FileSelector():
                         'label': name,
                         'value': item_path,
                     })
+                    self.file_count += 1  # Increment file_count for each file added
+              
                     item_counter += 1
     
         if children:
