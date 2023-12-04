@@ -12,6 +12,16 @@ class TestDateParser(Basetest):
     """
     test date parser
     """
+    
+    def test_aliases(self):
+        """
+        test the aliases
+        """
+        date_parser=DateParser()
+        debug=self.debug
+        if debug:
+            for org,repl in date_parser.aliases:
+                print(f"{org}->{repl}")
         
     def test_dateparser(self):
         """
@@ -19,6 +29,7 @@ class TestDateParser(Basetest):
         """
         date_parser=DateParser()
         test_cases = [
+            ("Mon, 29 Mar 1999 16:12:30 -0330 (NST)","1999-03-29T12:42:30Z"),
             ("Wed, 17 May 2006 14:26:33 +0100 (Etc/GMT)","2006-05-17T15:26:33Z"),
             ("Fri May 1 11:50:05 2009 METDST","2009-05-01T09:50:05Z"),
             ("Wed, 25 Feb 2009 07:15:38 +0100 (GMT+01:00)","2009-02-25T06:15:38Z"),

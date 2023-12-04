@@ -281,7 +281,7 @@ class DateParser:
         # Convert timezone offsets from hours to seconds and create tzinfos dictionary
         self.tzinfos = {}
         for tz, info in self.timezone_hours.items():
-            offset_in_seconds = info["offset"] * 3600
+            offset_in_seconds = int(info["offset"] * 3600)
             self.tzinfos[tz] = offset_in_seconds
  
     def parse_date(self, date_str)->str:
