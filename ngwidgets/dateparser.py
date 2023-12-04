@@ -19,6 +19,7 @@ class DateParser:
     def __init__(self):
         # https://stackoverflow.com/a/54629675/1497139
         self.aliases=[
+            ('"GMT"',"(GMT)"),
             ("(WET DST)","(WEST)"),
             ("+0200 (MET DST)","+0200"),
             ("+0200 (METDST)","+0200"),
@@ -33,6 +34,8 @@ class DateParser:
             ("(MSK/MSD)","(MSK)"),
             ("(GMT Standard Time)","(GMT)"),
             ("(Mountain Daylight Time)","(MDT)"),
+            (" Eastern Daylight Time","(EDT)"),
+            ("(Eastern Standard Time)","(EST)"),
             ("(Eastern Daylight Time)","(EDT)"),
             ("(Pacific Daylight Time)","(PDT)"),
             ("(Eastern Standard Time)","(EST)")
