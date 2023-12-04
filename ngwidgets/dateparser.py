@@ -5,6 +5,7 @@ Created on 2023-12-03
 """
 
 from dateutil import parser
+import re
 import pytz
 
 class DateParser:
@@ -18,11 +19,31 @@ class DateParser:
     def __init__(self):
         # https://stackoverflow.com/a/54629675/1497139
         self.aliases=[
+            ("(WET DST)","(WEST)"),
             ("+0200 (MET DST)","+0200"),
+            ("+0200 (METDST)","+0200"),
             (" METDST"," +0200"),
+            (" MET DST"," +0200"),
             ("(GMT)","+0000"),
+            ("+0100 (GMT Daylight Time)","+0100"),
             ("+0100 (Etc/GMT)","-0100"),
             ("Etc/GMT", "-0000"),
+            (" pst", " PST"),  # Convert lowercase 'pst' to uppercase 'PST'
+            (" est", " EST"),
+            ("(MSK/MSD)","(MSK)"),
+            ("(GMT Standard Time)","(GMT)"),
+            ("(Mountain Daylight Time)","(MDT)"),
+            ("(Eastern Daylight Time)","(EDT)"),
+            ("(Pacific Daylight Time)","(PDT)"),
+            ("(Eastern Standard Time)","(EST)")
+        ]   
+        self.regexp_aliases=[
+            # remove superfluous (added by ...) 
+            (r'\(added by [^\)]+\)', ''),
+            # Regular expression to remove conflicting timezone information like (GMT-1)
+            # but only if it follows a standard timezone offset like +0100
+            # example +0100 (GMT-1)
+            (r'(\+\d{4}|\-\d{4}) \(GMT[+-]\d+\)', r'\1'),
         ]
         # Add generic aliases for a range of timezones
         for hour in range(-12, 15):  # Ranges from GMT-12 to GMT+14
@@ -135,6 +156,7 @@ class DateParser:
             "MES": {"offset": 2, "description": "Middle European Summer Time"},
             "MEST": {"offset": 2, "description": "Middle European Summer Time"},
             "MESZ": {"offset": 2, "description": "Middle European Summer Time"},
+            "METDST": {"offset": 2, "description": "Middle European Time Daylight Saving Time"},
             "MET DST": {"offset": 2, "description": "Middle European Time Daylight Saving Time"},
             "SAST": {"offset": 2, "description": "South Africa Standard Time"},
             "WAST": {"offset": 2, "description": "West Africa Summer Time"},
@@ -294,8 +316,14 @@ class DateParser:
         Returns:
             str:  the ISO 8601 date string 
         """
+        # Apply regex replacements
+        for pattern, replacement in self.regexp_aliases:
+            date_str = re.sub(pattern, replacement, date_str)
+
+        # Apply simple string replacements
         for alias, replacement in self.aliases:
             date_str = date_str.replace(alias, replacement)
+
         parsed_date = parser.parse(date_str,tzinfos=self.tzinfos)
         parsed_date_z = parsed_date.astimezone(pytz.utc)
         # Convert to ISO 8601 format

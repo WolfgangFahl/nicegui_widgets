@@ -29,6 +29,14 @@ class TestDateParser(Basetest):
         """
         date_parser=DateParser()
         test_cases = [
+            ("Wed, 31 Jul 2002 11:27:35 +0100 (GMT Daylight Time)","2002-07-31T10:27:35Z"),
+            ("Mon, 2 Sep 1996 09:34:44 +0100 (WET DST)","1996-09-02T08:34:44Z"),
+            ("Wed, 8 Oct 1997 07:12:42 +0200 (METDST)","1997-10-08T05:12:42Z"),
+            ("Sun, 23 Aug 1998 15:04:33 -0600 (Mountain Daylight Time)","1998-08-23T21:04:33Z"),
+            ("Thu, 15 May 97 22:33:07 pst","1997-05-16T06:33:07Z"),
+            ("Sun, 18 Dec 2011 14:25:36 +0100 (added by postmaster@deutschebahn.com)","2011-12-18T13:25:36Z"),
+            ("Wed, 20 May 98 13:44 MET DST","1998-05-20T11:44:00Z"),
+            ("Wed, 9 Dec 1998 14:35:54 +0200 (IST)","1998-12-09T09:05:54Z"),
             ("Mon, 29 Mar 1999 16:12:30 -0330 (NST)","1999-03-29T12:42:30Z"),
             ("Wed, 17 May 2006 14:26:33 +0100 (Etc/GMT)","2006-05-17T15:26:33Z"),
             ("Fri May 1 11:50:05 2009 METDST","2009-05-01T09:50:05Z"),
