@@ -34,7 +34,7 @@ class DateParser:
             ("(MSK/MSD)","(MSK)"),
             ("(GMT Standard Time)","(GMT)"),
             ("(Mountain Daylight Time)","(MDT)"),
-            (" Eastern Daylight Time","(EDT)"),
+            (" Eastern Daylight Time","-0800 (EDT)"),
             ("(Eastern Standard Time)","(EST)"),
             ("(Eastern Daylight Time)","(EDT)"),
             ("(Pacific Daylight Time)","(PDT)"),

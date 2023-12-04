@@ -29,6 +29,7 @@ class TestDateParser(Basetest):
         """
         date_parser=DateParser()
         test_cases = [
+            ("Tue, 17 Apr 2001 19:26:26 Eastern Daylight Time","2001-04-17T23:26:26Z"),
             ('Wed, 16 Mar 2005 14:46:37 "GMT"',"2005-03-16T14:46:37Z"),
             ("Tue, 7 Jan 1997 00:19:06 +-800","1997-01-07T08:19:06Z"),
             ("19 Feb 01 16:34:12 +-0100","2001-02-19T17:34:12Z"),
