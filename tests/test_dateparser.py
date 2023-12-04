@@ -29,6 +29,7 @@ class TestDateParser(Basetest):
         """
         date_parser=DateParser()
         test_cases = [
+            ("Tue, 7 Jan 1997 00:19:06 +-800","1997-01-07T08:19:06Z"),
             ("19 Feb 01 16:34:12 +-0100","2001-02-19T17:34:12Z"),
             ("Wed, 31 Jul 2002 11:27:35 +0100 (GMT Daylight Time)","2002-07-31T10:27:35Z"),
             ("Mon, 2 Sep 1996 09:34:44 +0100 (WET DST)","1996-09-02T08:34:44Z"),

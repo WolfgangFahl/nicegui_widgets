@@ -47,6 +47,9 @@ class DateParser:
             # Regular expression to correct conflicting timezone information like +-0100
             #+-0100
             (r'\+\-(\d{4})', r'-\1'),  # Convert +-0100 to -0100
+            # Regular expression to correct timezone information like +-800
+            (r'\+\-(\d{3})', r'-0\1'),  # Convert +-800 to -0800
+
         ]
         # Add generic aliases for a range of timezones
         for hour in range(-12, 15):  # Ranges from GMT-12 to GMT+14
