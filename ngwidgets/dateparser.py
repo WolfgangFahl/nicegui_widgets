@@ -44,6 +44,9 @@ class DateParser:
             # but only if it follows a standard timezone offset like +0100
             # example +0100 (GMT-1)
             (r'(\+\d{4}|\-\d{4}) \(GMT[+-]\d+\)', r'\1'),
+            # Regular expression to correct conflicting timezone information like +-0100
+            #+-0100
+            (r'\+\-(\d{4})', r'-\1'),  # Convert +-0100 to -0100
         ]
         # Add generic aliases for a range of timezones
         for hour in range(-12, 15):  # Ranges from GMT-12 to GMT+14
