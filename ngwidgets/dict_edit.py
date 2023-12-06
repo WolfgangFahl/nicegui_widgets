@@ -4,13 +4,13 @@ Created on 2023-06-22
 @author: wf
 """
 from nicegui import ui
+
 class DictEdit:
     """
     nicegui based user interface for dictionary editing
-    
     """
     
-    def __init__(self, d, default_size:int=80):
+    def __init__(self, d, default_size: int = 80):
         """
         Constructor.
 
@@ -22,23 +22,18 @@ class DictEdit:
 
         if d:
             for k in d.keys():
-                value = d[k]
-                # Create an input field for each key in the dictionary
-                self.inputs[k] = ui.input(label=k, value=str(value), on_change=self.on_input_change).props(f"size={default_size}")
+                # Create an input field and bind it to the dictionary value
+                input_field = ui.input(label=k, value=d[k]).bind_value(d, k).props(f"size={default_size}")
+                self.inputs[k] = input_field
 
-    def on_input_change(self, event):
+    def add_on_change_handler(self, key:str, handler):
         """
-        Handle input change events.
+        Adds an on_change event handler to the input corresponding to the given key.
 
         Args:
-            event: The event object containing the changed data.
+            key (str): The key of the dictionary entry.
+            handler (callable): The event handler function to be added.
         """
-        key = event.source.label
-        new_value = event.value
-        self.d[key] = new_value
-        # Optionally, update the input field's value
-        self.inputs[key].value = new_value
-            
+        if key in self.inputs:
+            self.inputs[key].on_change(handler)
     
-        
-        
