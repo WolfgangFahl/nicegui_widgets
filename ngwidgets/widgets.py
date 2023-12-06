@@ -232,17 +232,7 @@ class About(ui.element):
 class HideShow:
     """
     A class representing a hideable/showable section in a NiceGUI application.
-
-    Attributes:
-        TRIANGLE_LEFT (str): Icon representing the hidden state.
-        TRIANGLE_DOWN (str): Icon representing the shown state.
-        label_if_shown (str): Label to display when content is shown.
-        label_if_hidden (str): Label to display when content is hidden.
-        show_content (bool): Flag to indicate the current visibility state.
-        btn (Button): Button to toggle visibility.
-        content_div (Element): Div element containing the toggleable content.
     """
-
     TRIANGLE_LEFT = "◀"
     TRIANGLE_DOWN = "▼"
 
@@ -250,74 +240,76 @@ class HideShow:
         self,
         hide_show_label: tuple[str, str] = None,
         show_content: bool = True,
+        content_div=None,
+        lazy_init: bool = False,
         **kwargs,
     ):
         """
         Initialize the HideShow component.
 
         Args:
-            hide_show_label (tuple[str, str]): A tuple containing labels for the shown and hidden states.
-            show_content (bool, optional): Initial visibility state of the content. Defaults to True.
-            **kwargs: Additional arguments to pass to the button element.
+            hide_show_label: Labels for shown/hidden states.
+            show_content: Initial visibility state (default True).
+            content_div: Div with content to hide/show.
+            lazy_init: If True, content_div initialized later.
+            **kwargs: Additional args for button element.
         """
         self.label_if_shown, self.label_if_hidden = hide_show_label
-        self.show_content: bool = show_content
-
-        # Create a button and a div container
+        self.show_content = show_content
         self.btn = ui.button(
             text=self._get_status_label(show_content),
             on_click=self.toggle_hide_show,
             **kwargs,
         )
-        self.content_div = ui.element()
 
-        # Set initial visibility
+        if not lazy_init:
+            self.content_div = content_div if content_div else ui.element()
+        else:
+            self.content_div = None
+
         self._set_show_content(show_content)
 
-    def _set_show_content(self, show_content: bool) -> None:
+    def _set_show_content(self, show_content: bool):
         """
-        Set the visibility of the content.
-
-        Args:
-            show_content (bool): Desired visibility state.
+        Set visibility of content.
         """
-        self.show_content = show_content
-        self.content_div.set_visibility(show_content)
-        self.btn.set_text(self._get_status_label(show_content))
+        if self.content_div:
+            self.show_content = show_content
+            self.content_div.set_visibility(show_content)
+            self.btn.set_text(self._get_status_label(show_content))
 
     def _get_status_label(self, show_content: bool) -> str:
         """
-        Get the label text based on the current visibility state.
-
-        Args:
-            show_content (bool): Current visibility state.
-
-        Returns:
-            str: The label text for the current state.
+        Get label text based on visibility state.
         """
         icon = self.TRIANGLE_DOWN if show_content else self.TRIANGLE_LEFT
-        label = (
-            self.label_if_shown
-            if show_content
-            else (
-                self.label_if_hidden
-                if self.label_if_hidden is not None
-                else self.label_if_shown
-            )
-        )
+        label = (self.label_if_shown if show_content else
+                 (self.label_if_hidden if self.label_if_hidden else 
+                  self.label_if_shown))
         return f"{label} {icon}"
 
-    def toggle_hide_show(self, _=None) -> None:
+    def toggle_hide_show(self, _=None):
         """
-        Toggle the visibility of the content.
+        Toggle visibility of content.
         """
         self._set_show_content(not self.show_content)
 
-    def add(self, widget) -> None:
+    def add(self, widget):
         """
-        Add a widget to the content div.
-
-        Args:
-            widget: A NiceGUI widget to be added.
+        Add a widget to content div.
         """
         self.content_div.add(widget)
+
+    def update(self):
+        """
+        Update the content div.
+        """
+        self.content_div.update()
+
+    def set_content(self, content_div=None):
+        """
+        Set or update content div.
+        """
+        self.content_div = content_div if content_div else ui.element()
+        self._set_show_content(self.show_content)
+
