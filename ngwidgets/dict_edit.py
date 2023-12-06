@@ -1,35 +1,43 @@
-'''
+"""
 Created on 2023-06-22
 
 @author: wf
-'''
+"""
 from nicegui import ui
 class DictEdit:
     """
-    User interface for dictionary editing
-    
-    using
-        https://nicegui.io/documentation/tree
+    nicegui based user interface for dictionary editing
     
     """
     
-    def __init__(self,d):
+    def __init__(self, d, default_size:int=80):
         """
-        constructor
+        Constructor.
+
+        Args:
+            d (dict): The dictionary to be edited.
         """
-        self.d=d
+        self.d = d
+        self.inputs = {}
+
         if d:
             for k in d.keys():
-                value=d[k]
-                ui.input(label=k,
-                    value=str(value),
-                    on_change=self.on_input_change).props("size=80")
+                value = d[k]
+                # Create an input field for each key in the dictionary
+                self.inputs[k] = ui.input(label=k, value=str(value), on_change=self.on_input_change).props(f"size={default_size}")
 
-    def on_input_change(self,event):
+    def on_input_change(self, event):
         """
-        change the given value
+        Handle input change events.
+
+        Args:
+            event: The event object containing the changed data.
         """
-        pass
+        key = event.source.label
+        new_value = event.value
+        self.d[key] = new_value
+        # Optionally, update the input field's value
+        self.inputs[key].value = new_value
             
     
         
