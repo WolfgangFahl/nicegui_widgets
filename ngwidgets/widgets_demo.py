@@ -128,7 +128,7 @@ class NiceGuiWidgetsDemoWebserver(InputWebserver):
         def update_icon_set_label(icon_set_name:str):
             # Update the label to show the icons of the new set
             self.icon_set_label.set_text(
-                f'Icons in Set: {" ".join(Tristate.ICON_SETS[icon_set_name])}'
+                f'Icons in Set {icon_set_name}: {" ".join(Tristate.ICON_SETS[icon_set_name])}'
             )
 
         def on_icon_set_change(event):
@@ -140,22 +140,23 @@ class NiceGuiWidgetsDemoWebserver(InputWebserver):
 
         def show():
             ui.label("Tristate Demo:")
+            # Initialize Tristate component with the default icon set
+            default_icon_set_name = "marks"
+
+            # Label to display the icons in the current set
+            self.icon_set_label = ui.label()
+            update_icon_set_label(default_icon_set_name)
 
             # Dropdown for selecting the icon set
             icon_set_names = list(Tristate.ICON_SETS.keys())
+            ui.label("Click to try:")
             self.add_select(
                 "Choose Icon Set", icon_set_names, on_change=on_icon_set_change
             )
 
-            # Label to display the icons in the current set
-            self.icon_set_label = ui.label()
-
-            # Initialize Tristate component with the default icon set
-            default_icon_set_name = icon_set_names[0]
             self.tristate = Tristate(
                 icon_set_name=default_icon_set_name, on_change=on_change
             )
-            update_icon_set_label(default_icon_set_name)
          
         await self.setup_content_div(show)
 
