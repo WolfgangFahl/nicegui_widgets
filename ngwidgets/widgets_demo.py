@@ -11,8 +11,9 @@ from ngwidgets.lod_grid import ListOfDictsGrid
 from ngwidgets.pdfviewer import pdfviewer
 from ngwidgets.version import Version
 from ngwidgets.webserver import WebserverConfig
-from ngwidgets.widgets import HideShow 
+from ngwidgets.widgets import HideShow
 from ngwidgets.tristate import Tristate
+
 
 class NiceGuiWidgetsDemoWebserver(InputWebserver):
     """
@@ -50,12 +51,12 @@ class NiceGuiWidgetsDemoWebserver(InputWebserver):
         async def show_hide_show(client: Client):
             await client.connected(timeout=self.timeout)
             return await self.show_hide_show_demo()
-        
+
         @ui.page("/tristate")
         async def show_tristate_demo(client: Client):
             await client.connected(timeout=self.timeout)
             return await self.show_tristate_demo()
-        
+
         @ui.page("/pdfviewer")
         async def show_pdf_viewer(client: Client):
             await client.connected(timeout=self.timeout)
@@ -108,44 +109,55 @@ class NiceGuiWidgetsDemoWebserver(InputWebserver):
         def show():
             hide_show_section = HideShow(("Hide", "Show More"))
             with hide_show_section.content_div:
-                ui.label("This is the hidden content. Click the button to hide/show this text.")
+                ui.label(
+                    "This is the hidden content. Click the button to hide/show this text."
+                )
 
         await self.setup_content_div(show)
-        
-     async def show_tristate_demo(self):
+
+    async def show_tristate_demo(self):
         """
         Demonstrate the Tristate component.
         """
-    
+
         def on_change():
-            ui.notify(f'New State: {self.tristate.current_icon_index} ({self.tristate.utf8_icon})')
-    
+            ui.notify(
+                f"New State: {self.tristate.current_icon_index} ({self.tristate.utf8_icon})"
+            )
+            
+        def update_icon_set_label(icon_set_name:str):
+            # Update the label to show the icons of the new set
+            self.icon_set_label.set_text(
+                f'Icons in Set: {" ".join(Tristate.ICON_SETS[icon_set_name])}'
+            )
+
         def on_icon_set_change(event):
             new_icon_set = event.value
             self.tristate.icon_set = Tristate.ICON_SETS[new_icon_set]
             self.tristate.current_icon_index = 0  # Reset to first icon of new set
             self.tristate.update_props()
-            # Update the label to show the icons of the new set
-            icon_set_label.set_text(f'Icons in Set: {" ".join(Tristate.ICON_SETS[new_icon_set])}')
-    
+            update_icon_set_label(new_icon_set)
+
         def show():
-            ui.label('Tristate Demo:')
-    
+            ui.label("Tristate Demo:")
+
             # Dropdown for selecting the icon set
             icon_set_names = list(Tristate.ICON_SETS.keys())
-            self.add_select("Choose Icon Set", icon_set_names, on_change=on_icon_set_change)
-    
+            self.add_select(
+                "Choose Icon Set", icon_set_names, on_change=on_icon_set_change
+            )
+
             # Label to display the icons in the current set
-            icon_set_label = ui.label()
-    
+            self.icon_set_label = ui.label()
+
             # Initialize Tristate component with the default icon set
             default_icon_set_name = icon_set_names[0]
-            self.tristate = Tristate(icon_set_name=default_icon_set_name, on_change=on_change)
-            # Initially set the icon set label text
-            icon_set_label.set_text(f'Icons in Set: {" ".join(Tristate.ICON_SETS[default_icon_set_name])}')
-    
+            self.tristate = Tristate(
+                icon_set_name=default_icon_set_name, on_change=on_change
+            )
+            update_icon_set_label(default_icon_set_name)
+         
         await self.setup_content_div(show)
-
 
     async def home(self, _client: Client):
         """
@@ -154,7 +166,7 @@ class NiceGuiWidgetsDemoWebserver(InputWebserver):
 
         def setup_home():
             ui.html(
-                    """<ul>
+                """<ul>
         <li><a href='/dictedit'>dictedit</a></li>
         <li><a href='/grid'>grid</a></li>
         <li><a href='/hideshow'>HideShow Demo</a></li>
