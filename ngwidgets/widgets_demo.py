@@ -149,11 +149,11 @@ class NiceGuiWidgetsDemoWebserver(InputWebserver):
 
             # Dropdown for selecting the icon set
             icon_set_names = list(Tristate.ICON_SETS.keys())
-            ui.label("Click to try:")
             self.add_select(
                 "Choose Icon Set", icon_set_names, on_change=on_icon_set_change
             )
 
+            ui.label("Click to try:")
             self.tristate = Tristate(
                 icon_set_name=default_icon_set_name, on_change=on_change
             )
