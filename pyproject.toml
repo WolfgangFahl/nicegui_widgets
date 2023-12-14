@@ -18,6 +18,8 @@ dependencies = [
  	# orjson
  	# https://pypi.org/project/orjson/
  	"orjson>=3.9.10",
+ 	# https://pypi.org/project/beautifulsoup4/
+ 	"beautifulsoup4",
     # https://pypi.org/project/bcrypt/
     "bcrypt>=4.0.1",
 	# https://pypi.org/project/tqdm/
