@@ -31,6 +31,9 @@ dependencies = [
 	# dateutil
 	# https://pypi.org/project/python-dateutil/
 	"python-dateutil>=2.8.2",
+	# https://github.com/PyGithub/PyGithub
+	# https://pypi.org/project/PyGithub/
+	"PyGithub>=2.1.1",
 	# https://pypi.org/project/pytz/
 	"pytz"
 ]

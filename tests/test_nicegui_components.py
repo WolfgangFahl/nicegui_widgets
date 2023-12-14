@@ -8,7 +8,7 @@ Test suite for the nicegui_components module in the ngwidgets package.
 import json
 from dataclasses import asdict
 from ngwidgets.basetest import Basetest
-from ngwidgets.nicegui_component import PyPi, Component
+from ngwidgets.nicegui_component import PyPi, Component, GitHubAccess
 
 class TestNiceguiComponents(Basetest):
     """
@@ -64,3 +64,14 @@ class TestNiceguiComponents(Basetest):
         self.assertIsNotNone(search_result)
         self.assertTrue(len(search_result) > 0)
         
+    def test_search_repositories_by_topic(self):
+        """
+        Test searching for repositories by a specific topic.
+        """
+        github_access=GitHubAccess()
+        topic = 'nicegui'
+        repositories = github_access.search_repositories_by_topic(topic)
+        self.assertIsNotNone(repositories)
+        self.assertTrue(len(repositories) > 0)
+        for repo in repositories:
+            print (repo)

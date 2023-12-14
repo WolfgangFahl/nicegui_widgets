@@ -20,7 +20,7 @@ from datetime import datetime
 from typing import Dict, List, Optional
 import json
 from urllib import request, error
-
+from github import Github
 from bs4 import BeautifulSoup, ResultSet, Tag
 
 
@@ -100,13 +100,21 @@ class PyPi:
             Component: An instance of the Component class populated with package data.
         """
         info = package_info.get('info', {})
+        github=None
+        project_urls = info.get('project_urls', {})
+        # Extract the GitHub URL if it exists
+        if project_urls:
+            github_url = project_urls.get('Repository', None)
+            if github_url:
+                github=github_url if "github" in github_url else None
         component = Component(
             name=info.get('name'),
             package=info.get('name'),
             pypi=package_info.get('package_url'),
             pypi_description=info.get('summary'),
             version=info.get('version'),
-            github_description=info.get('description')
+            github_description=info.get('description'),
+            github=github
         )
         return component
 
@@ -208,15 +216,26 @@ class PyPi:
                 package.find("span", {"class": "package-snippet__version"})
                 or Tag()
             ).text
-            
-            # Creating the packagedata dictionary
-            packagedata = {
-                "name": name,
-                "package_url": link,
-                "description": description,
-                "version": version
-            }
-            packages.append(packagedata)
+            package_info=self.get_package_info(name)
+            packages.append(package_info)
 
         # returning the result list back
         return packages
+
+class GitHubAccess:
+    def __init__(self, access_token=None):
+        """
+        Initialize the GitHub instance.
+        If access_token is provided, use it for authenticated access.
+        Otherwise, access is unauthenticated with lower rate limits.
+        """
+        self.github = Github(access_token) if access_token else Github()
+
+    def search_repositories_by_topic(self, topic):
+        """
+        Search for repositories with a given topic.
+        Returns a list of repository names.
+        """
+        query = f"topic:{topic}"
+        repositories = self.github.search_repositories(query)
+        return [repo.full_name for repo in repositories]
