@@ -30,9 +30,12 @@ class TestNiceguiComponents(Basetest):
         project_name = self.test_projects[1]["name"]
         package_info = pypi.get_package_info(project_name)
         component=pypi.as_component(package_info)
-        if self.debug:
-            print(json.dumps(package_info,indent=2))
-            print(json.dumps(asdict(component),indent=2,default=str))
+        if pypi.debug:
+            print("Package Info:")
+            print(json.dumps(package_info, indent=2))
+            
+            print("Component Data:")
+            print(json.dumps(asdict(component), indent=2, default=str))
         self.assertIsNotNone(package_info)
         self.assertIn("info", package_info)
         self.assertIn("summary", package_info["info"])
@@ -48,3 +51,16 @@ class TestNiceguiComponents(Basetest):
                 print(json.dumps(package_record,indent=2))
         self.assertIsNotNone(search_result)
         self.assertTrue(len(search_result) > 0)
+        
+    def test_search_components(self):
+        """
+        Test searching for nicegui components on PyPI.
+        """
+        pypi = PyPi()
+        search_result = pypi.search_components("nicegui")
+        if self.debug:
+            for component in search_result:
+                print(json.dumps(asdict(component), indent=2, default=str))
+        self.assertIsNotNone(search_result)
+        self.assertTrue(len(search_result) > 0)
+        

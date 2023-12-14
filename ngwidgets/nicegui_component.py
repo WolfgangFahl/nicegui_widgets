@@ -18,8 +18,9 @@ Main author: OpenAI's language model (instructed by WF)
 from dataclasses import dataclass, field
 from datetime import datetime
 from typing import Dict, List, Optional
+import json
+from urllib import request, error
 
-import requests
 from bs4 import BeautifulSoup, ResultSet, Tag
 
 
@@ -67,6 +68,16 @@ class Component:
     downloads: Optional[int] = None
     categories: List[str] = field(default_factory=list)
     version: Optional[str] = None
+    
+    @property
+    def install_instructions(self) -> str:
+        """
+        Get the installation instructions for the component.
+
+        Returns:
+            str: Installation instructions for the component.
+        """
+        return f"$ pip install {self.package}"
 
 
 class PyPi:
@@ -111,31 +122,55 @@ class PyPi:
             List[Component]: A list of Component instances representing the search results.
         """
         package_dicts = self.search_packages(term, limit)
-        return [self.convert_to_component(pkg) for pkg in package_dicts]
+        return [self.as_component(pkg) for pkg in package_dicts]
+
 
     def get_package_info(self, package_name: str) -> dict:
-        response = requests.get(f"{self.base_url}/{package_name}/json")
-        package_data = {}
-        if response.status_code == 200:
-            package_data = response.json()
+        """
+        Get detailed information about a package from PyPI using urllib.
+    
+        Args:
+            package_name (str): The name of the package to retrieve information for.
+    
+        Returns:
+            dict: A dictionary containing package information.
+    
+        Raises:
+            urllib.error.URLError: If there is an issue with the URL.
+            ValueError: If the response status code is not 200.
+        """
+        url = f"{self.base_url}/{package_name}/json"
+        
+        response = request.urlopen(url)
+        
+        if response.getcode() != 200:
+            raise ValueError(f"Failed to fetch package info for {package_name}. Status code: {response.getcode()}")
+        
+        package_data = json.loads(response.read())
+        
         return package_data
 
     def search_packages(self, term: str, limit: int = None) -> list:
-        """Search a package in the pypi repositories
-
-        `Arguments:`
-
-        **term** -- the term to search in the pypi repositories
-
-        **limit** -- the maximum amount of results to find
-        see https://raw.githubusercontent.com/shubhodeep9/pipsearch/master/pipsearch/api.py
+        """Search a package in the pypi repositories and retrieve detailed package information.
+    
+        Args:
+            term (str): The search term.
+            limit (int, optional): Maximum number of results to return.
+    
+        Returns:
+            List[Dict]: A list of dictionaries containing detailed package information.
+        
+                see https://raw.githubusercontent.com/shubhodeep9/pipsearch/master/pipsearch/api.py
         """
-
         # Constructing a search URL and sending the request
         url = "https://pypi.org/search/?q=" + term
-        req = requests.get(url)
+        try:
+            response = request.urlopen(url)
+            text=response.read()
+        except Exception as e:
+            raise e
 
-        soup = BeautifulSoup(req.text, "html.parser")
+        soup = BeautifulSoup(text, "html.parser")
         packagestable = soup.find("ul", {"class": "unstyled"})
 
         # If no package exists then there is no table displayed hence soup.table will be None
@@ -164,17 +199,22 @@ class PyPi:
                     href = href[0]
                 link = "https://pypi.org" + href
 
+            description = (
+                package.find("p", {"class": "package-snippet__description"})
+                or Tag()
+            ).text
+            
+            version = (
+                package.find("span", {"class": "package-snippet__version"})
+                or Tag()
+            ).text
+            
+            # Creating the packagedata dictionary
             packagedata = {
                 "name": name,
-                "link": link,
-                "description": (
-                    package.find("p", {"class": "package-snippet__description"})
-                    or Tag()
-                ).text,
-                "version": (
-                    package.find("span", {"class": "package-snippet__version"}) or Tag()
-                ).text,
-                "install_instruction": "$ pip install " + name,
+                "package_url": link,
+                "description": description,
+                "version": version
             }
             packages.append(packagedata)
 
