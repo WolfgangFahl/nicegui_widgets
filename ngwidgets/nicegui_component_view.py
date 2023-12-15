@@ -25,6 +25,7 @@ Prompts for LLM:
 
 Main author: OpenAI's language model (instructed by WF)
 """
+import math
 from datetime import datetime, timedelta
 from nicegui import ui
 from ngwidgets.nicegui_component import Component, Components  # Replace with the actual import path
@@ -32,6 +33,9 @@ from ngwidgets.widgets import Link
 from nicegui import run
 
 class ComponentView:
+    """
+    display a single component
+    """
     def __init__(self, component: Component):
         self.component = component
 
@@ -48,21 +52,32 @@ class ComponentView:
                 ui.label(title).classes('text-2xl')
                 if self.component.stars is not None:
                     ui.label(f'⭐️ Stars: {self.component.stars}')
-                if self.component.pypi_description:
-                    ui.label('Description:')
-                    ui.html(self.component.pypi_description)
                 if self.component.github:
                     with ui.row().classes('items-center').style('gap: 0.5rem'):
                         github_icon="<img src='https://upload.wikimedia.org/wikipedia/commons/thumb/9/91/Octicons-mark-github.svg/32px-Octicons-mark-github.svg.png' alt='github' title='github'/>"
                         github_link=Link.create(self.component.github,github_icon)
-                        ui.html(github_link)   
+                        html_markup=github_link
+                        if self.component.github_author:
+                            author_url = f"https://github.com/{self.component.github_author}"
+                            author_link=Link.create(author_url,self.component.github_author)
+                            html_markup=f"{html_markup}{author_link}"   
+                        if self.component.avatar:
+                            avatar_html = f"<img src='{self.component.avatar}' alt='{self.component.github_author}' style='width: 40px; height: 40px; border-radius: 50%;'/>"
+                            html_markup=f"{html_markup}{avatar_html}"
+                        ui.html(html_markup)   
                 if self.component.pypi:
-                    pypi_link=Link.create(self.component.pypi,"pypi")
-                    ui.html(pypi_link)
-                if self.component.package:
-                    ui.label(f'Package: {self.component.package}')
-                    inst_html=f"<pre>{self.component.install_instructions}</pre>"
-                    ui.html(inst_html)
+                    pypi_icon="<img src='https://upload.wikimedia.org/wikipedia/commons/thumb/6/64/PyPI_logo.svg/64px-PyPI_logo.svg.png' alt='pypi' title='pypi'/>"
+                    pypi_link=Link.create(self.component.pypi,pypi_icon)
+                    html_markup=pypi_link
+                    if self.component.pypi_description:
+                        html_markup=f"""{html_markup}
+        <strong>{self.component.package}</strong>:
+        <span>{self.component.pypi_description}</span>"""
+                    if self.component.package:
+                        inst_html=f"<pre>{self.component.install_instructions}</pre>"
+                        html_markup=f"{html_markup}\n{inst_html}"
+                   
+                    ui.html(html_markup)
             return self.card
         
 class ComponentsView:
@@ -133,13 +148,24 @@ class ComponentsView:
            
     def update_last_update_label(self):
         """Update the label showing the last update time."""
+        min_to_wait = 60  # Set the waiting time in minutes
         if self.components.last_update_time:
             last_update_str = self.components.last_update_time.strftime('%Y-%m-%d %H:%M:%S')
             self.last_update_label.set_text(f'Last Update: {last_update_str}')
             # Enable or disable the refresh button based on the GitHub API limits
-            if datetime.now() - self.components.last_update_time < timedelta(hours=1):  # 60 calls per day?
+            elapsed=datetime.now() - self.components.last_update_time
+            if  elapsed < timedelta(minutes=min_to_wait):  # 60 calls per day?
                 self.update_button.disable()
+                # Calculate remaining minutes until the next update is possible
+                remaining_time = timedelta(minutes=min_to_wait) - elapsed
+                # Round up to the nearest whole minute
+                minutes_until_next_update = math.ceil(remaining_time.total_seconds() / 60)
+
+                # Update the tooltip with the remaining minutes
+                self.update_button.tooltip(f'{minutes_until_next_update} min until enabled')
+     
             else:
                 self.update_button.enable()
+                self.update_button.tooltip("updating might take a few seconds")
         else:
             self.last_update_label.set_text('Last Update: Not yet updated')

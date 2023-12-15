@@ -111,7 +111,8 @@ class Component:
             Component: An instance of the Component class filled with GitHub repository details.
         """
         repo: Repository.Repository = github_access.github.get_repo(repo_name)
-        
+        avatar_url = repo.owner.avatar_url if repo.owner.avatar_url else None
+
         return cls(
             name=repo.name,
             github=repo.html_url,
@@ -119,6 +120,7 @@ class Component:
             github_description=repo.description,
             github_author=repo.owner.login,
             created_at=repo.created_at,
+            avatar=avatar_url,
             # Other fields can be filled in as needed
         )
         
@@ -141,15 +143,16 @@ class Component:
             if github_url and "github" in github_url:
                 github = github_url
 
-        return cls(
+        component= cls(
             name=info.get('name'),
             package=info.get('name'),
-            pypi=package_info.get('package_url'),
+            pypi=info.get('package_url'),
             pypi_description=info.get('summary'),
             version=info.get('version'),
             github_description=info.get('description'),
             github=github
         )
+        return component
 
 class Components:
     """

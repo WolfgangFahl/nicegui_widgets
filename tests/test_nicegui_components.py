@@ -5,6 +5,8 @@ Test suite for the nicegui_components module in the ngwidgets package.
 
 @author: wf
 """
+from dateutil.parser import parse
+from datetime import datetime
 import json
 from pathlib import Path
 from dataclasses import asdict
@@ -20,6 +22,7 @@ class TestNiceguiComponents(Basetest):
         Basetest.setUp(self, debug=debug, profile=profile)
         self.pypi_test_projects = [
             ("ngwidgets", "https://pypi.org/project/ngwidgets/"),
+            ("nicescad", "https://pypi.org/project/nicescad/"),
             ("nicegui-extensions", "https://pypi.org/project/nicegui-extensions/")           
         ]
 
@@ -40,6 +43,7 @@ class TestNiceguiComponents(Basetest):
             self.assertIsNotNone(package_info)
             self.assertIn("info", package_info)
             self.assertIn("summary", package_info["info"])
+            self.assertEqual(url,component.pypi)
 
     def test_search_packages(self):
         """
@@ -83,23 +87,48 @@ class TestNiceguiComponents(Basetest):
         """
         Test creating a Component instance from a GitHub repository.
         """
-        repo_name = "WolfgangFahl/nicegui_widgets"
         github_access = GitHubAccess()  # Assuming GitHubAccess is already defined and properly set up
+        # List of tuples with repository names and expected attributes
+        example_repos = [
+            ("WolfgangFahl/nicegui_widgets", {
+                "name": "nicegui_widgets",
+                "github": "https://github.com/WolfgangFahl/nicegui_widgets",
+                "stars": 3,
+                "github_description": "nicegui widgets",
+                "github_author": "WolfgangFahl",
+                "created_at": "2023-09-10 06:12:30+00:00",
+            }),
+            ("zauberzeug/rosys", {
+                "name": "rosys",
+                "github": "https://github.com/zauberzeug/rosys",
+                "stars": 37,
+                "github_description": "An all-Python robot system based on web technologies. The purpose is similar to ROS, but it's easier to use for mobile robotics.",
+                "github_author": "zauberzeug",
+                "created_at": "2020-07-20 13:29:11+00:00",
+            })
+            # Add more test cases here as needed
+        ]
+        for repo_name, expected_attributes in example_repos:
+      
+            # Create a Component from the GitHub repository
+            component = Component.from_github(repo_name, github_access)
+    
+            # Debug printout
+            if self.debug:
+                print(f"Component for GitHub {repo_name}:\n{json.dumps(asdict(component), indent=2,default=str)}")
 
-        # Create a Component from the GitHub repository
-        component = Component.from_github(repo_name, github_access)
+            # Assert that the Component has been properly created with expected attributes
+            for attribute, expected_value in expected_attributes.items():
+                actual_value = getattr(component, attribute)
+                if isinstance(actual_value, datetime):
+                    # Parse the expected date string into a datetime object for comparison
+                    expected_date = parse(expected_value)
+                    self.assertEqual(actual_value, expected_date)
+                elif isinstance(actual_value, int) and attribute == "stars":
+                    self.assertGreaterEqual(actual_value, expected_value)
+                else:
+                    self.assertEqual(actual_value, expected_value)
 
-        # Debug printout
-        if self.debug:
-            print(f"Created Component from GitHub:\n{json.dumps(asdict(component), indent=2,default=str)}")
-
-        # Assert that the Component has been properly created with expected attributes
-        self.assertEqual(component.name, "nicegui_widgets")
-        self.assertEqual(component.github, f"https://github.com/{repo_name}")
-        self.assertIsNotNone(component.stars)
-        self.assertIsNotNone(component.github_description)
-        self.assertIsNotNone(component.github_author)
-        self.assertIsNotNone(component.created_at)
         
     def test_update_save_and_load_components(self):
         """
