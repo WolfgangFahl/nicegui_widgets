@@ -25,10 +25,11 @@ Prompts for LLM:
 
 Main author: OpenAI's language model (instructed by WF)
 """
-
+from datetime import datetime, timedelta
 from nicegui import ui
 from ngwidgets.nicegui_component import Component, Components  # Replace with the actual import path
 from ngwidgets.widgets import Link
+from nicegui import run
 
 class ComponentView:
     def __init__(self, component: Component):
@@ -85,8 +86,13 @@ class ComponentsView:
 
     def setup(self):
         """Set up the UI elements to render the collection of components as a searchable and sortable card layout in NiceGUI."""
-        # Filter input for searching components
-        self.filter_input = ui.input(placeholder='Search components...',on_change=self.update_view)
+        with ui.row():
+            self.last_update_label = ui.label()
+            self.update_button = ui.button('Update', on_click=self.update_components)
+            self.update_last_update_label()
+        with ui.row():
+            # Filter input for searching components
+            self.filter_input = ui.input(placeholder='Search components...',on_change=self.update_view)
     
         # Component cards container
         self.cards_container = ui.grid(columns=4)
@@ -95,7 +101,7 @@ class ComponentsView:
         self.update_view()
     
     def update_view(self):
-        """Update the view to render the filtered and sorted components."""
+        """Update the view to render the filtered and sorted components."""   
         search_term = self.filter_input.value.lower()
         if search_term:
             filtered_components = [comp for comp in self.components.components if search_term in comp.name.lower()]
@@ -114,4 +120,26 @@ class ComponentsView:
             cv=ComponentView(component)
             self.views[component.name]=cv
             cv.setup(self.cards_container)
+            
+    async def update_components(self,p):
+        """
+        update the components
+        """
+        await run.io_bound(self.components.update)
+        await run.io_bound(self.components.save)
+
+        # Notify the user after completion (optional)
+        ui.notify('Components updated successfully.')
            
+    def update_last_update_label(self):
+        """Update the label showing the last update time."""
+        if self.components.last_update_time:
+            last_update_str = self.components.last_update_time.strftime('%Y-%m-%d %H:%M:%S')
+            self.last_update_label.set_text(f'Last Update: {last_update_str}')
+            # Enable or disable the refresh button based on the GitHub API limits
+            if datetime.now() - self.components.last_update_time < timedelta(hours=24):  # 60 calls per day?
+                self.update_button.disable()
+            else:
+                self.update_button.enable()
+        else:
+            self.last_update_label.set_text('Last Update: Not yet updated')

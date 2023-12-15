@@ -164,7 +164,20 @@ class Components:
         self._topic = topic
         self._default_directory = Path.home() / ".nicegui"
         self.components=[]
+        self.last_update_time = self.get_file_update_time()
+        
+    def get_file_update_time(self):
+        """
+        Get the last modification time of the components file.
 
+        Returns:
+            datetime: The last modification time of the file or None if file does not exist.
+        """
+        if self.file_path.exists():
+            file_mod_time = os.path.getmtime(self.file_path)
+            return datetime.fromtimestamp(file_mod_time)
+        return None
+    
     @property
     def default_directory(self) -> Path:
         """
@@ -263,7 +276,7 @@ class Components:
                 self.components.append(comp)
         # sort components by name
         self.components = sorted(self.components, key=lambda comp: comp.name.lower() if comp.name else "")
-
+        self.last_update_time = datetime.now()
         
         
 class PyPi:
