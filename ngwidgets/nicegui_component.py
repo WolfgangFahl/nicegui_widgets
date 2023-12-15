@@ -96,7 +96,7 @@ class Component:
         Returns:
             str: Installation instructions for the component.
         """
-        return f"$ pip install {self.package}"
+        return f"pip install {self.package}"
     
     @classmethod
     def from_github(cls, repo_name: str, github_access: GitHubAccess) -> 'Component':

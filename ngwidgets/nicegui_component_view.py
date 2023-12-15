@@ -26,9 +26,9 @@ Prompts for LLM:
 Main author: OpenAI's language model (instructed by WF)
 """
 
-from typing import List
 from nicegui import ui
 from ngwidgets.nicegui_component import Component, Components  # Replace with the actual import path
+from ngwidgets.widgets import Link
 
 class ComponentView:
     def __init__(self, component: Component):
@@ -41,16 +41,29 @@ class ComponentView:
         with container:
             self.card=ui.card()
             with self.card:
-                ui.label(f'{self.component.name} - {self.component.version}')
+                title=f"{self.component.name}"
+                if self.component.version:
+                    title+=f"{title} - {self.component.version}"
+                ui.label(title).classes('text-2xl')
                 if self.component.stars is not None:
                     ui.label(f'⭐️ Stars: {self.component.stars}')
-                ui.label(f'Package: {self.component.package}')
-                ui.label(f'GitHub: {self.component.github}')
-                ui.link('PyPI', self.component.pypi)
-                ui.label('Description:')
-                ui.textarea(self.component.pypi_description)
-                ui.button('Copy Install Command', on_click=lambda: self.copy_to_clipboard(self.component.install_instructions))
+                if self.component.pypi_description:
+                    ui.label('Description:')
+                    ui.html(self.component.pypi_description)
+                if self.component.github:
+                    with ui.row().classes('items-center').style('gap: 0.5rem'):
+                        github_icon="<img src='https://upload.wikimedia.org/wikipedia/commons/thumb/9/91/Octicons-mark-github.svg/32px-Octicons-mark-github.svg.png' alt='github' title='github'/>"
+                        github_link=Link.create(self.component.github,github_icon)
+                        ui.html(github_link)   
+                if self.component.pypi:
+                    pypi_link=Link.create(self.component.pypi,"pypi")
+                    ui.html(pypi_link)
+                if self.component.package:
+                    ui.label(f'Package: {self.component.package}')
+                    inst_html=f"<pre>{self.component.install_instructions}</pre>"
+                    ui.html(inst_html)
             return self.card
+        
 class ComponentsView:
     """
     display the available components as rows and columns
@@ -76,7 +89,7 @@ class ComponentsView:
         self.filter_input = ui.input(placeholder='Search components...',on_change=self.update_view)
     
         # Component cards container
-        self.cards_container = ui.grid()
+        self.cards_container = ui.grid(columns=4)
         self.views={}
         # Initially display all components
         self.update_view()
