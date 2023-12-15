@@ -13,6 +13,7 @@ from ngwidgets.version import Version
 from ngwidgets.webserver import WebserverConfig
 from ngwidgets.widgets import HideShow
 from ngwidgets.tristate import Tristate
+from ngwidgets.nicegui_component_view import ComponentsView
 
 
 class NiceGuiWidgetsDemoWebserver(InputWebserver):
@@ -36,6 +37,11 @@ class NiceGuiWidgetsDemoWebserver(InputWebserver):
         # pdf_url = "https://www.africau.edu/images/default/sample.pdf"
         self.pdf_url = "https://raw.githubusercontent.com/mozilla/pdf.js/ba2edeae/web/compressed.tracemonkey-pldi-09.pdf"
         self.timeout = 6.0
+        
+        @ui.page("/solutions")
+        async def show_solutions(client: Client):
+            await client.connected(timeout=self.timeout)
+            return await self.show_solutions()
 
         @ui.page("/dictedit")
         async def show_dictedit(client: Client):
@@ -70,6 +76,12 @@ class NiceGuiWidgetsDemoWebserver(InputWebserver):
     # def update_page(e):
     #    viewer.set_page(e.value)
 
+    async def show_solutions(self):
+        def show():
+            self.components_view=ComponentsView(self)
+            
+        await self.setup_content_div(show)
+            
     async def show_pdf_viewer(self):
         def show():
             self.pdf_viewer = pdfviewer(debug=self.args.debug).classes("w-full h-96")
@@ -168,6 +180,7 @@ class NiceGuiWidgetsDemoWebserver(InputWebserver):
         def setup_home():
             ui.html(
                 """<ul>
+        <li><a href='/solutions'>nicegui solutions bazaar</a></li>
         <li><a href='/dictedit'>dictedit</a></li>
         <li><a href='/grid'>grid</a></li>
         <li><a href='/hideshow'>HideShow Demo</a></li>

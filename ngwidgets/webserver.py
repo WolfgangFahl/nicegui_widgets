@@ -255,13 +255,14 @@ class NiceGuiWebserver(object):
             ui.label(self.config.copy_right)
             ui.link("Powered by nicegui", "https://nicegui.io/").style("color: #fff")
 
-    async def setup_content_div(self, setup_content: Optional[Callable] = None, **kwargs):
+    async def setup_content_div(self, setup_content: Optional[Callable] = None, with_exception_handling:bool=True, **kwargs):
         """
         Sets up the content frame div of the web server's user interface.
     
         Args:
             setup_content (Optional[Callable]): A callable for setting up the main content.
                                                  It can be a regular function or a coroutine.
+            with_exception_handling(bool): if True handle exceptions                                     
         
         Note:
             This method is asynchronous and should be awaited when called.
@@ -272,9 +273,15 @@ class NiceGuiWebserver(object):
         with ui.element("div").classes("w-full h-full") as self.content_div:
             # Execute setup_content if provided
             if setup_content:
-                if asyncio.iscoroutinefunction(setup_content):
-                    await setup_content(**kwargs)
-                else:
-                    setup_content(**kwargs)
+                try:
+                    if asyncio.iscoroutinefunction(setup_content):
+                        await setup_content(**kwargs)
+                    else:
+                        setup_content(**kwargs)
+                except Exception as ex:
+                    if with_exception_handling:
+                        self.handle_exception(ex,self.do_trace)
+                    else:
+                        raise ex
                     
         await self.setup_footer()

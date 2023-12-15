@@ -208,13 +208,15 @@ class Components:
         with open(self.file_path, "w", encoding="utf-8") as file:
             json.dump([component.__dict__ for component in components], file, indent=4, default=str)
 
-    def load(self, directory: str = None) -> List[Component]:
+    def load(self, directory: str = None, set_self:bool=True) -> List[Component]:
         """
         Load a list of Component instances from a JSON file.
         Args:
             directory (str, optional): The directory where the file is located. If None, uses the default directory.
+            set_self(bool): if True set self.components with the result
         Returns:
             List[Component]: A list of Component instances loaded from the file.
+            
         """
         directory = Path(directory or self.default_directory)
 
@@ -222,9 +224,15 @@ class Components:
             raise FileNotFoundError(f"No such file: {self.file_path}")
 
         with open(self.file_path, "r", encoding="utf-8") as file:
-            components_data = json.load(file)
-
-        return [Component(**data) for data in components_data]
+            components_records = json.load(file)
+        
+        components=[]
+        for component_record in components_records:
+            component=Component(**component_record)
+            components.append(component)
+        if set_self:
+            self.components=components
+        return components
 
     def update(self):
         """
