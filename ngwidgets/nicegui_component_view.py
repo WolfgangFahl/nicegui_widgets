@@ -44,7 +44,7 @@ class ComponentView:
             with self.card:
                 title=f"{self.component.name}"
                 if self.component.version:
-                    title+=f"{title} - {self.component.version}"
+                    title=f"{title} - {self.component.version}"
                 ui.label(title).classes('text-2xl')
                 if self.component.stars is not None:
                     ui.label(f'⭐️ Stars: {self.component.stars}')
