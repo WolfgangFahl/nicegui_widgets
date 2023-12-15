@@ -137,7 +137,7 @@ class ComponentsView:
             last_update_str = self.components.last_update_time.strftime('%Y-%m-%d %H:%M:%S')
             self.last_update_label.set_text(f'Last Update: {last_update_str}')
             # Enable or disable the refresh button based on the GitHub API limits
-            if datetime.now() - self.components.last_update_time < timedelta(hours=24):  # 60 calls per day?
+            if datetime.now() - self.components.last_update_time < timedelta(hours=1):  # 60 calls per day?
                 self.update_button.disable()
             else:
                 self.update_button.enable()
