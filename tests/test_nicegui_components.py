@@ -88,6 +88,7 @@ class TestNiceguiComponents(Basetest):
         Test creating a Component instance from a GitHub repository.
         """
         github_access = GitHubAccess()  # Assuming GitHubAccess is already defined and properly set up
+        components=Components(topic='nicegui')
         # List of tuples with repository names and expected attributes
         example_repos = [
             ("WolfgangFahl/nicegui_widgets", {
@@ -109,7 +110,9 @@ class TestNiceguiComponents(Basetest):
             # Add more test cases here as needed
         ]
         for repo_name, expected_attributes in example_repos:
-      
+            url=expected_attributes["github"]
+            ex_repo_name=components.extract_repo_name_from_url(url)
+            self.assertEqual(repo_name,ex_repo_name)
             # Create a Component from the GitHub repository
             component = Component.from_github(repo_name, github_access)
     

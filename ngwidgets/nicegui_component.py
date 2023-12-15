@@ -1,5 +1,5 @@
 """
-Created on 2023-14-12
+Created on 2023-12-14
 
 This module, developed as part of the ngwidgets package under the instruction of WF, provides 
 classes and methods for interacting with the Python Package Index (PyPI). It includes the 
@@ -112,17 +112,18 @@ class Component:
         """
         repo: Repository.Repository = github_access.github.get_repo(repo_name)
         avatar_url = repo.owner.avatar_url if repo.owner.avatar_url else None
-
-        return cls(
+        stars=repo.stargazers_count
+        component = cls(
             name=repo.name,
             github=repo.html_url,
-            stars=repo.stargazers_count,
+            stars=stars,
             github_description=repo.description,
             github_author=repo.owner.login,
             created_at=repo.created_at,
             avatar=avatar_url,
             # Other fields can be filled in as needed
         )
+        return component
         
     @classmethod
     def from_pypi(cls, package_info: Dict) -> 'Component':
@@ -276,11 +277,40 @@ class Components:
                 existing_comp.pypi_description = comp.pypi_description
                 existing_comp.version = comp.version
             else:
-                self.components.append(comp)
+                # Check if the PyPI component has a GitHub URL
+                if comp.github:
+                    repo_name = self.extract_repo_name_from_url(comp.github)
+                    if not repo_name:
+                        raise ValueError(f"Can't determine repo_name for {comp.github}")
+                    # Create a Component instance from GitHub
+                    github_comp = Component.from_github(repo_name, github_access)
+                    # Merge PyPI data into the newly created GitHub component
+                    github_comp.pypi = comp.pypi
+                    github_comp.pypi_description = comp.pypi_description
+                    github_comp.version = comp.version
+                    self.components.append(github_comp)
+                else:
+                    # PyPI component without a GitHub URL
+                    self.components.append(comp)
         # sort components by name
         self.components = sorted(self.components, key=lambda comp: comp.name.lower() if comp.name else "")
         self.last_update_time = datetime.now()
         
+    def extract_repo_name_from_url(self,url: str) -> str:
+        """
+        Extract the repository name in 'user/repo' format from a GitHub URL.
+    
+        Args:
+            url (str): The GitHub URL.
+    
+        Returns:
+            str: The repository name or None if not extractable.
+        """
+        # Assuming the URL format is https://github.com/user/repo
+        parts = url.split('/')
+        if len(parts) > 4 and parts[2] == 'github.com':
+            return '/'.join(parts[3:5])
+        return None
         
 class PyPi:
     """
