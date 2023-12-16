@@ -8,7 +8,7 @@ from nicegui import Client, ui
 from ngwidgets.dict_edit import DictEdit
 from ngwidgets.input_webserver import InputWebserver
 from ngwidgets.lod_grid import ListOfDictsGrid
-from ngwidgets.nicegui_component_view import ProjectsView
+from ngwidgets.projects_view import ProjectsView
 from ngwidgets.pdfviewer import pdfviewer
 from ngwidgets.tristate import Tristate
 from ngwidgets.version import Version

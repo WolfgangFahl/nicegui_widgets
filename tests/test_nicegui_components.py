@@ -11,8 +11,9 @@ import json
 from pathlib import Path
 from dataclasses import asdict
 from ngwidgets.basetest import Basetest
-from ngwidgets.nicegui_component import PyPi, Project,Projects, GitHubAccess
-
+from ngwidgets.components import Components
+from ngwidgets.progress import TqdmProgressbar
+from ngwidgets.projects import PyPi, Project,Projects, GitHubAccess
 class TestNiceguiProjects(Basetest):
     """
     Test cases for the nicegui_projects module.
@@ -74,13 +75,16 @@ class TestNiceguiProjects(Basetest):
         Test searching for repositories by a specific topic.
         """
         github_access=GitHubAccess()
-        topic = 'nicegui'
-        repositories = github_access.search_repositories_by_topic(topic)
+        query = 'topic:nicegui'
+        repositories = github_access.search_repositories(query)
         self.assertIsNotNone(repositories)
         self.assertTrue(len(repositories) > 0)
         if self.debug:
-            for repo in repositories:
-                print (repo)
+            # Sort the repositories first by owner login, then by repository full name
+            sorted_repos = sorted(repositories.items(), key=lambda item: (item[1].owner.login, item[0]))
+
+            for index, (repo_name, repo) in enumerate(sorted_repos, start=1):
+                print(f"{index:4}: {repo.owner.login:40} → {repo_name}  ")
         self.assertIn("WolfgangFahl/nicegui_widgets",repositories)
             
     def test_project_from_github(self):
@@ -91,6 +95,12 @@ class TestNiceguiProjects(Basetest):
         projects=Projects(topic='nicegui')
         # List of tuples with repository names and expected attributes
         example_repos = [
+            ("justpy-org/justpy",{
+                "github": "https://github.com/justpy-org/justpy",
+                "stars": 1110,
+                "github_description": "An object oriented high-level Python Web Framework that requires no frontend programming",
+                "avatar": "https://avatars.githubusercontent.com/u/112261672?v=4",
+            }),
             ("WolfgangFahl/nicegui_widgets", {
                 "name": "nicegui_widgets",
                 "github": "https://github.com/WolfgangFahl/nicegui_widgets",
@@ -113,8 +123,10 @@ class TestNiceguiProjects(Basetest):
             url=expected_attributes["github"]
             ex_repo_name=projects.extract_repo_name_from_url(url)
             self.assertEqual(repo_name,ex_repo_name)
+            repo=github_access.github.get_repo(repo_name)
+    
             # Create a Project from the GitHub repository
-            project = Project.from_github(repo_name, github_access)
+            project = Project.from_github(repo)
     
             # Debug printout
             if self.debug:
@@ -131,19 +143,29 @@ class TestNiceguiProjects(Basetest):
                     self.assertGreaterEqual(actual_value, expected_value)
                 else:
                     self.assertEqual(actual_value, expected_value)
-
-        
+            
+            if project.components_url:
+                components=project.get_components(cache_directory=projects.default_directory)
+                if self.debug:
+                    print(f"found {len(components.components)} components for {project.name}")
+    
     def test_update_save_and_load_projects(self):
         """
         Test updating, saving, and loading projects for a specific topic using the Projects class.
         """
+        limit_github=10
+        limit_pypi=5
         topic = "nicegui"
         test_directory = "/tmp/projects_test"
         projects_manager = Projects(topic=topic)
         projects_manager.default_directory=test_directory
-
+        progress_bar=None
+        if self.debug:
+            progress_bar = TqdmProgressbar(
+                    total=0, desc="update projects", unit="steps"
+                )
         # Update the projects (this method should be implemented to fetch projects from PyPI and GitHub)
-        projects_manager.update()
+        projects_manager.update(progress_bar=progress_bar,limit_github=limit_github,limit_pypi=limit_pypi)
         projects_manager.save()
 
         # Load the projects
@@ -163,3 +185,17 @@ class TestNiceguiProjects(Basetest):
                 projects_manager.file_path.unlink()
             if Path(test_directory).exists():
                 Path(test_directory).rmdir()
+                
+    def test_components_from_url(self):
+        """
+        test loading components from url
+        """
+        cases=[
+            (217,"https://raw.githubusercontent.com/justpy-org/justpy/master/.components.yaml")
+        ]
+        for expected,url in cases:
+            components=Components.load_from_url(url)
+            if self.debug:
+                for index,component in enumerate(components.components):
+                    print(f"{index}:{component}")
+            self.assertTrue(len(components.components)>=expected)        

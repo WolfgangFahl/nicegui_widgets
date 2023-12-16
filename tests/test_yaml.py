@@ -9,7 +9,7 @@ Prompts:
 """
 
 from ngwidgets.basetest import Basetest
-from ngwidgets.yaml import Yaml
+from ngwidgets.dataclass_yaml import Yaml
 from dataclasses import dataclass
 
 @dataclass

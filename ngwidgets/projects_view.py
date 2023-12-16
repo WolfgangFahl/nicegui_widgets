@@ -30,7 +30,7 @@ from datetime import datetime, timedelta
 
 from nicegui import run, ui
 
-from ngwidgets.nicegui_component import (  
+from ngwidgets.projects import (  
     Project,
     Projects,
 )
@@ -74,6 +74,12 @@ class ProjectView:
                         if self.project.avatar:
                             avatar_html = f"<img src='{self.project.avatar}' alt='{self.project.github_author}' style='width: 40px; height: 40px; border-radius: 50%;'/>"
                             html_markup = f"{html_markup}{avatar_html}"
+                        if self.project.components_url:
+                            components=self.project.get_components()
+                            components_count = len(components.components)  # Assuming get_components returns a list
+                            components_icon = "<img src='https://upload.wikimedia.org/wikipedia/commons/thumb/1/11/Octicons-puzzle.svg/32px-Octicons-puzzle.svg.png' alt='components' title='components'/>"
+                            html_markup += f" {components_icon} {components_count}"
+                     
                         ui.html(html_markup)
                 if self.project.pypi:
                     pypi_icon = "<img src='https://upload.wikimedia.org/wikipedia/commons/thumb/6/64/PyPI_logo.svg/64px-PyPI_logo.svg.png' alt='pypi' title='pypi'/>"
