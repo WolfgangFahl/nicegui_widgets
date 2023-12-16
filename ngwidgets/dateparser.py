@@ -4,9 +4,11 @@ Created on 2023-12-03
 @author: wf
 """
 
-from dateutil import parser
 import re
+
 import pytz
+from dateutil import parser
+
 
 class DateParser:
     """A parser for converting date strings with timezone information into ISO 8601 format.
@@ -15,58 +17,59 @@ class DateParser:
         aliases (list): A list of tuples mapping timezone string aliases to their canonical form.
         whois_timezone_info (dict): A dictionary mapping timezone abbreviations to their UTC offsets.
     """
-    
+
     def __init__(self):
         # https://stackoverflow.com/a/54629675/1497139
-        self.aliases=[
-            ('"GMT"',"(GMT)"),
-            ("(WET DST)","(WEST)"),
-            ("+0200 (MET DST)","+0200"),
-            ("+0200 (METDST)","+0200"),
-            (" METDST"," +0200"),
-            (" MET DST"," +0200"),
-            ("(GMT)","+0000"),
-            ("+0100 (GMT Daylight Time)","+0100"),
-            ("+0100 (Etc/GMT)","-0100"),
+        self.aliases = [
+            ('"GMT"', "(GMT)"),
+            ("(WET DST)", "(WEST)"),
+            ("+0200 (MET DST)", "+0200"),
+            ("+0200 (METDST)", "+0200"),
+            (" METDST", " +0200"),
+            (" MET DST", " +0200"),
+            ("(GMT)", "+0000"),
+            ("+0100 (GMT Daylight Time)", "+0100"),
+            ("+0100 (Etc/GMT)", "-0100"),
             ("Etc/GMT", "-0000"),
             (" pst", " PST"),  # Convert lowercase 'pst' to uppercase 'PST'
             (" est", " EST"),
-            ("(MSK/MSD)","(MSK)"),
-            ("(GMT Standard Time)","(GMT)"),
-            ("(Mountain Daylight Time)","(MDT)"),
-            (" Eastern Daylight Time","-0800 (EDT)"),
-            ("(Eastern Standard Time)","(EST)"),
-            ("(Eastern Daylight Time)","(EDT)"),
-            ("(Pacific Daylight Time)","(PDT)"),
-            ("(Eastern Standard Time)","(EST)")
-        ]   
-        self.regexp_aliases=[
-            # remove superfluous (added by ...) 
-            (r'\(added by [^\)]+\)', ''),
+            ("(MSK/MSD)", "(MSK)"),
+            ("(GMT Standard Time)", "(GMT)"),
+            ("(Mountain Daylight Time)", "(MDT)"),
+            (" Eastern Daylight Time", "-0800 (EDT)"),
+            ("(Eastern Standard Time)", "(EST)"),
+            ("(Eastern Daylight Time)", "(EDT)"),
+            ("(Pacific Daylight Time)", "(PDT)"),
+            ("(Eastern Standard Time)", "(EST)"),
+        ]
+        self.regexp_aliases = [
+            # remove superfluous (added by ...)
+            (r"\(added by [^\)]+\)", ""),
             # Regular expression to remove conflicting timezone information like (GMT-1)
             # but only if it follows a standard timezone offset like +0100
             # example +0100 (GMT-1)
-            (r'(\+\d{4}|\-\d{4}) \(GMT[+-]\d+\)', r'\1'),
+            (r"(\+\d{4}|\-\d{4}) \(GMT[+-]\d+\)", r"\1"),
             # Regular expression to correct conflicting timezone information like +-0100
-            #+-0100
-            (r'\+\-(\d{4})', r'-\1'),  # Convert +-0100 to -0100
+            # +-0100
+            (r"\+\-(\d{4})", r"-\1"),  # Convert +-0100 to -0100
             # Regular expression to correct timezone information like +-800
-            (r'\+\-(\d{3})', r'-0\1'),  # Convert +-800 to -0800
-
+            (r"\+\-(\d{3})", r"-0\1"),  # Convert +-800 to -0800
         ]
         # Add generic aliases for a range of timezones
         for hour in range(-12, 15):  # Ranges from GMT-12 to GMT+14
-            sign = '+' if hour >= 0 else '-'
+            sign = "+" if hour >= 0 else "-"
             hour_abs = abs(hour)
 
             # Example: ("(GMT+00:00)","+0000")
-            self.aliases.append((f"(GMT{sign}{hour_abs:02d}:00)", f"{sign}{hour_abs:02d}00"))
+            self.aliases.append(
+                (f"(GMT{sign}{hour_abs:02d}:00)", f"{sign}{hour_abs:02d}00")
+            )
             # Example: ("(GMT-1)","-0100"),
             self.aliases.append((f"(GMT{sign}{hour})", f"{sign}0{hour_abs}00"))
 
             # Handling Etc/GMT formats
             # Example: ("Etc/GMT+1", "+0100")
-            gmt_sign = '' if hour <= 0 else '+'
+            gmt_sign = "" if hour <= 0 else "+"
             self.aliases.append((f"Etc/GMT{gmt_sign}{hour}", f"{sign}{hour_abs:02d}00"))
 
         self.timezone_hours = {
@@ -165,8 +168,14 @@ class DateParser:
             "MES": {"offset": 2, "description": "Middle European Summer Time"},
             "MEST": {"offset": 2, "description": "Middle European Summer Time"},
             "MESZ": {"offset": 2, "description": "Middle European Summer Time"},
-            "METDST": {"offset": 2, "description": "Middle European Time Daylight Saving Time"},
-            "MET DST": {"offset": 2, "description": "Middle European Time Daylight Saving Time"},
+            "METDST": {
+                "offset": 2,
+                "description": "Middle European Time Daylight Saving Time",
+            },
+            "MET DST": {
+                "offset": 2,
+                "description": "Middle European Time Daylight Saving Time",
+            },
             "SAST": {"offset": 2, "description": "South Africa Standard Time"},
             "WAST": {"offset": 2, "description": "West Africa Summer Time"},
             "NDT": {"offset": 2.5, "description": "Newfoundland Daylight Time"},
@@ -244,7 +253,10 @@ class DateParser:
             "SGT": {"offset": 8, "description": "Singapore Time"},
             "ULAT": {"offset": 8, "description": "Ulaanbaatar Time"},
             "WITA": {"offset": 8, "description": "Central Indonesia Time"},
-            "ACWST": {"offset": 8.75, "description": "Australian Central Western Standard Time"},
+            "ACWST": {
+                "offset": 8.75,
+                "description": "Australian Central Western Standard Time",
+            },
             "AWDT": {"offset": 9, "description": "Australian Western Daylight Time"},
             "CHOST": {"offset": 9, "description": "Choibalsan Summer Time"},
             "I": {"offset": 9, "description": "India Time Zone"},
@@ -307,15 +319,15 @@ class DateParser:
             "CHADT": {"offset": 13.75, "description": "Chatham Daylight Time"},
             "LINT": {"offset": 14, "description": "Line Islands Time"},
             "TOST": {"offset": 14, "description": "Tonga Summer Time"},
-            "WST": {"offset": 14, "description": "West Samoa Time"}
+            "WST": {"offset": 14, "description": "West Samoa Time"},
         }
         # Convert timezone offsets from hours to seconds and create tzinfos dictionary
         self.tzinfos = {}
         for tz, info in self.timezone_hours.items():
             offset_in_seconds = int(info["offset"] * 3600)
             self.tzinfos[tz] = offset_in_seconds
- 
-    def parse_date(self, date_str)->str:
+
+    def parse_date(self, date_str) -> str:
         """
         Parses a date string and converts it to ISO 8601 format.
 
@@ -323,7 +335,7 @@ class DateParser:
             date_str (str): The date string to be parsed.
 
         Returns:
-            str:  the ISO 8601 date string 
+            str:  the ISO 8601 date string
         """
         # Apply regex replacements
         for pattern, replacement in self.regexp_aliases:
@@ -333,9 +345,9 @@ class DateParser:
         for alias, replacement in self.aliases:
             date_str = date_str.replace(alias, replacement)
 
-        parsed_date = parser.parse(date_str,tzinfos=self.tzinfos)
+        parsed_date = parser.parse(date_str, tzinfos=self.tzinfos)
         parsed_date_z = parsed_date.astimezone(pytz.utc)
         # Convert to ISO 8601 format
         iso_date_str = parsed_date_z.isoformat()
-        iso_date_str_z= iso_date_str.replace("+00:00", "Z")
+        iso_date_str_z = iso_date_str.replace("+00:00", "Z")
         return iso_date_str_z

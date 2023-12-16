@@ -1,10 +1,12 @@
 """
-Created on 15.11.2023
+Created on 2023-11-15
 
 @author: wf
 """
 import logging
+
 from nicegui import ui
+
 
 class LogElementHandler(logging.Handler):
     """A logging handler that emits messages to a log element."""

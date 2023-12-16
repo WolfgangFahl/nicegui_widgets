@@ -3,9 +3,9 @@ Created on 2023-15-12
 
 
 This module, developed as part of the ngwidgets package under the instruction of WF, provides
-classes for displaying software components in a NiceGUI application. It defines the
-`ComponentView` class for rendering a single component and the `ComponentsView` class for
-managing a collection of `ComponentView` instances in a searchable and sortable card layout.
+classes for displaying software projects in a NiceGUI application. It defines the
+`ProjectView` class for rendering a single project and the `ProjectsView` class for
+managing a collection of `ProjectView` instances in a searchable and sortable card layout.
 
 see https://github.com/WolfgangFahl/nicegui_widgets/issues/50
 
@@ -15,157 +15,183 @@ command. These will be recreated using NiceGUI's elements such as `ui.date_picke
 `ui.link()`, `ui.card()`, `ui.text()`, and `ui.input()` for a similar user experience.
 
 For details on the original Streamlit implementation, refer to:
-https://raw.githubusercontent.com/jrieke/components-hub/main/streamlit_app.py
+https://raw.githubusercontent.com/jrieke/projects-hub/main/streamlit_app.py
 
 Prompts for LLM:
-- Incorporate the Component and Components classes from ngwidgets into NiceGUI.
-- Implement the setup method for ComponentView to render component details in a UI card.
-- Implement the setup method for ComponentsView to manage a searchable and sortable display of components.
-- Adapt the webserver class from ngwidgets to use ComponentsView for displaying components.
+- Incorporate the Project and Projects classes from ngwidgets into NiceGUI.
+- Implement the setup method for ProjectView to render project details in a UI card.
+- Implement the setup method for ProjectsView to manage a searchable and sortable display of projects.
+- Adapt the webserver class from ngwidgets to use ProjectsView for displaying projects.
 
 Main author: OpenAI's language model (instructed by WF)
 """
 import math
 from datetime import datetime, timedelta
-from nicegui import ui
-from ngwidgets.nicegui_component import Component, Components  # Replace with the actual import path
+
+from nicegui import run, ui
+
+from ngwidgets.nicegui_component import (  # Replace with the actual import path
+    Project,
+    Projects,
+)
 from ngwidgets.widgets import Link
-from nicegui import run
 
-class ComponentView:
-    """
-    display a single component
-    """
-    def __init__(self, component: Component):
-        self.component = component
 
-    def setup(self,container) -> ui.card:
+class ProjectView:
+    """
+    display a single project
+    """
+
+    def __init__(self, project: Project):
+        self.project = project
+
+    def setup(self, container) -> ui.card:
         """
-        setup a card 
+        setup a card
         """
         with container:
-            self.card=ui.card()
+            self.card = ui.card()
             with self.card:
-                title=f"{self.component.name}"
-                if self.component.version:
-                    title=f"{title} - {self.component.version}"
-                ui.label(title).classes('text-2xl')
-                if self.component.stars is not None:
-                    ui.label(f'⭐️ Stars: {self.component.stars}')
-                if self.component.github:
-                    with ui.row().classes('items-center').style('gap: 0.5rem'):
-                        github_icon="<img src='https://upload.wikimedia.org/wikipedia/commons/thumb/9/91/Octicons-mark-github.svg/32px-Octicons-mark-github.svg.png' alt='github' title='github'/>"
-                        github_link=Link.create(self.component.github,github_icon)
-                        html_markup=github_link
-                        if self.component.github_author:
-                            author_url = f"https://github.com/{self.component.github_author}"
-                            author_link=Link.create(author_url,self.component.github_author)
-                            html_markup=f"{html_markup}{author_link}"   
-                        if self.component.avatar:
-                            avatar_html = f"<img src='{self.component.avatar}' alt='{self.component.github_author}' style='width: 40px; height: 40px; border-radius: 50%;'/>"
-                            html_markup=f"{html_markup}{avatar_html}"
-                        ui.html(html_markup)   
-                if self.component.pypi:
-                    pypi_icon="<img src='https://upload.wikimedia.org/wikipedia/commons/thumb/6/64/PyPI_logo.svg/64px-PyPI_logo.svg.png' alt='pypi' title='pypi'/>"
-                    pypi_link=Link.create(self.component.pypi,pypi_icon)
-                    html_markup=pypi_link
-                    if self.component.pypi_description:
-                        html_markup=f"""{html_markup}
-        <strong>{self.component.package}</strong>:
-        <span>{self.component.pypi_description}</span>"""
-                    if self.component.package:
-                        inst_html=f"<pre>{self.component.install_instructions}</pre>"
-                        html_markup=f"{html_markup}\n{inst_html}"
-                   
+                title = f"{self.project.name}"
+                if self.project.version:
+                    title = f"{title} - {self.project.version}"
+                ui.label(title).classes("text-2xl")
+                if self.project.stars is not None:
+                    ui.label(f"⭐️ Stars: {self.project.stars}")
+                if self.project.github:
+                    with ui.row().classes("items-center").style("gap: 0.5rem"):
+                        github_icon = "<img src='https://upload.wikimedia.org/wikipedia/commons/thumb/9/91/Octicons-mark-github.svg/32px-Octicons-mark-github.svg.png' alt='github' title='github'/>"
+                        github_link = Link.create(self.project.github, github_icon)
+                        html_markup = github_link
+                        if self.project.github_author:
+                            author_url = (
+                                f"https://github.com/{self.project.github_author}"
+                            )
+                            author_link = Link.create(
+                                author_url, self.project.github_author
+                            )
+                            html_markup = f"{html_markup}{author_link}"
+                        if self.project.avatar:
+                            avatar_html = f"<img src='{self.project.avatar}' alt='{self.project.github_author}' style='width: 40px; height: 40px; border-radius: 50%;'/>"
+                            html_markup = f"{html_markup}{avatar_html}"
+                        ui.html(html_markup)
+                if self.project.pypi:
+                    pypi_icon = "<img src='https://upload.wikimedia.org/wikipedia/commons/thumb/6/64/PyPI_logo.svg/64px-PyPI_logo.svg.png' alt='pypi' title='pypi'/>"
+                    pypi_link = Link.create(self.project.pypi, pypi_icon)
+                    html_markup = pypi_link
+                    if self.project.pypi_description:
+                        html_markup = f"""{html_markup}
+        <strong>{self.project.package}</strong>:
+        <span>{self.project.pypi_description}</span>"""
+                    if self.project.package:
+                        inst_html = f"<pre>{self.project.install_instructions}</pre>"
+                        html_markup = f"{html_markup}\n{inst_html}"
+
                     ui.html(html_markup)
             return self.card
-        
-class ComponentsView:
+
+
+class ProjectsView:
     """
-    display the available components as rows and columns
+    display the available projects as rows and columns
     sorted by user preference (default: stars) and allows to search/filter
     """
-    def __init__(self, webserver: 'InputWebserver', components: Components = None):
-        """Initialize the ComponentsView with an optional collection of Components.
+
+    def __init__(self, webserver: "InputWebserver", projects: Projects = None):
+        """Initialize the ProjectsView with an optional collection of Projects.
 
         Args:
-            webserver (InputWebserver): The webserver that serves the components.
-            components (Components): The collection of software components. If None, components are loaded from storage.
-        """        
+            webserver (InputWebserver): The webserver that serves the projects.
+            projects (Projects): The collection of software projects. If None, projects are loaded from storage.
+        """
         self.webserver = webserver
-        if components is None:
-            components = Components(topic="nicegui")
-            components.load()
-        self.components = components
+        if projects is None:
+            projects = Projects(topic="nicegui")
+            projects.load()
+        self.projects = projects
         self.setup()
 
     def setup(self):
-        """Set up the UI elements to render the collection of components as a searchable and sortable card layout in NiceGUI."""
+        """Set up the UI elements to render the collection of projects as a searchable and sortable card layout in NiceGUI."""
         with ui.row():
             self.last_update_label = ui.label()
-            self.update_button = ui.button('Update', on_click=self.update_components)
+            self.update_button = ui.button("Update", on_click=self.update_projects)
             self.update_last_update_label()
         with ui.row():
-            # Filter input for searching components
-            self.filter_input = ui.input(placeholder='Search components...',on_change=self.update_view)
-    
-        # Component cards container
+            # Filter input for searching projects
+            self.filter_input = ui.input(
+                placeholder="Search projects...", on_change=self.update_view
+            )
+
+        # Project cards container
         self.cards_container = ui.grid(columns=4)
-        self.views={}
-        # Initially display all components
+        self.views = {}
+        # Initially display all projects
         self.update_view()
-    
+
     def update_view(self):
-        """Update the view to render the filtered and sorted components."""   
+        """Update the view to render the filtered and sorted projects."""
         search_term = self.filter_input.value.lower()
         if search_term:
-            filtered_components = [comp for comp in self.components.components if search_term in comp.name.lower()]
+            filtered_projects = [
+                comp
+                for comp in self.projects.projects
+                if search_term in comp.name.lower()
+            ]
         else:
-            # Include all components if search term is empty
-            filtered_components = self.components.components
+            # Include all projects if search term is empty
+            filtered_projects = self.projects.projects
 
         # Clear the current cards container
         self.cards_container.clear()
-    
-        # Sort the components by stars (descending order) as an example
-        sorted_components = sorted(filtered_components, key=lambda c: c.stars if c.stars else 0, reverse=True)
-    
-        # Create a card for each component
-        for component in sorted_components:
-            cv=ComponentView(component)
-            self.views[component.name]=cv
+
+        # Sort the projects by stars (descending order) as an example
+        sorted_projects = sorted(
+            filtered_projects, key=lambda c: c.stars if c.stars else 0, reverse=True
+        )
+
+        # Create a card for each project
+        for project in sorted_projects:
+            cv = ProjectView(project)
+            self.views[project.name] = cv
             cv.setup(self.cards_container)
-            
-    async def update_components(self,p):
+
+    async def update_projects(self, p):
         """
-        update the components
+        update the projects
         """
-        await run.io_bound(self.components.update)
-        await run.io_bound(self.components.save)
+        await run.io_bound(self.projects.update)
+        await run.io_bound(self.projects.save)
 
         # Notify the user after completion (optional)
-        ui.notify('Components updated successfully.')
-           
+        ui.notify("Projects updated successfully.")
+
     def update_last_update_label(self):
         """Update the label showing the last update time."""
         min_to_wait = 60  # Set the waiting time in minutes
-        if self.components.last_update_time:
-            last_update_str = self.components.last_update_time.strftime('%Y-%m-%d %H:%M:%S')
-            self.last_update_label.set_text(f'Last Update: {last_update_str}')
+        if self.projects.last_update_time:
+            last_update_str = self.projects.last_update_time.strftime(
+                "%Y-%m-%d %H:%M:%S"
+            )
+            self.last_update_label.set_text(f"Last Update: {last_update_str}")
             # Enable or disable the refresh button based on the GitHub API limits
-            elapsed=datetime.now() - self.components.last_update_time
-            if  elapsed < timedelta(minutes=min_to_wait):  # 60 calls per day?
+            elapsed = datetime.now() - self.projects.last_update_time
+            if elapsed < timedelta(minutes=min_to_wait):  # 60 calls per day?
                 self.update_button.disable()
                 # Calculate remaining minutes until the next update is possible
                 remaining_time = timedelta(minutes=min_to_wait) - elapsed
                 # Round up to the nearest whole minute
-                minutes_until_next_update = math.ceil(remaining_time.total_seconds() / 60)
+                minutes_until_next_update = math.ceil(
+                    remaining_time.total_seconds() / 60
+                )
 
                 # Update the tooltip with the remaining minutes
-                self.update_button.tooltip(f'{minutes_until_next_update} min until enabled')
-     
+                self.update_button.tooltip(
+                    f"{minutes_until_next_update} min until enabled"
+                )
+
             else:
                 self.update_button.enable()
                 self.update_button.tooltip("updating might take a few seconds")
         else:
-            self.last_update_label.set_text('Last Update: Not yet updated')
+            self.last_update_label.set_text("Last Update: Not yet updated")

@@ -3,13 +3,15 @@ Created on 2023-09-12
 
 @author: wf
 """
-import os
 import logging
-from ngwidgets.webserver import NiceGuiWebserver, WebserverConfig
+import os
+
+from nicegui import Client, ui
+
 from ngwidgets.local_filepicker import LocalFilePicker
-from ngwidgets.widgets import About
-from nicegui import ui, Client
 from ngwidgets.log_view import LogElementHandler
+from ngwidgets.webserver import NiceGuiWebserver, WebserverConfig
+from ngwidgets.widgets import About
 
 
 class InputWebserver(NiceGuiWebserver):
@@ -118,10 +120,10 @@ class InputWebserver(NiceGuiWebserver):
         show about
         """
         await self.setup_content_div(self.setup_about)
-        
+
     def setup_about(self):
         self.about_div = About(self.config.version)
- 
+
     async def setup_footer(
         self,
         with_log: bool = True,

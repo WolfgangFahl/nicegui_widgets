@@ -65,7 +65,11 @@ class Tristate(Element, component="tristate.js"):
 
     ICON_SETS = {
         "arrows": ["←", "↕️", "→"],  # Left Arrow, Up-Down Arrow, Right Arrow
-        "ballot": ["☐", "☑️", "☒️"],  # Ballot Box, Ballot Box with Check, Ballot Box with X
+        "ballot": [
+            "☐",
+            "☑️",
+            "☒️",
+        ],  # Ballot Box, Ballot Box with Check, Ballot Box with X
         "check": ["☐", "❔", "✔️"],  # Checkbox, Question Mark, Checkmark
         "circles": ["⭘", "🎯", "🔘"],  # Circle, Bullseye, Fisheye
         "electrical": ["🔌", "🔋", "⚡"],  # Plug, Battery Half, Lightning

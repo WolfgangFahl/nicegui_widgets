@@ -3,10 +3,13 @@ Created on 19.11.2023
 
 @author: wf
 """
+
+
 class MarkupHeader:
     """
     Helper to generate tabulate compatible markup header lines.
     """
+
     @classmethod
     def get_markup(cls, title: str, markup_format: str, level: int = 1) -> str:
         """
@@ -24,7 +27,7 @@ class MarkupHeader:
             return f"{'#' * level} {title}\n"
         elif markup_format == "mediawiki":
             return f"{'=' * level} {title} {'=' * level}\n"
-        elif markup_format == "html" or markup_format=="unsafehtml":
+        elif markup_format == "html" or markup_format == "unsafehtml":
             return f"<h{level}>{title}</h{level}>"
         elif markup_format == "latex":
             if level == 1:

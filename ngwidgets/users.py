@@ -1,23 +1,25 @@
-'''
+"""
 Created on 2023-08-15
 
 @author: wf
-'''
-import os
-import json
+"""
 import argparse
+import json
+import os
+
 import bcrypt
+
 
 class Users:
     """
     A class to manage user credentials stored in a JSON file.
-    
+
     Attributes:
         dir_path (str): The directory path where the JSON file resides.
         file_path (str): The full path to the JSON file.
     """
-    
-    def __init__(self,path_str:str):
+
+    def __init__(self, path_str: str):
         """
         Initialize the Users class and set file paths.
         """
@@ -37,7 +39,7 @@ class Users:
         Args:
             data (dict): Dictionary containing username: password pairs.
         """
-        with open(self.file_path, 'w') as file:
+        with open(self.file_path, "w") as file:
             json.dump(data, file, indent=4)
 
     def load_password_data(self):
@@ -48,7 +50,7 @@ class Users:
             dict: Dictionary containing username: password pairs.
         """
         if os.path.exists(self.file_path):
-            with open(self.file_path, 'r') as file:
+            with open(self.file_path, "r") as file:
                 return json.load(file)
         return {}
 
@@ -60,7 +62,9 @@ class Users:
             username (str): The username of the new user.
             password (str): The password for the new user.
         """
-        hashed_password = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
+        hashed_password = bcrypt.hashpw(
+            password.encode("utf-8"), bcrypt.gensalt()
+        ).decode("utf-8")
         data = self.load_password_data()
         data[username] = hashed_password
         self.save_password_data(data)
@@ -80,15 +84,23 @@ class Users:
         hashed_password = data.get(username)
         if not hashed_password:
             return False
-        ok=bcrypt.checkpw(password.encode('utf-8'), hashed_password.encode('utf-8'))
+        ok = bcrypt.checkpw(password.encode("utf-8"), hashed_password.encode("utf-8"))
         return ok
-    
+
+
 def main():
-    parser = argparse.ArgumentParser(description='Manage user data.')
-    parser.add_argument('-u', '--username', required=True, help='The username.')
-    parser.add_argument('-p', '--password', required=True, help='The password.')
-    parser.add_argument('-c', '--project', required=True, help='The configuration name/project')
-    parser.add_argument('-a', '--add', action='store_true', help='Add a user. Otherwise, checks the password.')
+    parser = argparse.ArgumentParser(description="Manage user data.")
+    parser.add_argument("-u", "--username", required=True, help="The username.")
+    parser.add_argument("-p", "--password", required=True, help="The password.")
+    parser.add_argument(
+        "-c", "--project", required=True, help="The configuration name/project"
+    )
+    parser.add_argument(
+        "-a",
+        "--add",
+        action="store_true",
+        help="Add a user. Otherwise, checks the password.",
+    )
     args = parser.parse_args()
 
     user_manager = Users(f"~/.{args.project}/")
@@ -101,6 +113,7 @@ def main():
             print(f"Password for {args.username} is correct!")
         else:
             print(f"Password for {args.username} is incorrect!")
+
 
 if __name__ == "__main__":
     main()

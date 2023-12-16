@@ -15,9 +15,11 @@ Prompts for the development of the 'Yaml' class within the 'yaml' module:
 
 """
 
-import yaml
 from dataclasses import asdict, is_dataclass
 from typing import Any
+
+import yaml
+
 
 class Yaml:
     """
@@ -37,20 +39,20 @@ class Yaml:
         """
         Custom representer for ignoring None values in the YAML output.
         """
-        return self.dumper.represent_scalar('tag:yaml.org,2002:null', '')
+        return self.dumper.represent_scalar("tag:yaml.org,2002:null", "")
 
     def represent_literal(self, dumper: yaml.Dumper, data: str) -> yaml.Node:
         """
         Custom representer for block scalar style for strings.
         """
         if "\n" in data:
-            return dumper.represent_scalar('tag:yaml.org,2002:str', data, style='|')
-        return dumper.represent_scalar('tag:yaml.org,2002:str', data)
+            return dumper.represent_scalar("tag:yaml.org,2002:str", data, style="|")
+        return dumper.represent_scalar("tag:yaml.org,2002:str", data)
 
     def to_yaml(self, obj: Any) -> str:
         """
         Converts a dataclass object to a YAML string, omitting None values and using block scalar style for strings.
-        
+
         Args:
             obj (Any): The dataclass object to convert to YAML.
 
@@ -65,7 +67,13 @@ class Yaml:
 
         obj_dict = asdict(obj)
         clean_dict = self.remove_nones(obj_dict)
-        yaml_str = yaml.dump(clean_dict, Dumper=self.dumper, default_flow_style=False, allow_unicode=True, sort_keys=False)
+        yaml_str = yaml.dump(
+            clean_dict,
+            Dumper=self.dumper,
+            default_flow_style=False,
+            allow_unicode=True,
+            sort_keys=False,
+        )
         return yaml_str
 
     def remove_nones(self, value: Any) -> Any:
@@ -84,9 +92,9 @@ class Yaml:
             return [self.remove_nones(v) for v in value]
         return value
 
+
 # Example usage:
 # Assuming 'competence_tree' is an instance of a dataclass
 # yaml_handler = Yaml()
 # yaml_representation = yaml_handler.to_yaml(competence_tree)
 # print(yaml_representation)
-

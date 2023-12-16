@@ -8,12 +8,12 @@ from nicegui import Client, ui
 from ngwidgets.dict_edit import DictEdit
 from ngwidgets.input_webserver import InputWebserver
 from ngwidgets.lod_grid import ListOfDictsGrid
+from ngwidgets.nicegui_component_view import ProjectsView
 from ngwidgets.pdfviewer import pdfviewer
+from ngwidgets.tristate import Tristate
 from ngwidgets.version import Version
 from ngwidgets.webserver import WebserverConfig
 from ngwidgets.widgets import HideShow
-from ngwidgets.tristate import Tristate
-from ngwidgets.nicegui_component_view import ComponentsView
 
 
 class NiceGuiWidgetsDemoWebserver(InputWebserver):
@@ -37,7 +37,7 @@ class NiceGuiWidgetsDemoWebserver(InputWebserver):
         # pdf_url = "https://www.africau.edu/images/default/sample.pdf"
         self.pdf_url = "https://raw.githubusercontent.com/mozilla/pdf.js/ba2edeae/web/compressed.tracemonkey-pldi-09.pdf"
         self.timeout = 6.0
-        
+
         @ui.page("/solutions")
         async def show_solutions(client: Client):
             await client.connected(timeout=self.timeout)
@@ -78,10 +78,10 @@ class NiceGuiWidgetsDemoWebserver(InputWebserver):
 
     async def show_solutions(self):
         def show():
-            self.components_view=ComponentsView(self)
-            
+            self.projects_view = ProjectsView(self)
+
         await self.setup_content_div(show)
-            
+
     async def show_pdf_viewer(self):
         def show():
             self.pdf_viewer = pdfviewer(debug=self.args.debug).classes("w-full h-96")
@@ -115,7 +115,7 @@ class NiceGuiWidgetsDemoWebserver(InputWebserver):
 
     async def show_hide_show_demo(self):
         """
-        Demonstrate the HideShow component.
+        Demonstrate the HideShow project.
         """
 
         def show():
@@ -129,15 +129,15 @@ class NiceGuiWidgetsDemoWebserver(InputWebserver):
 
     async def show_tristate_demo(self):
         """
-        Demonstrate the Tristate component.
+        Demonstrate the Tristate project.
         """
 
         def on_change():
             ui.notify(
                 f"New State: {self.tristate.current_icon_index} ({self.tristate.utf8_icon})"
             )
-            
-        def update_icon_set_label(icon_set_name:str):
+
+        def update_icon_set_label(icon_set_name: str):
             # Update the label to show the icons of the new set
             self.icon_set_label.set_text(
                 f'Icons in Set {icon_set_name}: {" ".join(Tristate.ICON_SETS[icon_set_name])}'
@@ -169,7 +169,7 @@ class NiceGuiWidgetsDemoWebserver(InputWebserver):
             self.tristate = Tristate(
                 icon_set_name=default_icon_set_name, on_change=on_change
             )
-         
+
         await self.setup_content_div(show)
 
     async def home(self, _client: Client):

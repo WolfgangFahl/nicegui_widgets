@@ -4,16 +4,18 @@ Created on 2023-09-10
 @author: wf
 """
 import asyncio
-from nicegui import ui, core
 import os
 import sys
 import traceback
-from typing import Callable, Optional, Union, Any, Dict, List
 import urllib.request
 from dataclasses import dataclass, field
-from ngwidgets.version import Version
-from ngwidgets.color_schema import ColorSchema
+from typing import Any, Callable, Dict, List, Optional, Union
+
+from nicegui import core, ui
 from pydevd_file_utils import setup_client_server_paths
+
+from ngwidgets.color_schema import ColorSchema
+from ngwidgets.version import Version
 
 
 @dataclass
@@ -255,21 +257,26 @@ class NiceGuiWebserver(object):
             ui.label(self.config.copy_right)
             ui.link("Powered by nicegui", "https://nicegui.io/").style("color: #fff")
 
-    async def setup_content_div(self, setup_content: Optional[Callable] = None, with_exception_handling:bool=True, **kwargs):
+    async def setup_content_div(
+        self,
+        setup_content: Optional[Callable] = None,
+        with_exception_handling: bool = True,
+        **kwargs,
+    ):
         """
         Sets up the content frame div of the web server's user interface.
-    
+
         Args:
             setup_content (Optional[Callable]): A callable for setting up the main content.
                                                  It can be a regular function or a coroutine.
-            with_exception_handling(bool): if True handle exceptions                                     
-        
+            with_exception_handling(bool): if True handle exceptions
+
         Note:
             This method is asynchronous and should be awaited when called.
         """
         # Setting up the menu
         self.setup_menu()
-    
+
         with ui.element("div").classes("w-full h-full") as self.content_div:
             # Execute setup_content if provided
             if setup_content:
@@ -280,8 +287,8 @@ class NiceGuiWebserver(object):
                         setup_content(**kwargs)
                 except Exception as ex:
                     if with_exception_handling:
-                        self.handle_exception(ex,self.do_trace)
+                        self.handle_exception(ex, self.do_trace)
                     else:
                         raise ex
-                    
+
         await self.setup_footer()

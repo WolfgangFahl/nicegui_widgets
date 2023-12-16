@@ -233,6 +233,7 @@ class HideShow:
     """
     A class representing a hideable/showable section in a NiceGUI application.
     """
+
     TRIANGLE_LEFT = "◀"
     TRIANGLE_DOWN = "▼"
 
@@ -283,9 +284,11 @@ class HideShow:
         Get label text based on visibility state.
         """
         icon = self.TRIANGLE_DOWN if show_content else self.TRIANGLE_LEFT
-        label = (self.label_if_shown if show_content else
-                 (self.label_if_hidden if self.label_if_hidden else 
-                  self.label_if_shown))
+        label = (
+            self.label_if_shown
+            if show_content
+            else (self.label_if_hidden if self.label_if_hidden else self.label_if_shown)
+        )
         return f"{label} {icon}"
 
     def toggle_hide_show(self, _=None):
@@ -312,4 +315,3 @@ class HideShow:
         """
         self.content_div = content_div if content_div else ui.element()
         self._set_show_content(self.show_content)
-
