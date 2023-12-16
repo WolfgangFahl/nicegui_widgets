@@ -14,7 +14,8 @@ from ngwidgets.tristate import Tristate
 from ngwidgets.version import Version
 from ngwidgets.webserver import WebserverConfig
 from ngwidgets.widgets import HideShow
-
+from ngwidgets.components_view import ComponentsView
+from ngwidgets.projects import Projects
 
 class NiceGuiWidgetsDemoWebserver(InputWebserver):
     """
@@ -37,11 +38,18 @@ class NiceGuiWidgetsDemoWebserver(InputWebserver):
         # pdf_url = "https://www.africau.edu/images/default/sample.pdf"
         self.pdf_url = "https://raw.githubusercontent.com/mozilla/pdf.js/ba2edeae/web/compressed.tracemonkey-pldi-09.pdf"
         self.timeout = 6.0
+        self.projects = Projects(topic="nicegui")
+        self.projects.load()
 
         @ui.page("/solutions")
         async def show_solutions(client: Client):
             await client.connected(timeout=self.timeout)
             return await self.show_solutions()
+        
+        @ui.page("/components/{solution_id}")
+        async def show_components(solution_id:str,client: Client):
+            await client.connected(timeout=self.timeout)
+            return await self.show_components(solution_id)
 
         @ui.page("/dictedit")
         async def show_dictedit(client: Client):
@@ -75,7 +83,14 @@ class NiceGuiWidgetsDemoWebserver(InputWebserver):
     #    slider_label = ui.label().bind_text_from(slider, 'value')
     # def update_page(e):
     #    viewer.set_page(e.value)
-
+    async def show_components(self,solution_id):
+        def show():
+            project=self.projects.get_project4_solution_id(solution_id)
+            # Create a ComponentsView and display the components
+            components_view = ComponentsView(self,self.projects,project)
+            components_view.setup()
+        await self.setup_content_div(show)
+         
     async def show_solutions(self):
         def show():
             self.projects_view = ProjectsView(self)

@@ -99,8 +99,9 @@ class ProjectView:
                             components=self.project.get_components()
                             components_count = len(components.components)  # Assuming get_components returns a list
                             components_icon = "<img src='https://upload.wikimedia.org/wikipedia/commons/thumb/1/11/Octicons-puzzle.svg/32px-Octicons-puzzle.svg.png' alt='components' title='components'/>"
-                            components_restful_url="/components/{}"
-                            html_markup += f" {components_icon} {components_count}"
+                            components_restful_url=f"/components/{self.project.solution_id}"
+                            components_link=Link.create(components_restful_url,components_icon)
+                            html_markup += f" {components_link} {components_count}"
                             self.components_html=ui.html(html_markup)
                 html_markup=""
                 if self.project.pypi:

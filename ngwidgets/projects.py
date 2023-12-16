@@ -400,6 +400,21 @@ class Projects:
         """
         filename = f"components_{self._topic}.json"
         return self._default_directory / filename
+    
+    def get_project4_solution_id(self, solution_id: str) -> Project:
+        """
+        Get a project based on the provided solution_id.
+
+        Args:
+            solution_id (str): The solution_id to search for.
+
+        Returns:
+            Project: The Project instance matching the provided solution_id, or None if not found.
+        """
+        for project in self.projects:
+            if project.solution_id == solution_id:
+                return project
+        return None
 
     def save(self, projects: List[Project] = None, directory: str = None):
         """
