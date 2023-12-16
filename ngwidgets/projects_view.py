@@ -92,12 +92,14 @@ class ProjectView:
                                 author_url, f"{avatar_icon}{author}"
                             )
                             html_markup = f"{author_link}"
-                        self.project_html=ui.html(html_markup)    
+                        self.project_html=ui.html(html_markup) 
+                        # components (if any)   
                         html_markup=""
                         if self.project.components_url:
                             components=self.project.get_components()
                             components_count = len(components.components)  # Assuming get_components returns a list
                             components_icon = "<img src='https://upload.wikimedia.org/wikipedia/commons/thumb/1/11/Octicons-puzzle.svg/32px-Octicons-puzzle.svg.png' alt='components' title='components'/>"
+                            components_restful_url="/components/{}"
                             html_markup += f" {components_icon} {components_count}"
                             self.components_html=ui.html(html_markup)
                 html_markup=""

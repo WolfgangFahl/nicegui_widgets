@@ -162,8 +162,22 @@ class Project(YamlAble['Project']):
     downloads: Optional[int] = None
     categories: List[str] = field(default_factory=list)
     version: Optional[str] = None
+    # solution bazaar properties
     components_url: Optional[str] = None
     solution_tags: Optional[str] = ""
+    solution_id: Optional[str] = None
+    
+    def __post_init__(self):
+        if self.github_owner and self.github_repo_name:
+            self.solution_id = self._generate_solution_id()
+            
+    def _generate_solution_id(self) -> str:
+        owner = self.github_owner or ""
+        repo_name = self.github_repo_name or ""
+        base_id = f"{owner}_{repo_name}"
+        base_id = base_id.replace('/', '_').replace('\\', '_')  # Replace slashes with underscores
+        normalized_id = unicodedata.normalize('NFKD', base_id).encode('ascii', 'ignore').decode('ascii')
+        return re.sub(r'[^\w\s.-]', '', normalized_id)
 
     @property
     def install_instructions(self) -> str:
@@ -198,7 +212,7 @@ class Project(YamlAble['Project']):
         if cache_directory:
             cache_directory = Path(cache_directory) / "components"
             os.makedirs(cache_directory, exist_ok=True)
-            filename = self._generate_valid_filename(self.github_owner, self.github_repo_name)
+            filename = f"{self.solution_id}.yaml"
             file_path = cache_directory / filename
 
             if file_path.exists() and not self._is_file_outdated(file_path,cache_valid_secs):
@@ -211,17 +225,6 @@ class Project(YamlAble['Project']):
                 components.save_to_file(str(file_path))
 
         return components
-
-    def _generate_valid_filename(self, owner: str, repo_name: str) -> str:
-        """
-        Generate a valid filename from GitHub repository owner and name.
-        Replace invalid file system characters and remove non-ASCII characters.
-        """
-        base_name = f"{owner}_{repo_name}.yaml"
-        filename = base_name.replace('/', '_').replace('\\', '_')
-        filename = unicodedata.normalize('NFKD', filename).encode('ascii', 'ignore').decode('ascii')
-        filename = re.sub(r'[^\w\s.-]', '', filename)
-        return filename
 
     def _is_file_outdated(self, file_path: Path, cache_valid_secs:int=3600) -> bool:
         """
