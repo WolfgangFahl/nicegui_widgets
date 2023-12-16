@@ -35,7 +35,7 @@ from ngwidgets.projects import (
     Projects,
 )
 from ngwidgets.widgets import Link
-
+from ngwidgets.progress import NiceguiProgressbar
 
 class ProjectView:
     """
@@ -137,12 +137,13 @@ class ProjectsView:
             self.last_update_label = ui.label()
             self.update_button = ui.button("Update", on_click=self.update_projects)
             self.update_last_update_label()
+            self.progress_bar=NiceguiProgressbar(total=100,desc="updating projects",unit="projects")
+           
         with ui.row():
             # Filter input for searching projects
             self.filter_input = ui.input(
                 placeholder="Search projects...", on_change=self.update_view
             )
-
         # Project cards container
         self.cards_container = ui.grid(columns=4)
         self.views = {}
@@ -184,7 +185,7 @@ class ProjectsView:
         self.update_button.disable()
         ui.notify("Updating projects ... this might take a few seconds")
         
-        await run.io_bound(self.projects.update)
+        await run.io_bound(self.projects.update(progress_bar=self.progress_bar))
         await run.io_bound(self.projects.save)
 
         # Notify the user after completion (optional)

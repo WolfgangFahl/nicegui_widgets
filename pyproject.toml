@@ -4,6 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "ngwidgets"
+description = "NiceGUI widgets"
 authors = [
   {name = "Wolfgang Fahl", email = "wf@bitplan.com"}
 ]
@@ -53,7 +54,7 @@ classifiers=[
     "Intended Audience :: Education",
     "License :: OSI Approved :: Apache Software License"
 ]
-dynamic = ["version", "description"]
+dynamic = ["version"]
 
 [tool.hatch.version]
 path = "ngwidgets/__init__.py"
@@ -77,4 +78,3 @@ only-include = ["ngwidgets"]
 [project.scripts]
 ngdemo = "ngwidgets.ngwidgets_cmd:main"
 niceuser = "ngwidgets.users:main"
-

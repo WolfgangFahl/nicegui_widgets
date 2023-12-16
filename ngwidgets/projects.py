@@ -50,7 +50,7 @@ from bs4 import BeautifulSoup, ResultSet, Tag
 from github import Github
 from ngwidgets.components import Components
 from ngwidgets.yamable import YamlAble
-from ngwidgets.progress import Progressbar
+from ngwidgets.progress import Progressbar, NiceguiProgressbar
 
 class GitHubAccess:
     """
@@ -315,9 +315,20 @@ class Project(YamlAble['Project']):
         github = None
         project_urls = info.get("project_urls", {})
         if project_urls:
-            github_url = project_urls.get("Repository") or project_urls.get("Source")
-            if github_url and "github" in github_url:
-                github = github_url
+            # Preferred keys for GitHub URLs
+            preferred_keys = ["Repository", "Source", "Home"]
+            github_base_url = "https://github.com/"
+        
+            # Iterate over the preferred keys and check if any URL starts with the GitHub base URL
+            for key in preferred_keys:
+                url = project_urls.get(key)
+                if url and url.startswith(github_base_url):
+                    github = url
+                    break
+            else:
+                # If no GitHub URL is found, you may choose to handle this case (e.g., logging, fallback logic)
+                github = None
+
 
         project = cls(
             name=info.get("name"),
@@ -494,13 +505,16 @@ class Projects:
 
         # Merge PyPI projects into the GitHub projects
         for pypi in pypi_projects:
-            if pypi.github in projects_by_github_url:
-                # Merge PyPI data into existing GitHub project
-                p = projects_by_github_url[pypi.github]
-                p.merge_pypi(pypi)
-            else:
-                # Check if the PyPI project has a GitHub URL
-                if pypi.github:
+            matched_project=None # Reset for each PyPI project
+            if pypi.github:
+                for github_url in projects_by_github_url.keys():
+                    if pypi.github.startswith(github_url):
+                        matched_project = projects_by_github_url[github_url]
+                if matched_project:
+                    matched_project.merge_pypi(pypi)
+                else:
+                    # we have github url but it was not in our search list
+                    # check the gitub repo for more details
                     repo_name = self.extract_repo_name_from_url(pypi.github)
                     if not repo_name:
                         raise ValueError(f"Can't determine repo_name for {pypi.github} of pypi package {pypi.package}")
@@ -510,9 +524,9 @@ class Projects:
                     # Merge PyPI data into the newly created GitHub project
                     github_comp.merge_pypi(pypi)
                     self.projects.append(github_comp)
-                else:
-                    # PyPI project without a GitHub URL
-                    self.projects.append(pypi)
+            else:
+                # PyPI project without a GitHub URL
+                self.projects.append(pypi)
             if progress_bar:
                 progress_bar.update(1)
         # sort projects by name
