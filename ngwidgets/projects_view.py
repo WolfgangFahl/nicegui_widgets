@@ -185,7 +185,7 @@ class ProjectsView:
         self.update_button.disable()
         ui.notify("Updating projects ... this might take a few seconds")
         
-        await run.io_bound(self.projects.update(progress_bar=self.progress_bar))
+        await run.io_bound(self.projects.update,progress_bar=self.progress_bar)
         await run.io_bound(self.projects.save)
 
         # Notify the user after completion (optional)
