@@ -37,6 +37,7 @@ Main author: OpenAI's language model (instructed by WF)
 
 import json
 import os
+import yaml
 from dataclasses import dataclass, field
 from datetime import datetime
 from pathlib import Path
@@ -48,18 +49,61 @@ from github import Github, Repository
 
 
 class GitHubAccess:
-    def __init__(self, access_token=None):
+    """
+    A class to handle GitHub API access.
+
+    This class provides functionalities to access the GitHub API, either with authenticated or unauthenticated access. 
+    It can read a GitHub access token from a YAML file in a specified directory for authenticated access, 
+    which increases the rate limit for API requests. If no access token is provided or found in the YAML file,
+    it defaults to unauthenticated access with lower rate limits.
+
+    Attributes:
+        github (Github): An instance of the Github class from the PyGithub library, configured for either authenticated or unauthenticated access.
+    """
+    def __init__(self, default_directory: str, access_token: Optional[str] = None):
         """
         Initialize the GitHub instance.
-        If access_token is provided, use it for authenticated access.
-        Otherwise, access is unauthenticated with lower rate limits.
-        """
-        self.github = Github(access_token) if access_token else Github()
 
-    def search_repositories(self, query):
+        If an access_token is provided, use it for authenticated access to increase the rate limit.
+        Otherwise, attempt to read the access token from a YAML file in the default directory.
+        If no token is found, access is unauthenticated with lower rate limits.
+
+        Args:
+            default_directory (str): Path to the directory where the access token file is stored.
+            access_token (Optional[str]): A GitHub personal access token. Defaults to None.
         """
-        Search for repositories with a given query.
-        Returns a list of repository names.
+        if access_token:
+            self.github = Github(access_token)
+        else:
+            access_token=self._read_access_token(default_directory)
+            self.github = Github(access_token)
+
+    def _read_access_token(self, default_directory: str) -> Optional[str]:
+        """
+        Read the GitHub access token from a YAML file located in the default directory.
+
+        Args:
+            default_directory (str): Path to the directory where the access token file is stored.
+
+        Returns:
+            Optional[str]: The access token if found, otherwise None.
+        """
+        token_file = Path(default_directory) / "github_access_token.yaml"
+        if token_file.exists():
+            with open(token_file, 'r') as file:
+                data = yaml.safe_load(file)
+                return data.get('access_token', None)
+        return None
+    
+    def search_repositories(self, query: str) -> list:
+        """
+        Search for GitHub repositories matching a given query.
+
+        Args:
+            query (str): The search query string.
+
+        Returns:
+            list: A list of repository names (str) that match the query.
         """
         repositories = self.github.search_repositories(query)
         return [repo.full_name for repo in repositories]
@@ -316,7 +360,7 @@ class Projects:
         # Fetch projects from PyPI
         pypi_projects = pypi.search_projects(self._topic)
         # Fetch repositories from GitHub
-        github_access = GitHubAccess()
+        github_access = GitHubAccess(self.default_directory)
         self.projects= self.get_github_projects(github_access)
         # Create a dictionary to map GitHub URLs to projects
         comp_by_github_url = {
