@@ -78,5 +78,7 @@ class ComponentView:
                         url=self.project.components_url.replace("/.components.yaml",self.component.source)
                         link=Link.create(url,self.component.name)
                         ui.html(link)
+                    if (self.component.issue):
+                        url=f"{self.component.issue}"
                     if (self.component.video_url):
                         ui.image(self.component.video_url)

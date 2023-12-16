@@ -1,0 +1,6 @@
+# Components
+# WF 2023-12-16
+components:
+- name: dict_edit.py
+  source: /ngwidgets/dict_edit.py
+  issue: 47
