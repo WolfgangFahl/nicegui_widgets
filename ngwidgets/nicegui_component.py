@@ -56,12 +56,11 @@ class GitHubAccess:
         """
         self.github = Github(access_token) if access_token else Github()
 
-    def search_repositories_by_topic(self, topic):
+    def search_repositories(self, query):
         """
-        Search for repositories with a given topic.
+        Search for repositories with a given query.
         Returns a list of repository names.
         """
-        query = f"topic:{topic}"
         repositories = self.github.search_repositories(query)
         return [repo.full_name for repo in repositories]
 
@@ -90,6 +89,8 @@ class Project:
         downloads (int): Number of downloads from PyPI.
         categories (List[str]): Categories associated with the project.
         version (str): The current version of the project on PyPI.
+        solution_tags(str): a list of comma separated tags for checking the conformance of the project
+        to the solution bazaar guidelines
     """
 
     name: Optional[str] = None
@@ -110,6 +111,7 @@ class Project:
     downloads: Optional[int] = None
     categories: List[str] = field(default_factory=list)
     version: Optional[str] = None
+    solution_tags: Optional[str] = ""
 
     @property
     def install_instructions(self) -> str:
@@ -232,7 +234,7 @@ class Projects:
         Returns:
             Path: The file path.
         """
-        filename = f"projects_{self._topic}.json"
+        filename = f"components_{self._topic}.json"
         return self._default_directory / filename
 
     def save(self, projects: List[Project] = None, directory: str = None):
@@ -277,36 +279,59 @@ class Projects:
         if set_self:
             self.projects = projects
         return projects
+    
+    def get_github_projects(self,github_access):
+        """
+        Retrieve GitHub projects both specifically tagged and generally related to the topic.
+        """
+        
+        queries = [
+            f"topic:{self._topic}",  # Specific topic query
+            f"{self._topic}"         # General topic query
+        ]
+        all_projects = {}
+
+        for query in queries:
+            github_repos = github_access.search_repositories(query)
+            for repo in github_repos:
+                project = Project.from_github(repo, github_access)
+
+                # If this is from a specific topic query, add 'topic' to solution_tags
+                if query.startswith("topic:"):
+                    if project.solution_tags:
+                        project.solution_tags += ","
+                    project.solution_tags += "topic"
+
+                all_projects[project.name] = project
+
+        return list(all_projects.values())
 
     def update(self):
         """
         Update the list of projects by retrieving potential projects from PyPI and GitHub based on the topic.
         """
+        # pypi access
         pypi = PyPi()
-        github_access = GitHubAccess()
 
         # Fetch projects from PyPI
         pypi_projects = pypi.search_projects(self._topic)
         # Fetch repositories from GitHub
-        github_repos = github_access.search_repositories_by_topic(self._topic)
-        github_projects = [
-            Project.from_github(repo, github_access) for repo in github_repos
-        ]
-
-        self.projects = github_projects
+        github_access = GitHubAccess()
+        self.projects= self.get_github_projects(github_access)
         # Create a dictionary to map GitHub URLs to projects
         comp_by_github_url = {
-            comp.github: comp for comp in github_projects if comp.github
+            comp.github: comp for comp in self.projects if comp.github
         }
 
         # Merge PyPI projects into the GitHub projects
         for comp in pypi_projects:
             if comp.github in comp_by_github_url:
                 # Merge PyPI data into existing GitHub project
-                existing_comp = comp_by_github_url[comp.github]
-                existing_comp.pypi = comp.pypi
-                existing_comp.pypi_description = comp.pypi_description
-                existing_comp.version = comp.version
+                pypi_comp = comp_by_github_url[comp.github]
+                pypi_comp.pypi = comp.pypi
+                pypi_comp.package = comp.package
+                pypi_comp.pypi_description = comp.pypi_description
+                pypi_comp.version = comp.version
             else:
                 # Check if the PyPI project has a GitHub URL
                 if comp.github:

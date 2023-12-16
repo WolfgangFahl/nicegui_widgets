@@ -30,7 +30,7 @@ from datetime import datetime, timedelta
 
 from nicegui import run, ui
 
-from ngwidgets.nicegui_component import (  # Replace with the actual import path
+from ngwidgets.nicegui_component import (  
     Project,
     Projects,
 )
@@ -47,7 +47,7 @@ class ProjectView:
 
     def setup(self, container) -> ui.card:
         """
-        setup a card
+        setup a card for my project
         """
         with container:
             self.card = ui.card()
@@ -89,7 +89,6 @@ class ProjectView:
 
                     ui.html(html_markup)
             return self.card
-
 
 class ProjectsView:
     """
@@ -160,11 +159,16 @@ class ProjectsView:
         """
         update the projects
         """
+        # avoid multiple background runs
+        self.update_button.disable()
+        ui.notify("Updating projects ... this might take a few seconds")
+        
         await run.io_bound(self.projects.update)
         await run.io_bound(self.projects.save)
 
         # Notify the user after completion (optional)
         ui.notify("Projects updated successfully.")
+        self.update_last_update_label()
 
     def update_last_update_label(self):
         """Update the label showing the last update time."""
