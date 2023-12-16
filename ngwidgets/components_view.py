@@ -74,11 +74,15 @@ class ComponentView:
                     # Title
                     title = f"{self.component.name}"
                     ui.label(title).classes("text-2xl")
+                    html_markup=""
                     if (self.component.source):
                         url=self.project.components_url.replace("/.components.yaml",self.component.source)
                         link=Link.create(url,self.component.name)
-                        ui.html(link)
+                        html_markup+=link
                     if (self.component.issue):
-                        url=f"{self.component.issue}"
+                        url=f"{self.project.github}/issues/{self.component.issue}"
+                        link=Link.create(url,f"#{self.component.issue}")
+                        html_markup+=link
+                    ui.html(html_markup)
                     if (self.component.video_url):
                         ui.image(self.component.video_url)

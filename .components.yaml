@@ -4,3 +4,4 @@ components:
 - name: dict_edit.py
   source: /ngwidgets/dict_edit.py
   issue: 47
+  video_url: https://github.com/WolfgangFahl/nicegui_widgets/assets/1336221/d1682fce-975a-4ecc-a82e-c2c397e8222a.png
