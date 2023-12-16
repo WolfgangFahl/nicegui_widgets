@@ -42,12 +42,12 @@ import re
 import unicodedata
 import urllib
 import yaml
-from dataclasses import asdict, dataclass, field
+from dataclasses import  dataclass, field
 from datetime import datetime
 from pathlib import Path
 from typing import Dict, List, Optional
 from bs4 import BeautifulSoup, ResultSet, Tag
-from github import Github, Repository
+from github import Github
 from ngwidgets.components import Components
 from ngwidgets.yamable import YamlAble
 from ngwidgets.progress import Progressbar

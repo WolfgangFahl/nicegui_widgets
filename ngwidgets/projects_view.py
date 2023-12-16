@@ -52,48 +52,63 @@ class ProjectView:
         with container:
             self.card = ui.card()
             with self.card:
-                title = f"{self.project.name}"
-                if self.project.version:
-                    title = f"{title} - {self.project.version}"
-                ui.label(title).classes("text-2xl")
-                if self.project.stars is not None:
-                    ui.label(f"⭐️ Stars: {self.project.stars}")
-                if self.project.github:
-                    with ui.row().classes("items-center").style("gap: 0.5rem"):
+                with ui.row().classes("flex w-full items-center"):
+                    # Title
+                    title = f"{self.project.name}"
+                    if self.project.version:
+                        title = f"{title} - {self.project.version}"
+                    ui.label(title).classes("text-2xl")
+                    if self.project.stars:
+                        # Flexible space to push stars to the right
+                        ui.label('').classes("flex-grow")
+                        star_rating=math.ceil(math.log10(self.project.stars+0.5))
+                        star_rating=min(star_rating,5)
+                        github_stars=f"{'⭐'*star_rating}️ {self.project.stars}"
+                        ui.label(github_stars).classes("text-xl ml-auto")
+                columns=4 if self.project.components_url else 3
+                self.card_grid=ui.grid(columns=columns)
+                with self.card_grid:
+                    if self.project.pypi:
+                        pypi_icon = "<img src='https://upload.wikimedia.org/wikipedia/commons/thumb/6/64/PyPI_logo.svg/64px-PyPI_logo.svg.png' alt='pypi' title='pypi'/>"
+                        pypi_link = Link.create(self.project.pypi, f"{pypi_icon}{self.project.package}")
+                        html_markup = pypi_link
+                        self.pypi_html=ui.html(html_markup)
+                    if self.project.github:
                         github_icon = "<img src='https://upload.wikimedia.org/wikipedia/commons/thumb/9/91/Octicons-mark-github.svg/32px-Octicons-mark-github.svg.png' alt='github' title='github'/>"
-                        github_link = Link.create(self.project.github, github_icon)
-                        html_markup = github_link
+                        github_name = self.project.github_repo_name
+                        github_html_markup=f"{github_icon}{github_name}"
+                        github_link = Link.create(self.project.github, github_html_markup)
+                        html_markup = f"{github_link}"
+                        self.github_html=ui.html(html_markup) 
+                        html_markup = ""   
                         if self.project.github_author:
-                            author_url = (
-                                f"https://github.com/{self.project.github_author}"
-                            )
+                            author=self.project.github_author
+                            author_url = f"https://github.com/{author}"
+                            if self.project.avatar:
+                                avatar_icon = f"<img src='{self.project.avatar}' alt='{author}' title='{author}' style='width: 40px; height: 40px; border-radius: 50%;'/>"
+                            else:
+                                avatar_icon = author 
                             author_link = Link.create(
-                                author_url, self.project.github_author
+                                author_url, f"{avatar_icon}{author}"
                             )
-                            html_markup = f"{html_markup}{author_link}"
-                        if self.project.avatar:
-                            avatar_html = f"<img src='{self.project.avatar}' alt='{self.project.github_author}' style='width: 40px; height: 40px; border-radius: 50%;'/>"
-                            html_markup = f"{html_markup}{avatar_html}"
+                            html_markup = f"{author_link}"
+                        self.project_html=ui.html(html_markup)    
+                        html_markup=""
                         if self.project.components_url:
                             components=self.project.get_components()
                             components_count = len(components.components)  # Assuming get_components returns a list
                             components_icon = "<img src='https://upload.wikimedia.org/wikipedia/commons/thumb/1/11/Octicons-puzzle.svg/32px-Octicons-puzzle.svg.png' alt='components' title='components'/>"
                             html_markup += f" {components_icon} {components_count}"
-                     
-                        ui.html(html_markup)
+                            self.components_html=ui.html(html_markup)
+                html_markup=""
                 if self.project.pypi:
-                    pypi_icon = "<img src='https://upload.wikimedia.org/wikipedia/commons/thumb/6/64/PyPI_logo.svg/64px-PyPI_logo.svg.png' alt='pypi' title='pypi'/>"
-                    pypi_link = Link.create(self.project.pypi, pypi_icon)
-                    html_markup = pypi_link
                     if self.project.pypi_description:
-                        html_markup = f"""{html_markup}
-        <strong>{self.project.package}</strong>:
-        <span>{self.project.pypi_description}</span>"""
-                    if self.project.package:
-                        inst_html = f"<pre>{self.project.install_instructions}</pre>"
-                        html_markup = f"{html_markup}\n{inst_html}"
+                        html_markup = f"""<strong>{self.project.package}</strong>:
+            <span>{self.project.pypi_description}</span>"""
+                    inst_html = f"<pre>{self.project.install_instructions}</pre>"
+                    html_markup = f"{html_markup}\n{inst_html}"
 
-                    ui.html(html_markup)
+                self.desc_html=ui.html(html_markup)
             return self.card
 
 class ProjectsView:
