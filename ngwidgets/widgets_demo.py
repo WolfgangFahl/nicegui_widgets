@@ -48,7 +48,7 @@ class NiceGuiWidgetsDemoWebserver(InputWebserver):
         
         @ui.page("/components/{solution_id}")
         async def show_components(solution_id:str,client: Client):
-            await client.connected(timeout=self.timeout)
+            await client.connected(timeout=self.timeout*4)
             return await self.show_components(solution_id)
 
         @ui.page("/dictedit")

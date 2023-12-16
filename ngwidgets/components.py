@@ -26,6 +26,7 @@ from typing import List,Optional
 @dataclass
 class Component:
     name: str
+    source: Optional[str] = None
     video_url: Optional[str] = None
     issue: Optional[str] = None
     fixed: Optional[str] = None

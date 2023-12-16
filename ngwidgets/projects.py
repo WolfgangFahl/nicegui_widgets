@@ -50,7 +50,7 @@ from bs4 import BeautifulSoup, ResultSet, Tag
 from github import Github
 from ngwidgets.components import Components
 from ngwidgets.yamable import YamlAble
-from ngwidgets.progress import Progressbar, NiceguiProgressbar
+from ngwidgets.progress import Progressbar
 
 class GitHubAccess:
     """
@@ -244,20 +244,21 @@ class Project(YamlAble['Project']):
           
         
     @classmethod
-    def get_components_yaml_raw_url(cls, owner: str, repo_name: str, branch_name: str) -> str:
+    def get_raw_url(cls, owner: str, repo_name: str, branch_name: str,file_path:str) -> str:
         """
-        Construct the URL for the raw .component.yaml file from the owner, repository name, and branch name.
+        Construct the URL for the raw  file_path from the owner, repository name, and branch name.
 
         Args:
             owner (str): The owner of the GitHub repository.
             repo_name (str): The name of the GitHub repository.
             branch_name (str): The name of the branch.
+            file_path(str): the file_path to get the raw content for
 
         Returns:
-            str: The URL of the raw .component.yaml file if it exists
+            str: The URL of the raw file_path if it exists
             
         """
-        raw_url = f"https://raw.githubusercontent.com/{owner}/{repo_name}/{branch_name}/.components.yaml"
+        raw_url = f"https://raw.githubusercontent.com/{owner}/{repo_name}/{branch_name}{file_path}"
         try:
             # Attempt to open the raw URL
             with urllib.request.urlopen(raw_url) as response:
@@ -287,7 +288,7 @@ class Project(YamlAble['Project']):
         owner = repo.owner.login
         repo_name = repo.name
 
-        components_url = cls.get_components_yaml_raw_url(owner, repo_name, repo.default_branch)
+        components_url = cls.get_raw_url(owner, repo_name, repo.default_branch,"/.components.yaml")
         project = cls(
             name=repo.name,
             github=repo.html_url,
