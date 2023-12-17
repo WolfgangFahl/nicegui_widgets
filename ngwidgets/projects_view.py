@@ -132,6 +132,8 @@ class ProjectsView:
             projects = Projects(topic="nicegui")
             projects.load()
         self.projects = projects
+        self.sorting = "stars"  # Set the default sorting method to "Stars"
+     
         self.setup()
 
     def setup(self):
@@ -147,6 +149,12 @@ class ProjectsView:
             self.filter_input = ui.input(
                 placeholder="Search projects...", on_change=self.update_view
             )
+        # Radio buttons for sorting
+        sort_options = {"Stars": "stars", "Name": "name", "Component Count": "component_count", "Author": "author"}
+        with ui.row():
+            ui.label("Sort by:")
+            self.sort_radio_group = ui.radio(options=sort_options).bind_value(self, 'sorting')
+
         # Project cards container
         self.cards_container = ui.grid(columns=4)
         self.views = {}
@@ -169,10 +177,20 @@ class ProjectsView:
         # Clear the current cards container
         self.cards_container.clear()
 
-        # Sort the projects by stars (descending order) as an example
-        sorted_projects = sorted(
-            filtered_projects, key=lambda c: c.stars if c.stars else 0, reverse=True
-        )
+        # Get the selected sorting method from the radio buttons
+        selected_sorting = self.sort_radio_group.value
+
+        # Sort the projects based on the selected method
+        if selected_sorting == "stars":
+            sorted_projects = sorted(
+                filtered_projects, key=lambda c: c.stars if c.stars else 0, reverse=True
+            )
+        elif selected_sorting == "name":
+            sorted_projects = sorted(filtered_projects, key=lambda c: c.name)
+        elif selected_sorting == "component_count":
+            sorted_projects = sorted(filtered_projects, key=lambda c: c.component_count)
+        elif selected_sorting == "author":
+            sorted_projects = sorted(filtered_projects, key=lambda c: c.author)
 
         # Create a card for each project
         for project in sorted_projects:

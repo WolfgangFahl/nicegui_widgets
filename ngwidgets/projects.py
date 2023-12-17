@@ -180,6 +180,17 @@ class Project(YamlAble['Project']):
         return re.sub(r'[^\w\s.-]', '', normalized_id)
 
     @property
+    def component_count(self) -> int:
+        """
+        Counts the number of components associated with the project.
+        Returns 0 if there are no components or if components_url is not set.
+        """
+        if not self.components_url:
+            return 0
+        components = self.get_components()
+        return len(components.components) if components else 0
+    
+    @property
     def install_instructions(self) -> str:
         """
         Get the installation instructions for the project.
@@ -436,28 +447,30 @@ class Projects:
                 [project.__dict__ for project in projects], file, indent=4, default=str
             )
 
-    def load(self, directory: str = None, set_self: bool = True) -> List[Project]:
+    def load(self, directory: str = None, set_self: bool = True, lenient:bool=True) -> List[Project]:
         """
         Load a list of Project instances from a JSON file.
         Args:
             directory (str, optional): The directory where the file is located. If None, uses the default directory.
             set_self(bool): if True set self.projects with the result
+            lenient(bool): if True allow that there is no projects json file
         Returns:
             List[Project]: A list of Project instances loaded from the file.
 
         """
         directory = Path(directory or self.default_directory)
-
-        if not self.file_path.exists():
-            raise FileNotFoundError(f"No such file: {self.file_path}")
-
-        with open(self.file_path, "r", encoding="utf-8") as file:
-            projects_records = json.load(file)
-
         projects = []
-        for project_record in projects_records:
-            project = Project(**project_record)
-            projects.append(project)
+        if not self.file_path.exists():
+            if not lenient:
+                raise FileNotFoundError(f"No such file: {self.file_path}")
+        else:                    
+            with open(self.file_path, "r", encoding="utf-8") as file:
+                projects_records = json.load(file)
+    
+           
+            for project_record in projects_records:
+                project = Project(**project_record)
+                projects.append(project)
         if set_self:
             self.projects = projects
         return projects
@@ -480,6 +493,28 @@ class Projects:
             projects_by_url[repo.html_url]=project
         return projects_by_url
         
+    def sort_projects(self, projects:List[Project],sort_key:str):
+        """
+        Sorts a list of projects based on the specified sort key.
+
+        Args:
+            projects (list): List of Project instances.
+            sort_key (str): Attribute name to sort the projects by.
+
+        Returns:
+            list: Sorted list of projects.
+        """
+
+        # Define the function to determine the sorting value
+        def get_sort_value(proj):
+            attr = getattr(proj, sort_key, None)
+            return attr if isinstance(attr, int) else attr or ""
+
+        # Determine if sorting should be in reverse
+        reverse_sort = sort_key in ["stars", "downloads", "component_count"]
+
+        return sorted(projects, key=get_sort_value, reverse=reverse_sort)
+
 
     def update(
         self,
@@ -645,21 +680,22 @@ class PyPi:
 
         soup = BeautifulSoup(text, "html.parser")
         packagestable = soup.find("ul", {"class": "unstyled"})
-
+        # Constructing the result list
+        packages = []
+        
         # If no package exists then there is no table displayed hence soup.table will be None
         if packagestable is None:
-            return []
-
-        if not isinstance(packagestable, Tag):
-            return []
+            return packages
 
         packagerows: ResultSet[Tag] = packagestable.findAll("li")
 
-        # Constructing the result list
-        packages = []
         if self.debug:
             print(f"found len{packagerows} package rows")
-        for package in packagerows[:limit]:
+        if limit:
+            selected_rows=packagerows[:limit]
+        else:
+            selected_rows=packagerows
+        for package in selected_rows:
             nameSelector = package.find("span", {"class": "package-snippet__name"})
             if nameSelector is None:
                 continue

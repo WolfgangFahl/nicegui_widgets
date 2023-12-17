@@ -108,6 +108,7 @@ class TestNiceguiProjects(Basetest):
                     "stars": 1110,
                     "github_description": "An object oriented high-level Python Web Framework that requires no frontend programming",
                     "avatar": "https://avatars.githubusercontent.com/u/112261672?v=4",
+                    "component_count": 228,
                 },
             ),
             (
