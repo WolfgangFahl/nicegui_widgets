@@ -51,6 +51,11 @@ class NiceGuiWidgetsDemoWebserver(InputWebserver):
             await client.connected(timeout=self.timeout*4)
             return await self.show_components(solution_id)
 
+        @ui.page("/color_schema")
+        async def show_color_schema(client: Client):
+            await client.connected(timeout=self.timeout)
+            return await self.show_color_schema()
+        
         @ui.page("/dictedit")
         async def show_dictedit(client: Client):
             await client.connected(timeout=self.timeout)
@@ -95,6 +100,12 @@ class NiceGuiWidgetsDemoWebserver(InputWebserver):
         def show():
             self.projects_view = ProjectsView(self)
 
+        await self.setup_content_div(show)
+        
+    async def show_color_schema(self):
+        def show():
+            self.config.color_schema.display()
+            pass
         await self.setup_content_div(show)
 
     async def show_pdf_viewer(self):
@@ -196,6 +207,7 @@ class NiceGuiWidgetsDemoWebserver(InputWebserver):
             ui.html(
                 """<ul>
         <li><a href='/solutions'>nicegui solutions bazaar</a></li>
+        <li><a href='/color_schema'>ColorSchema</a></li>
         <li><a href='/dictedit'>dictedit</a></li>
         <li><a href='/grid'>grid</a></li>
         <li><a href='/hideshow'>HideShow Demo</a></li>

@@ -76,15 +76,20 @@ class ComponentView:
                     ui.label(title).classes("text-2xl")
                     html_markup=""
                     delim=""
+                    if (self.component.demo_url):
+                        link=Link.create(self.component.demo.url,"demo")
+                        html_markup+=link
+                        delim=" "
                     if (self.component.source):
                         url=self.project.components_url.replace("/.components.yaml",self.component.source)
                         link=Link.create(url,self.component.name)
-                        html_markup+=link
+                        html_markup+=delim+link
                         delim=" "
                     if (self.component.issue):
                         url=f"{self.project.github}/issues/{self.component.issue}"
                         link=Link.create(url,f"#{self.component.issue}")
                         html_markup+=delim+link
+                        delim=" "
                     ui.html(html_markup)
-                    if (self.component.video_url):
-                        ui.image(self.component.video_url)
+                    if (self.component.demo_image_url):
+                        ui.image(self.component.demo_image_url)

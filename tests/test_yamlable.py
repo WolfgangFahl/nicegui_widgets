@@ -9,11 +9,11 @@ Prompts:
 """
 
 from ngwidgets.basetest import Basetest
-from ngwidgets.dataclass_yaml import Yaml
+from ngwidgets.yamlable import YamlAble
 from dataclasses import dataclass
 
 @dataclass
-class MockDataClass:
+class MockDataClass(YamlAble["MockDataClass"]):
     """
     Mock dataclass for testing YAML conversion.
 
@@ -28,7 +28,7 @@ class MockDataClass:
     description: str = None
     url: str = None
 
-class TestYaml(Basetest):
+class TestYamlAble(Basetest):
     """
     Test the Yaml handler for dataclass to YAML conversion.
     """
@@ -42,7 +42,6 @@ class TestYaml(Basetest):
             profile (bool): Flag to enable profiling. Defaults to True.
         """
         Basetest.setUp(self, debug=debug, profile=profile)
-        self.yaml_handler = Yaml()
         self.mock_data = MockDataClass(
             name="Example",
             id=123,
@@ -57,7 +56,7 @@ class TestYaml(Basetest):
         Returns:
             str: The YAML string representation of the mock dataclass.
         """
-        yaml_str = self.yaml_handler.to_yaml(self.mock_data)
+        yaml_str = self.mock_data.to_yaml()
         if self.debug:
             print(yaml_str)
         return yaml_str

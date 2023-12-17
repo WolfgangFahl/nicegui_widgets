@@ -49,7 +49,7 @@ from typing import Dict, List, Optional
 from bs4 import BeautifulSoup, ResultSet, Tag
 from github import Github
 from ngwidgets.components import Components
-from ngwidgets.yamable import YamlAble
+from ngwidgets.yamlable import YamlAble
 from ngwidgets.progress import Progressbar
 
 class GitHubAccess:
