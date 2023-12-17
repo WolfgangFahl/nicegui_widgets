@@ -32,9 +32,10 @@ class ComponentsView:
         self.project_container=ui.grid(columns=1)
         self.project_view = ProjectView(self.project)
         self.project_view.setup(self.project_container)
-        self.slider = ui.slider(min=1, max=len(self.components.components) // self.page_size + 1, 
-                                step=1, value=1, on_change=self.update_display)
-        self.container = ui.grid(columns=4)
+        if self.components:
+            self.slider = ui.slider(min=1, max=len(self.components.components) // self.page_size + 1, 
+                                    step=1, value=1, on_change=self.update_display)
+            self.container = ui.grid(columns=4)
         self.update_display()
 
     def update_display(self, *args):
