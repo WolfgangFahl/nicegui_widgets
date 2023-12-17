@@ -16,3 +16,8 @@ components:
   issue: 49
   demo_url: http://ngdemo.bitplan.com/tristate
   demo_image_url: https://github.com/WolfgangFahl/nicegui_widgets/assets/1336221/50998f00-c6a0-4df0-b233-b40ddc15e26a
+- name: file_selector.py
+  source: /ngwidgets/file_selector.py
+  issue: 7
+  demo_url: http://nicescad.bitplan.com/
+  demo_image_url: https://github.com/WolfgangFahl/nicegui_widgets/assets/1336221/5f27ddb9-3827-4cf2-bfb3-f237718ebe38
