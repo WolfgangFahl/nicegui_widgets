@@ -38,7 +38,7 @@ class ComponentsView:
             self.container = ui.grid(columns=4)
         self.update_display()
 
-    def update_display(self, *args):
+    def update_display(self, *_args):
         """
         Update the displayed components based on the slider's position
         """
