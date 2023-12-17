@@ -42,7 +42,7 @@ class Component:
     demo_url: Optional[str] = None
     demo_image_url: Optional[str] = None
     doc_url: Optional[str] = None
-    issue: Optional[str] = None
+    issue: Optional[int] = None
     fixed: Optional[str] = None
 
 @dataclass

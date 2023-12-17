@@ -77,7 +77,7 @@ class ComponentView:
                     html_markup=""
                     delim=""
                     if (self.component.demo_url):
-                        link=Link.create(self.component.demo.url,"demo")
+                        link=Link.create(self.component.demo_url,"demo")
                         html_markup+=link
                         delim=" "
                     if (self.component.source):

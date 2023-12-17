@@ -5,9 +5,9 @@ components:
   source: /ngwidgets/dict_edit.py
   issue: 47
   demo_url: http://ngdemo.bitplan.com/dictedit
-  demo_image_url: https://github.com/WolfgangFahl/nicegui_widgets/assets/1336221/d1682fce-975a-4ecc-a82e-c2c397e8222a.png
+  demo_image_url: https://github.com/WolfgangFahl/nicegui_widgets/assets/1336221/d1682fce-975a-4ecc-a82e-c2c397e8222a
 - name: color_schema.py
   source: /ngwidgets/color_schema.py
   issue: 15
   demo_url: http://ngdemo.bitplan.com/color_schema
-  demo_image_url: https://github.com/WolfgangFahl/nicegui_widgets/assets/1336221/2bb926d4-da56-4201-a04c-af032d4de08e.png
+  demo_image_url: https://github.com/WolfgangFahl/nicegui_widgets/assets/1336221/2bb926d4-da56-4201-a04c-af032d4de08e

@@ -18,6 +18,7 @@ from dataclasses import asdict, is_dataclass, fields
 import yaml
 import urllib.request
 from typing import Any, Type, TypeVar, Generic
+from dacite import from_dict
 
 T = TypeVar('T')
 
@@ -114,9 +115,10 @@ class YamlAble(Generic[T]):
         """
         if not data:
             return None
-        dataclass_fields = {field.name for field in fields(cls)}
-        filtered_data = {key: value for key, value in data.items() if key in dataclass_fields}
-        return cls(**filtered_data)
+        instance=from_dict(data_class=cls,data=data)
+        #dataclass_fields = {field.name for field in fields(cls)}
+        #filtered_data = {key: value for key, value in data.items() if key in dataclass_fields}
+        return instance
 
     def to_dict(self) -> dict:
         """
