@@ -94,7 +94,7 @@ class YamlAble(Generic[T]):
         Saves the current dataclass instance to a YAML file.
         """
         with open(filename, 'w') as file:
-            file.write(self.to_yaml(self))
+            file.write(self.to_yaml())
 
     @staticmethod
     def remove_nones(value: Any) -> Any:
@@ -112,6 +112,8 @@ class YamlAble(Generic[T]):
         """
         Creates an instance of a dataclass from a dictionary, typically used in deserialization.
         """
+        if not data:
+            return None
         dataclass_fields = {field.name for field in fields(cls)}
         filtered_data = {key: value for key, value in data.items() if key in dataclass_fields}
         return cls(**filtered_data)

@@ -20,7 +20,7 @@ Prompts for LLM:
 Main author: OpenAI's language model (instructed by WF)
 """
 from ngwidgets.yamlable import YamlAble
-from dataclasses import asdict, dataclass
+from dataclasses import dataclass, field
 from typing import List,Optional
 
 @dataclass
@@ -45,11 +45,12 @@ class Component:
     issue: Optional[str] = None
     fixed: Optional[str] = None
 
+@dataclass
 class Components(YamlAble['Components']):
     """
     Components
     """
-    components: List[Component]
+    components: List[Component] = field(default_factory=list)
 
     def __init__(self, components: List[Component] = None):
         if components is None:
@@ -57,10 +58,4 @@ class Components(YamlAble['Components']):
         else:
             self.components = components
 
-    @classmethod
-    def from_dict(cls, data: dict) -> 'Components':
-        components = [Component(**item) for item in data['components']]
-        return cls(components)
-
-    def to_dict(self) -> dict:
-        return {'components': [asdict(component) for component in self.components]}
+   

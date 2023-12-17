@@ -215,9 +215,11 @@ class Project(YamlAble['Project']):
             filename = f"{self.solution_id}.yaml"
             file_path = cache_directory / filename
 
-            if file_path.exists() and not self._is_file_outdated(file_path,cache_valid_secs):
-                load_from_url = False
-                components = Components.load_from_file(str(file_path))
+            if file_path.exists():
+                file_size=file_path.stat().st_size
+                if file_size>0 and not self._is_file_outdated(file_path,cache_valid_secs):
+                    load_from_url = False
+                    components = Components.load_from_file(str(file_path))
 
         if load_from_url:
             components = Components.load_from_url(self.components_url)

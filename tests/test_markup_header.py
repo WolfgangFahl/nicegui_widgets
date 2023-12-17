@@ -6,6 +6,7 @@ Created on 2023-11-19
 from ngwidgets.markup_header import MarkupHeader
 from ngwidgets.basetest import Basetest
 
+
 class TestsMarkupHeader(Basetest):
     """
     Test markup header handling.
@@ -65,11 +66,10 @@ class TestsMarkupHeader(Basetest):
             ("textile", 1, f"h1. {test_title}"),
             ("textile", 2, f"h2. {test_title}"),
             ("textile", 3, f"h3. {test_title}"),
-            ("tsv", 1, f"{test_title}")
+            ("tsv", 1, f"{test_title}"),
         ]
 
         for markup_format, level, expected_content in formats:
             with self.subTest(f"Testing format: {markup_format}, level: {level}"):
                 header = MarkupHeader.get_markup(test_title, markup_format, level)
                 self.assertEqual(header.strip(), expected_content)
-
