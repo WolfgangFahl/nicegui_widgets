@@ -36,6 +36,7 @@ class TestNiceguiProjects(Basetest):
         pypi = PyPi(debug=self.debug)
         for project_name, url in self.pypi_test_projects:
             package_info = pypi.get_package_info(project_name)
+            
             project = Project.from_pypi(package_info)
             if pypi.debug:
                 print("Package Info:")

@@ -4,7 +4,8 @@ build-backend = "hatchling.build"
 
 [project]
 name = "ngwidgets"
-description = "NiceGUI widgets"
+keywords = ["nicegui", "components", "ui"]
+description = "NiceGUI widgets and solution bazaar"
 authors = [
   {name = "Wolfgang Fahl", email = "wf@bitplan.com"}
 ]
