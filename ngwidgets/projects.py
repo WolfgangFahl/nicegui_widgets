@@ -42,7 +42,7 @@ import re
 import unicodedata
 import urllib
 import yaml
-from dataclasses import  dataclass, field
+from dataclasses import dataclass, field, fields
 from datetime import datetime
 from pathlib import Path
 from typing import Dict, List, Optional
@@ -52,19 +52,23 @@ from ngwidgets.components import Components
 from ngwidgets.yamlable import YamlAble
 from ngwidgets.progress import Progressbar
 
+
 class GitHubAccess:
     """
     A class to handle GitHub API access.
 
-    This class provides functionalities to access the GitHub API, either with authenticated or unauthenticated access. 
-    It can read a GitHub access token from a YAML file in a specified directory for authenticated access, 
+    This class provides functionalities to access the GitHub API, either with authenticated or unauthenticated access.
+    It can read a GitHub access token from a YAML file in a specified directory for authenticated access,
     which increases the rate limit for API requests. If no access token is provided or found in the YAML file,
     it defaults to unauthenticated access with lower rate limits.
 
     Attributes:
         github (Github): An instance of the Github class from the PyGithub library, configured for either authenticated or unauthenticated access.
     """
-    def __init__(self, default_directory: str=None, access_token: Optional[str] = None):
+
+    def __init__(
+        self, default_directory: str = None, access_token: Optional[str] = None
+    ):
         """
         Initialize the GitHub instance.
 
@@ -77,7 +81,7 @@ class GitHubAccess:
             access_token (Optional[str]): A GitHub personal access token. Defaults to None.
         """
         if not access_token and default_directory:
-            access_token=self._read_access_token(default_directory)
+            access_token = self._read_access_token(default_directory)
         self.github = Github(access_token)
 
     def _read_access_token(self, default_directory: str) -> Optional[str]:
@@ -92,28 +96,28 @@ class GitHubAccess:
         """
         token_file = Path(default_directory) / "github_access_token.yaml"
         if token_file.exists():
-            with open(token_file, 'r') as file:
+            with open(token_file, "r") as file:
                 data = yaml.safe_load(file)
-                return data.get('access_token', None)
+                return data.get("access_token", None)
         return None
-    
+
     def search_repositories(self, query: str) -> dict:
         """
         Search for GitHub repositories matching a given query.
-    
+
         Args:
             query (str): The search query string.
-    
+
         Returns:
             dict: A dictionary of repository objects keyed by their full names.
         """
         repositories = self.github.search_repositories(query)
-        repo_dict= {repo.full_name: repo for repo in repositories}
+        repo_dict = {repo.full_name: repo for repo in repositories}
         return repo_dict
 
 
 @dataclass
-class Project(YamlAble['Project']):
+class Project(YamlAble["Project"]):
     """
     A data class representing a software project, potentially from PyPI or GitHub.
 
@@ -136,12 +140,13 @@ class Project(YamlAble['Project']):
         downloads (int): Number of downloads from PyPI.
         categories (List[str]): Categories associated with the project.
         version (str): The current version of the project on PyPI.
-        
+
     Solution bazaar attributes:
         component_url(str): the url of a yaml file with component declarations, demo, install and usage information
         solution_tags(str): a list of comma separated tags for checking the conformance of the project
         to the solution bazaar guidelines
     """
+
     name: Optional[str] = None
     package: Optional[str] = None
     demo: Optional[str] = None
@@ -166,18 +171,24 @@ class Project(YamlAble['Project']):
     components_url: Optional[str] = None
     solution_tags: Optional[str] = ""
     solution_id: Optional[str] = None
-    
+
     def __post_init__(self):
         if self.github_owner and self.github_repo_name:
             self.solution_id = self._generate_solution_id()
-            
+
     def _generate_solution_id(self) -> str:
         owner = self.github_owner or ""
         repo_name = self.github_repo_name or ""
         base_id = f"{owner}_{repo_name}"
-        base_id = base_id.replace('/', '_').replace('\\', '_')  # Replace slashes with underscores
-        normalized_id = unicodedata.normalize('NFKD', base_id).encode('ascii', 'ignore').decode('ascii')
-        return re.sub(r'[^\w\s.-]', '', normalized_id)
+        base_id = base_id.replace("/", "_").replace(
+            "\\", "_"
+        )  # Replace slashes with underscores
+        normalized_id = (
+            unicodedata.normalize("NFKD", base_id)
+            .encode("ascii", "ignore")
+            .decode("ascii")
+        )
+        return re.sub(r"[^\w\s.-]", "", normalized_id)
 
     @property
     def component_count(self) -> int:
@@ -189,7 +200,7 @@ class Project(YamlAble['Project']):
             return 0
         components = self.get_components()
         return len(components.components) if components else 0
-    
+
     @property
     def install_instructions(self) -> str:
         """
@@ -200,10 +211,12 @@ class Project(YamlAble['Project']):
         """
         return f"pip install {self.package}"
 
-    def get_components(self, cache_directory: str = None,cache_valid_secs:int=3600) -> Components:
+    def get_components(
+        self, cache_directory: str = None, cache_valid_secs: int = 3600
+    ) -> Components:
         """
         method to lazy-loaded components. Loads components from URL if components_url is set.
-        If a cache directory is provided, it caches the YAML file in that directory. The cache validity period 
+        If a cache directory is provided, it caches the YAML file in that directory. The cache validity period
         can be specified in seconds.
 
         Args:
@@ -227,8 +240,10 @@ class Project(YamlAble['Project']):
             file_path = cache_directory / filename
 
             if file_path.exists():
-                file_size=file_path.stat().st_size
-                if file_size>0 and not self._is_file_outdated(file_path,cache_valid_secs):
+                file_size = file_path.stat().st_size
+                if file_size > 0 and not self._is_file_outdated(
+                    file_path, cache_valid_secs
+                ):
                     load_from_url = False
                     components = Components.load_from_file(str(file_path))
 
@@ -239,14 +254,14 @@ class Project(YamlAble['Project']):
 
         return components
 
-    def _is_file_outdated(self, file_path: Path, cache_valid_secs:int=3600) -> bool:
+    def _is_file_outdated(self, file_path: Path, cache_valid_secs: int = 3600) -> bool:
         """
         Check if the file is outdated (older than 1 hour).
         """
         file_mod_time = file_path.stat().st_mtime
         return (time.time() - file_mod_time) > cache_valid_secs
 
-    def merge_pypi(self,pypi):
+    def merge_pypi(self, pypi):
         """
         merge the given pypi project info to with mine
         """
@@ -254,10 +269,11 @@ class Project(YamlAble['Project']):
         self.package = pypi.package
         self.pypi_description = pypi.pypi_description
         self.version = pypi.version
-          
-        
+
     @classmethod
-    def get_raw_url(cls, owner: str, repo_name: str, branch_name: str,file_path:str) -> str:
+    def get_raw_url(
+        cls, owner: str, repo_name: str, branch_name: str, file_path: str
+    ) -> str:
         """
         Construct the URL for the raw  file_path from the owner, repository name, and branch name.
 
@@ -269,7 +285,7 @@ class Project(YamlAble['Project']):
 
         Returns:
             str: The URL of the raw file_path if it exists
-            
+
         """
         raw_url = f"https://raw.githubusercontent.com/{owner}/{repo_name}/{branch_name}{file_path}"
         try:
@@ -279,10 +295,9 @@ class Project(YamlAble['Project']):
                 if response.getcode() == 200:
                     return raw_url
         except urllib.error.URLError as ex:
-            
+
             pass  # Handle any exceptions here
         return None  # Return None if .component.yaml doesn't exist
-        
 
     @classmethod
     def from_github(cls, repo) -> "Project":
@@ -301,7 +316,9 @@ class Project(YamlAble['Project']):
         owner = repo.owner.login
         repo_name = repo.name
 
-        components_url = cls.get_raw_url(owner, repo_name, repo.default_branch,"/.components.yaml")
+        components_url = cls.get_raw_url(
+            owner, repo_name, repo.default_branch, "/.components.yaml"
+        )
         project = cls(
             name=repo.name,
             github=repo.html_url,
@@ -335,7 +352,7 @@ class Project(YamlAble['Project']):
             # Preferred keys for GitHub URLs
             preferred_keys = ["Repository", "Source", "Home"]
             github_base_url = "https://github.com/"
-        
+
             # Iterate over the preferred keys and check if any URL starts with the GitHub base URL
             for key in preferred_keys:
                 url = project_urls.get(key)
@@ -345,7 +362,6 @@ class Project(YamlAble['Project']):
             else:
                 # If no GitHub URL is found, you may choose to handle this case (e.g., logging, fallback logic)
                 github = None
-
 
         project = cls(
             name=info.get("name"),
@@ -414,7 +430,7 @@ class Projects:
         """
         filename = f"components_{self._topic}.json"
         return self._default_directory / filename
-    
+
     def get_project4_solution_id(self, solution_id: str) -> Project:
         """
         Get a project based on the provided solution_id.
@@ -447,7 +463,9 @@ class Projects:
                 [project.__dict__ for project in projects], file, indent=4, default=str
             )
 
-    def load(self, directory: str = None, set_self: bool = True, lenient:bool=True) -> List[Project]:
+    def load(
+        self, directory: str = None, set_self: bool = True, lenient: bool = True
+    ) -> List[Project]:
         """
         Load a list of Project instances from a JSON file.
         Args:
@@ -463,58 +481,67 @@ class Projects:
         if not self.file_path.exists():
             if not lenient:
                 raise FileNotFoundError(f"No such file: {self.file_path}")
-        else:                    
+        else:
             with open(self.file_path, "r", encoding="utf-8") as file:
                 projects_records = json.load(file)
-    
-           
+
             for project_record in projects_records:
                 project = Project(**project_record)
                 projects.append(project)
         if set_self:
             self.projects = projects
         return projects
-    
-    def get_github_projects(self, repo_dict: dict, progress_bar=None) -> Dict[str, Project]:
+
+    def get_github_projects(
+        self, repo_dict: dict, progress_bar=None
+    ) -> Dict[str, Project]:
         """
         Get GitHub projects related to the specified topic.
-    
+
         Args:
             github_access (GitHubAccess): An instance of GitHubAccess for API calls.
-    
+
         Returns:
             Dict[str, Project]: A dictionary of GitHub projects with their URLs as keys and Project instances as values.
         """
-        projects_by_url={}
+        projects_by_url = {}
         for repo in repo_dict.values():
             if progress_bar:
                 progress_bar.update(1)
-            project=Project.from_github(repo)
-            projects_by_url[repo.html_url]=project
+            project = Project.from_github(repo)
+            projects_by_url[repo.html_url] = project
         return projects_by_url
-        
-    def sort_projects(self, projects:List[Project],sort_key:str):
-        """
-        Sorts a list of projects based on the specified sort key.
 
+    def sort_projects(self, projects: List[Project], sort_key: str):
+        """
+        Sorts a list of projects based on the specified sort key, converting integers to fixed-length strings.
+    
         Args:
             projects (list): List of Project instances.
             sort_key (str): Attribute name to sort the projects by.
-
+    
         Returns:
             list: Sorted list of projects.
         """
-
+    
         # Define the function to determine the sorting value
         def get_sort_value(proj):
             attr = getattr(proj, sort_key, None)
-            return attr if isinstance(attr, int) else attr or ""
-
+    
+            # Handle None values; place them at the end of the sorted list
+            if attr is None:
+                return " "  # Assuming you want None values to appear last
+    
+            # Convert integers to zero-padded strings, and others to strings
+            if isinstance(attr, int):
+                return f"{attr:010d}"  # Zero-pad to 10 digits
+            else:
+                return str(attr).lower()
+    
         # Determine if sorting should be in reverse
         reverse_sort = sort_key in ["stars", "downloads", "component_count"]
-
+    
         return sorted(projects, key=get_sort_value, reverse=reverse_sort)
-
 
     def update(
         self,
@@ -532,11 +559,11 @@ class Projects:
         """
         # Initialize progress bar if provided
         if progress_bar:
-            cached_projects=self.load()
-            progress_bar.total=len(cached_projects)
+            cached_projects = self.load()
+            progress_bar.total = len(cached_projects)
             progress_bar.reset()
             progress_bar.set_description("Updating projects")
-   
+
         # pypi access
         pypi = PyPi()
 
@@ -547,21 +574,21 @@ class Projects:
             pypi_projects = pypi_projects[:limit_pypi]
         # Fetch repositories from GitHub
         github_access = GitHubAccess(self.default_directory)
-        query=self._topic
-        repo_dict=github_access.search_repositories(query)
+        query = self._topic
+        repo_dict = github_access.search_repositories(query)
         # Apply limit to the GitHub repositories
         if limit_github is not None:
             repo_dict = dict(list(repo_dict.items())[:limit_github])
-        total = len(repo_dict)+len(pypi_projects)
+        total = len(repo_dict) + len(pypi_projects)
         if progress_bar:
-            progress_bar.total=total
-            
-        projects_by_github_url = self.get_github_projects(repo_dict,progress_bar)
-        self.projects=list(projects_by_github_url.values())
+            progress_bar.total = total
+
+        projects_by_github_url = self.get_github_projects(repo_dict, progress_bar)
+        self.projects = list(projects_by_github_url.values())
 
         # Merge PyPI projects into the GitHub projects
         for pypi in pypi_projects:
-            matched_project=None # Reset for each PyPI project
+            matched_project = None  # Reset for each PyPI project
             if pypi.github:
                 for github_url in projects_by_github_url.keys():
                     if pypi.github.startswith(github_url):
@@ -573,9 +600,11 @@ class Projects:
                     # check the gitub repo for more details
                     repo_name = self.extract_repo_name_from_url(pypi.github)
                     if not repo_name:
-                        raise ValueError(f"Can't determine repo_name for {pypi.github} of pypi package {pypi.package}")
+                        raise ValueError(
+                            f"Can't determine repo_name for {pypi.github} of pypi package {pypi.package}"
+                        )
                     # Create a Project instance from GitHub
-                    repo=github_access.github.get_repo(repo_name)
+                    repo = github_access.github.get_repo(repo_name)
                     github_comp = Project.from_github(repo)
                     # Merge PyPI data into the newly created GitHub project
                     github_comp.merge_pypi(pypi)
@@ -682,7 +711,7 @@ class PyPi:
         packagestable = soup.find("ul", {"class": "unstyled"})
         # Constructing the result list
         packages = []
-        
+
         # If no package exists then there is no table displayed hence soup.table will be None
         if packagestable is None:
             return packages
@@ -692,9 +721,9 @@ class PyPi:
         if self.debug:
             print(f"found len{packagerows} package rows")
         if limit:
-            selected_rows=packagerows[:limit]
+            selected_rows = packagerows[:limit]
         else:
-            selected_rows=packagerows
+            selected_rows = packagerows
         for package in selected_rows:
             nameSelector = package.find("span", {"class": "package-snippet__name"})
             if nameSelector is None:
@@ -721,4 +750,3 @@ class PyPi:
 
         # returning the result list back
         return packages
-    
