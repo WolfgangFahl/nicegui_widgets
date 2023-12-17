@@ -42,6 +42,8 @@ class ComponentsView:
         """
         Update the displayed components based on the slider's position
         """
+        if not self.components:
+            return 
         start_index = (self.slider.value - 1) * self.page_size
         end_index = start_index + self.page_size
         displayed_components = self.components.components[start_index:end_index]
