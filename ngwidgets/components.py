@@ -50,12 +50,5 @@ class Components(YamlAble['Components']):
     """
     Components
     """
+    version: Optional[str] = None
     components: List[Component] = field(default_factory=list)
-
-    def __init__(self, components: List[Component] = None):
-        if components is None:
-            self.components = []
-        else:
-            self.components = components
-
-   

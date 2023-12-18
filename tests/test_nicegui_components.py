@@ -24,6 +24,7 @@ class TestNiceguiProjects(Basetest):
     def setUp(self, debug=True, profile=True):
         Basetest.setUp(self, debug=debug, profile=profile)
         self.pypi_test_projects = [
+            ("dynamic-competence-map","https://pypi.org/project/dynamic-competence-map/"),
             ("ngwidgets", "https://pypi.org/project/ngwidgets/"),
             ("nicescad", "https://pypi.org/project/nicescad/"),
             ("nicegui-extensions", "https://pypi.org/project/nicegui-extensions/"),
@@ -102,6 +103,13 @@ class TestNiceguiProjects(Basetest):
         projects = Projects(topic="nicegui")
         # List of tuples with repository names and expected attributes
         example_repos = [
+            (
+                "WolfgangFahl/dcm",
+                {
+                    "github": "https://github.com/WolfgangFahl/dcm",
+                    "component_count": 1,
+                }
+            ),
             (
                 "justpy-org/justpy",
                 {
