@@ -29,7 +29,7 @@ class ComponentsView:
         Set up the UI elements to render the collection of components
         as a grid layout with four columns.
         """
-        self.project_container=ui.grid(columns=1)
+        self.project_container=ui.grid(columns=4)
         self.project_view = ProjectView(self.project)
         self.project_view.setup(self.project_container)
         if self.components:
