@@ -3,7 +3,8 @@ Created on 2023-09-13
 
 @author: wf
 """
-from nicegui import Client, ui
+from fastapi.responses import Response
+from nicegui import app, Client, ui
 
 from ngwidgets.dict_edit import DictEdit
 from ngwidgets.input_webserver import InputWebserver
@@ -40,6 +41,12 @@ class NiceGuiWidgetsDemoWebserver(InputWebserver):
         self.timeout = 6.0
         self.projects = Projects(topic="nicegui")
         self.projects.load()
+        
+        @app.get('/solutions.yaml')
+        def get_solutions_yaml():
+            yaml_data = self.projects.to_yaml()
+            return Response(content=yaml_data, media_type="text/yaml")
+
 
         @ui.page("/solutions")
         async def show_solutions(client: Client):

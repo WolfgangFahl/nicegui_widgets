@@ -374,22 +374,24 @@ class Project(YamlAble["Project"]):
         )
         return project
 
-
-class Projects:
+@dataclass
+class Projects(YamlAble["Projects"]):
     """
     handle a list of python projects on a specific topic
     """
+    
+    topic: str
+    _default_directory: Path = field(init=False)
+    projects: List = field(default_factory=list, init=False)
+    last_update_time: datetime = field(init=False)
 
-    def __init__(self, topic: str):
+    def __post_init__(self):
         """
-        Constructor
-        Args:
-            topic (str): The topic of the projects.
+        Post-initialization to set non-static attributes.
         """
-        self._topic = topic
         self._default_directory = Path.home() / ".nicegui"
-        self.projects = []
         self.last_update_time = self.get_file_update_time()
+
 
     def get_file_update_time(self):
         """
@@ -428,7 +430,7 @@ class Projects:
         Returns:
             Path: The file path.
         """
-        filename = f"components_{self._topic}.json"
+        filename = f"components_{self.topic}.json"
         return self._default_directory / filename
 
     def get_project4_solution_id(self, solution_id: str) -> Project:
@@ -568,13 +570,13 @@ class Projects:
         pypi = PyPi()
 
         # Fetch projects from PyPI
-        pypi_projects = pypi.search_projects(self._topic)
+        pypi_projects = pypi.search_projects(self.topic)
         # Apply limit to the PyPI projects
         if limit_pypi is not None:
             pypi_projects = pypi_projects[:limit_pypi]
         # Fetch repositories from GitHub
         github_access = GitHubAccess(self.default_directory)
-        query = self._topic
+        query = self.topic
         repo_dict = github_access.search_repositories(query)
         # Apply limit to the GitHub repositories
         if limit_github is not None:
