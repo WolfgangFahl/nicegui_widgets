@@ -140,15 +140,21 @@ class NiceGuiWidgetsDemoWebserver(InputWebserver):
         """
         show the DictEdit example
         """
-        sample_dict = {"given_name": "Alice","family_name": "Wonderland", "age": 30, "is_student": False}
+        sample_dict = {
+            "given_name": "Alice",
+            "family_name": "Wonderland",
+            "age": 30,
+            "is_student": False,
+        }
 
         def show():
             customization = {
                 "given_name": {"label": "Given Name", "size": 50},
                 "family_name": {"label": "Family Name", "size": 50},
             }
-            self.dict_edit = DictEdit(sample_dict,customization=customization)
-
+            with ui.grid(columns=3):
+                self.dict_edit = DictEdit(sample_dict, customization=customization)
+                self.dict_edit.expansion.open()
         await self.setup_content_div(show)
 
     async def show_hide_show_demo(self):
