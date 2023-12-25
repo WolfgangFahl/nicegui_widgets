@@ -11,7 +11,7 @@ class Profiler:
     simple profiler
     """
 
-    def __init__(self, msg, profile=True):
+    def __init__(self, msg, profile=True, with_start:bool=True):
         """
         construct me with the given msg and profile active flag
 
@@ -21,9 +21,16 @@ class Profiler:
         """
         self.msg = msg
         self.profile = profile
+        if with_start:
+            self.start()
+        
+    def start(self):
+        """
+        start profiling
+        """
         self.starttime = time.time()
-        if profile:
-            print(f"Starting {msg} ...")
+        if self.profile:
+            print(f"Starting {self.msg} ...")
 
     def time(self, extraMsg=""):
         """
