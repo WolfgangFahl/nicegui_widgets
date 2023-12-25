@@ -51,7 +51,7 @@ class FormUiDef:
         """Automatically creates a FormUiDef from a dataclass."""
         ui_fields = {}
         for field in fields(data):
-            fields[field.name] = FieldUiDef.from_field(field)
+            ui_fields[field.name] = FieldUiDef.from_field(field)
         return FormUiDef(title=data.__class__.__name__, ui_fields=ui_fields)
 
     @staticmethod
