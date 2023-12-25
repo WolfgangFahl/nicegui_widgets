@@ -9,12 +9,15 @@ from ngwidgets.projects_view import ProjectView
 from nicegui import ui
 from ngwidgets.widgets import Link
 
+
 class ComponentsView:
     """
     Display a collection of components in a grid layout
     """
 
-    def __init__(self, webserver: "InputWebserver", projects: Projects, project: Project):
+    def __init__(
+        self, webserver: "InputWebserver", projects: Projects, project: Project
+    ):
         self.webserver = webserver
         self.projects = projects
         self.project = project
@@ -29,12 +32,17 @@ class ComponentsView:
         Set up the UI elements to render the collection of components
         as a grid layout with four columns.
         """
-        self.project_container=ui.grid(columns=4)
+        self.project_container = ui.grid(columns=4)
         self.project_view = ProjectView(self.project)
         self.project_view.setup(self.project_container)
         if self.components:
-            self.slider = ui.slider(min=1, max=len(self.components.components) // self.page_size + 1, 
-                                    step=1, value=1, on_change=self.update_display)
+            self.slider = ui.slider(
+                min=1,
+                max=len(self.components.components) // self.page_size + 1,
+                step=1,
+                value=1,
+                on_change=self.update_display,
+            )
             self.container = ui.grid(columns=4)
         self.update_display()
 
@@ -43,7 +51,7 @@ class ComponentsView:
         Update the displayed components based on the slider's position
         """
         if not self.components:
-            return 
+            return
         start_index = (self.slider.value - 1) * self.page_size
         end_index = start_index + self.page_size
         displayed_components = self.components.components[start_index:end_index]
@@ -54,18 +62,19 @@ class ComponentsView:
         # Add new components to the container
         with self.container:
             for component in displayed_components:
-                cv = ComponentView(self.project,component)
+                cv = ComponentView(self.project, component)
                 cv.setup(self.container)
-                
+
+
 class ComponentView:
     """
     Display a single component
     """
 
-    def __init__(self, project:Project,component: Component):
+    def __init__(self, project: Project, component: Component):
         self.project = project
         self.component = component
-        
+
     def setup(self, container) -> ui.card:
         """
         Setup a card for the component
@@ -77,22 +86,24 @@ class ComponentView:
                     # Title
                     title = f"{self.component.name}"
                     ui.label(title).classes("text-2xl")
-                    html_markup=""
-                    delim=""
-                    if (self.component.demo_url):
-                        link=Link.create(self.component.demo_url,"demo")
-                        html_markup+=link
-                        delim=" "
-                    if (self.component.source):
-                        url=self.project.components_url.replace("/.components.yaml",self.component.source)
-                        link=Link.create(url,self.component.name)
-                        html_markup+=delim+link
-                        delim=" "
-                    if (self.component.issue):
-                        url=f"{self.project.github}/issues/{self.component.issue}"
-                        link=Link.create(url,f"#{self.component.issue}")
-                        html_markup+=delim+link
-                        delim=" "
+                    html_markup = ""
+                    delim = ""
+                    if self.component.demo_url:
+                        link = Link.create(self.component.demo_url, "demo")
+                        html_markup += link
+                        delim = " "
+                    if self.component.source:
+                        url = self.project.components_url.replace(
+                            "/.components.yaml", self.component.source
+                        )
+                        link = Link.create(url, self.component.name)
+                        html_markup += delim + link
+                        delim = " "
+                    if self.component.issue:
+                        url = f"{self.project.github}/issues/{self.component.issue}"
+                        link = Link.create(url, f"#{self.component.issue}")
+                        html_markup += delim + link
+                        delim = " "
                     ui.html(html_markup)
-                    if (self.component.demo_image_url):
+                    if self.component.demo_image_url:
                         ui.image(self.component.demo_image_url)

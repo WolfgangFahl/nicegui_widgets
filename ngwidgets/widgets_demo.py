@@ -18,6 +18,7 @@ from ngwidgets.widgets import HideShow
 from ngwidgets.components_view import ComponentsView
 from ngwidgets.projects import Projects
 
+
 class NiceGuiWidgetsDemoWebserver(InputWebserver):
     """
     webserver to demonstrate ngwidgets capabilities
@@ -41,28 +42,27 @@ class NiceGuiWidgetsDemoWebserver(InputWebserver):
         self.timeout = 6.0
         self.projects = Projects(topic="nicegui")
         self.projects.load()
-        
-        @app.get('/solutions.yaml')
+
+        @app.get("/solutions.yaml")
         def get_solutions_yaml():
             yaml_data = self.projects.to_yaml()
             return Response(content=yaml_data, media_type="text/yaml")
-
 
         @ui.page("/solutions")
         async def show_solutions(client: Client):
             await client.connected(timeout=self.timeout)
             return await self.show_solutions()
-        
+
         @ui.page("/components/{solution_id}")
-        async def show_components(solution_id:str,client: Client):
-            await client.connected(timeout=self.timeout*4)
+        async def show_components(solution_id: str, client: Client):
+            await client.connected(timeout=self.timeout * 4)
             return await self.show_components(solution_id)
 
         @ui.page("/color_schema")
         async def show_color_schema(client: Client):
             await client.connected(timeout=self.timeout)
             return await self.show_color_schema()
-        
+
         @ui.page("/dictedit")
         async def show_dictedit(client: Client):
             await client.connected(timeout=self.timeout)
@@ -95,24 +95,26 @@ class NiceGuiWidgetsDemoWebserver(InputWebserver):
     #    slider_label = ui.label().bind_text_from(slider, 'value')
     # def update_page(e):
     #    viewer.set_page(e.value)
-    async def show_components(self,solution_id):
+    async def show_components(self, solution_id):
         def show():
-            project=self.projects.get_project4_solution_id(solution_id)
+            project = self.projects.get_project4_solution_id(solution_id)
             # Create a ComponentsView and display the components
-            components_view = ComponentsView(self,self.projects,project)
+            components_view = ComponentsView(self, self.projects, project)
             components_view.setup()
+
         await self.setup_content_div(show)
-         
+
     async def show_solutions(self):
         def show():
             self.projects_view = ProjectsView(self)
 
         await self.setup_content_div(show)
-        
+
     async def show_color_schema(self):
         def show():
             self.config.color_schema.display()
             pass
+
         await self.setup_content_div(show)
 
     async def show_pdf_viewer(self):
@@ -138,11 +140,14 @@ class NiceGuiWidgetsDemoWebserver(InputWebserver):
         """
         show the DictEdit example
         """
-        sample_dict = {"name": "Alice", "age": 30, "is_student": False}
+        sample_dict = {"given_name": "Alice","family_name": "Wonderland", "age": 30, "is_student": False}
 
         def show():
-            with ui.card() as _card:
-                DictEdit(sample_dict)
+            customization = {
+                "given_name": {"label": "Given Name", "size": 50},
+                "family_name": {"label": "Family Name", "size": 50},
+            }
+            self.dict_edit = DictEdit(sample_dict,customization=customization)
 
         await self.setup_content_div(show)
 

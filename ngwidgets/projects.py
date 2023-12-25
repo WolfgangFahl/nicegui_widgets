@@ -374,12 +374,13 @@ class Project(YamlAble["Project"]):
         )
         return project
 
+
 @dataclass
 class Projects(YamlAble["Projects"]):
     """
     handle a list of python projects on a specific topic
     """
-    
+
     topic: str
     _default_directory: Path = field(init=False)
     projects: List = field(default_factory=list, init=False)
@@ -391,7 +392,6 @@ class Projects(YamlAble["Projects"]):
         """
         self._default_directory = Path.home() / ".nicegui"
         self.last_update_time = self.get_file_update_time()
-
 
     def get_file_update_time(self):
         """
@@ -517,32 +517,32 @@ class Projects(YamlAble["Projects"]):
     def sort_projects(self, projects: List[Project], sort_key: str):
         """
         Sorts a list of projects based on the specified sort key, converting integers to fixed-length strings.
-    
+
         Args:
             projects (list): List of Project instances.
             sort_key (str): Attribute name to sort the projects by.
-    
+
         Returns:
             list: Sorted list of projects.
         """
-    
+
         # Define the function to determine the sorting value
         def get_sort_value(proj):
             attr = getattr(proj, sort_key, None)
-    
+
             # Handle None values; place them at the end of the sorted list
             if attr is None:
                 return " "  # Assuming you want None values to appear last
-    
+
             # Convert integers to zero-padded strings, and others to strings
             if isinstance(attr, int):
                 return f"{attr:010d}"  # Zero-pad to 10 digits
             else:
                 return str(attr).lower()
-    
+
         # Determine if sorting should be in reverse
         reverse_sort = sort_key in ["stars", "downloads", "component_count"]
-    
+
         return sorted(projects, key=get_sort_value, reverse=reverse_sort)
 
     def update(

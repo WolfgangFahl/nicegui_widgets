@@ -14,6 +14,7 @@ class NiceguiWidgetsCmd(WebserverCmd):
     command line handling for ngwidgets
     """
 
+
 def main(argv: list = None):
     """
     main call

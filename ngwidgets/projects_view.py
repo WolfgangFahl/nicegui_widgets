@@ -172,8 +172,10 @@ class ProjectsView:
         }
         with ui.row():
             ui.label("Sort by:")
-            self.sort_radio_group = ui.radio(options=sort_options, on_change=self.update_view).props('inline').bind_value(
-                self, "sorting"
+            self.sort_radio_group = (
+                ui.radio(options=sort_options, on_change=self.update_view)
+                .props("inline")
+                .bind_value(self, "sorting")
             )
 
         # Project cards container
@@ -200,9 +202,11 @@ class ProjectsView:
         # Clear the current cards container
         self.cards_container.clear()
         if self.sorting:
-            sorted_projects = self.projects.sort_projects(filtered_projects, self.sorting)
+            sorted_projects = self.projects.sort_projects(
+                filtered_projects, self.sorting
+            )
         else:
-            sorted_projects=filtered_projects  
+            sorted_projects = filtered_projects
         # Create a card for each project
         for project in sorted_projects:
             cv = ProjectView(project)

@@ -11,7 +11,7 @@ class Profiler:
     simple profiler
     """
 
-    def __init__(self, msg, profile=True, with_start:bool=True):
+    def __init__(self, msg, profile=True, with_start: bool = True):
         """
         construct me with the given msg and profile active flag
 
@@ -23,7 +23,7 @@ class Profiler:
         self.profile = profile
         if with_start:
             self.start()
-        
+
     def start(self):
         """
         start profiling

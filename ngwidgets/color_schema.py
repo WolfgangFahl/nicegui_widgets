@@ -13,14 +13,15 @@ class ColorSchema:
     """
     a nicegui color schema
     """
-    name: str = "default" 
+
+    name: str = "default"
     primary: str = "#5898d4"
     secondary: str = "#26a69a"
     accent: str = "#9c27b0"
     dark: str = "#1d1d1d"
     positive: str = "#21ba45"
     negative: str = "#c10015"
-    info: str =  "#31ccec"
+    info: str = "#31ccec"
     warning: str = "#f2c037"
 
     def apply(self):
@@ -63,8 +64,9 @@ class ColorSchema:
             cls.deep_orange(),
             cls.brown(),
             cls.grey(),
-            cls.blue_grey()
+            cls.blue_grey(),
         ]
+
     @classmethod
     def default(cls):
         """
@@ -77,16 +79,18 @@ class ColorSchema:
         Display all available color schemas visually in the UI.
         """
         for schema in ColorSchema.get_schemas():
-            style=('color: white;'
-                'width: 75px; '
-                'height: 50px; '
-                'border: 1px solid #000; '
-                'display: flex; '
-                'justify-content: center; '
-                'align-items: center; '
-                'border-radius: 5px;')
+            style = (
+                "color: white;"
+                "width: 75px; "
+                "height: 50px; "
+                "border: 1px solid #000; "
+                "display: flex; "
+                "justify-content: center; "
+                "align-items: center; "
+                "border-radius: 5px;"
+            )
             with ui.row().style("margin-bottom: 10px;"):
-                ui.label(schema.name).style(style+"background:grey;")
+                ui.label(schema.name).style(style + "background:grey;")
                 schema._display_color("Primary", schema.primary, style)
                 schema._display_color("Secondary", schema.secondary, style)
                 schema._display_color("Accent", schema.accent, style)
@@ -98,8 +102,7 @@ class ColorSchema:
 
     def _display_color(self, name: str, color: str, style: str):
         with ui.column():
-            ui.label(name).style(style + f'background: {color};')
-
+            ui.label(name).style(style + f"background: {color};")
 
     @classmethod
     def blue_grey(cls):
@@ -118,7 +121,7 @@ class ColorSchema:
             info="#2196F3",  # Standard Info Blue
             warning="#FFC107",  # Standard Warning Amber
         )
-        
+
     @classmethod
     def red(cls):
         """
@@ -227,7 +230,6 @@ class ColorSchema:
             warning="#FFC107",  # Standard Warning Amber
         )
 
-        
     @classmethod
     def pink_red(cls):
         """
@@ -300,7 +302,7 @@ class ColorSchema:
             warning="#FFB74D",
         )
         return color_schema
-    
+
     @classmethod
     def light_green(cls):
         """
@@ -337,7 +339,6 @@ class ColorSchema:
             warning="#FFC107",
         )
 
-    
     @classmethod
     def yellow(cls):
         """
@@ -355,7 +356,7 @@ class ColorSchema:
             info="#2196F3",
             warning="#FFC107",
         )
-    
+
     @classmethod
     def amber(cls):
         """
@@ -373,7 +374,7 @@ class ColorSchema:
             info="#2196F3",
             warning="#FFC107",
         )
-    
+
     @classmethod
     def orange(cls):
         """
@@ -391,7 +392,7 @@ class ColorSchema:
             info="#2196F3",
             warning="#FFC107",
         )
-    
+
     @classmethod
     def deep_orange(cls):
         """
@@ -409,7 +410,7 @@ class ColorSchema:
             info="#2196F3",
             warning="#FFC107",
         )
-    
+
     @classmethod
     def brown(cls):
         """
@@ -427,7 +428,7 @@ class ColorSchema:
             info="#2196F3",
             warning="#FFC107",
         )
-    
+
     @classmethod
     def grey(cls):
         """
@@ -445,4 +446,3 @@ class ColorSchema:
             info="#2196F3",
             warning="#FFC107",
         )
-

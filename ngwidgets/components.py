@@ -21,7 +21,8 @@ Main author: OpenAI's language model (instructed by WF)
 """
 from ngwidgets.yamlable import YamlAble
 from dataclasses import dataclass, field
-from typing import List,Optional
+from typing import List, Optional
+
 
 @dataclass
 class Component:
@@ -37,6 +38,7 @@ class Component:
         issue (Optional[str]): The identifier for any related issue (github), if applicable.
         fixed (Optional[str]): The date on which any related issue was fixed, if applicable.
     """
+
     name: str
     source: Optional[str] = None
     demo_url: Optional[str] = None
@@ -45,10 +47,12 @@ class Component:
     issue: Optional[int] = None
     fixed: Optional[str] = None
 
+
 @dataclass
-class Components(YamlAble['Components']):
+class Components(YamlAble["Components"]):
     """
     Components
     """
+
     version: Optional[str] = None
     components: List[Component] = field(default_factory=list)

@@ -20,7 +20,8 @@ import urllib.request
 from typing import Any, Type, TypeVar, Generic
 from dacite import from_dict
 
-T = TypeVar('T')
+T = TypeVar("T")
+
 
 class YamlAble(Generic[T]):
     """
@@ -54,26 +55,39 @@ class YamlAble(Generic[T]):
             return dumper.represent_scalar("tag:yaml.org,2002:str", data, style="|")
         return dumper.represent_scalar("tag:yaml.org,2002:str", data)
 
-    def to_yaml(self, ignore_none: bool = True, ignore_underscore: bool = True, allow_unicode: bool = True, sort_keys: bool = False) -> str:
+    def to_yaml(
+        self,
+        ignore_none: bool = True,
+        ignore_underscore: bool = True,
+        allow_unicode: bool = True,
+        sort_keys: bool = False,
+    ) -> str:
         """
         Converts this dataclass object to a YAML string, with options to omit None values and/or underscore-prefixed variables,
         and using block scalar style for strings.
-    
+
         Args:
             ignore_none: Flag to indicate whether None values should be removed from the YAML output.
             ignore_underscore: Flag to indicate whether attributes starting with an underscore should be excluded from the YAML output.
             allow_unicode: Flag to indicate whether to allow unicode characters in the output.
             sort_keys: Flag to indicate whether to sort the dictionary keys in the output.
-    
+
         Returns:
             A string representation of the dataclass object in YAML format.
         """
         obj_dict = asdict(self)
         self._yaml_setup()
-        clean_dict = self.remove_ignored_values(obj_dict, ignore_none, ignore_underscore)
-        yaml_str = yaml.dump(clean_dict, Dumper=self._yaml_dumper, default_flow_style=False, allow_unicode=allow_unicode, sort_keys=sort_keys)
+        clean_dict = self.remove_ignored_values(
+            obj_dict, ignore_none, ignore_underscore
+        )
+        yaml_str = yaml.dump(
+            clean_dict,
+            Dumper=self._yaml_dumper,
+            default_flow_style=False,
+            allow_unicode=allow_unicode,
+            sort_keys=sort_keys,
+        )
         return yaml_str
-
 
     @classmethod
     def from_yaml(cls, yaml_str: str) -> T:
@@ -88,7 +102,7 @@ class YamlAble(Generic[T]):
         """
         Loads a dataclass instance from a YAML file.
         """
-        with open(filename, 'r') as file:
+        with open(filename, "r") as file:
             return cls.from_yaml(file.read())
 
     @classmethod
@@ -106,15 +120,17 @@ class YamlAble(Generic[T]):
         """
         Saves the current dataclass instance to a YAML file.
         """
-        with open(filename, 'w') as file:
+        with open(filename, "w") as file:
             file.write(self.to_yaml())
 
     @staticmethod
-    def remove_ignored_values(value: Any, ignore_none: bool = True, ignore_underscore: bool = False) -> Any:
+    def remove_ignored_values(
+        value: Any, ignore_none: bool = True, ignore_underscore: bool = False
+    ) -> Any:
         """
         Recursively removes specified types of values from a dictionary or list.
         By default, it removes keys with None values. Optionally, it can also remove keys starting with an underscore.
-        
+
         Args:
             value: The value to process (dictionary, list, or other).
             ignore_none: Flag to indicate whether None values should be removed.
@@ -124,12 +140,15 @@ class YamlAble(Generic[T]):
             return {
                 k: YamlAble.remove_ignored_values(v, ignore_none, ignore_underscore)
                 for k, v in value.items()
-                if (not ignore_none or v is not None) and (not ignore_underscore or not k.startswith('_'))
+                if (not ignore_none or v is not None)
+                and (not ignore_underscore or not k.startswith("_"))
             }
         elif isinstance(value, list):
-            return [YamlAble.remove_ignored_values(v, ignore_none, ignore_underscore) for v in value]
+            return [
+                YamlAble.remove_ignored_values(v, ignore_none, ignore_underscore)
+                for v in value
+            ]
         return value
-
 
     @classmethod
     def from_dict(cls: Type[T], data: dict) -> T:
@@ -138,9 +157,9 @@ class YamlAble(Generic[T]):
         """
         if not data:
             return None
-        instance=from_dict(data_class=cls,data=data)
-        #dataclass_fields = {field.name for field in fields(cls)}
-        #filtered_data = {key: value for key, value in data.items() if key in dataclass_fields}
+        instance = from_dict(data_class=cls, data=data)
+        # dataclass_fields = {field.name for field in fields(cls)}
+        # filtered_data = {key: value for key, value in data.items() if key in dataclass_fields}
         return instance
 
     def to_dict(self) -> dict:
