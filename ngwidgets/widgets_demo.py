@@ -18,8 +18,21 @@ from ngwidgets.webserver import WebserverConfig
 from ngwidgets.widgets import HideShow
 from ngwidgets.components_view import ComponentsView
 from ngwidgets.projects import Projects
+from dataclasses import dataclass
 
-
+@dataclass
+class Element:
+    name: str
+    wikidata_id: str
+    atomic_number: int
+    
+    @property 
+    def ui_label(self)->str:
+        if self.name and self.atomic_number:
+            return f"{self.name} ({self.atomic_number})"
+        else:
+            return DictEdit.empty
+    
 class NiceGuiWidgetsDemoWebserver(InputWebserver):
     """
     webserver to demonstrate ngwidgets capabilities
@@ -139,7 +152,7 @@ class NiceGuiWidgetsDemoWebserver(InputWebserver):
 
     async def show_dictedit(self):
         """
-        show the DictEdit example
+        show the DictEdit examples
         """
         # Updated sample_dict with a datetime field for enrollment_date
         sample_dict = {
@@ -149,6 +162,8 @@ class NiceGuiWidgetsDemoWebserver(InputWebserver):
             "is_student": False,
             "enrollment_date": datetime.now()  # Set default to current time
         }
+        
+        sample_element=Element("hydrogen","Q556",1)
     
         def show():
             customization = {
@@ -158,8 +173,11 @@ class NiceGuiWidgetsDemoWebserver(InputWebserver):
                 "enrollment_date": {"label": "Enrollment Date", "widget": "datetime"}  # Customization for datetime
             }
             with ui.grid(columns=3):
-                self.dict_edit = DictEdit(sample_dict, customization=customization)
-                self.dict_edit.expansion.open()
+                self.dict_edit1 = DictEdit(sample_dict, customization=customization)
+                self.dict_edit1.expansion.open()
+                self.dict_edit2 = DictEdit(sample_element)
+                self.dict_edit2.expansion.open()
+                
         await self.setup_content_div(show)
 
     async def show_hide_show_demo(self):
