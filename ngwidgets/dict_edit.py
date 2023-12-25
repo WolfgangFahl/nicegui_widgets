@@ -77,20 +77,21 @@ class DictEdit:
     """
     empty="❓"
 
-    def __init__(self, d: Union[dict, dataclass], form_ui_def: Optional[FormUiDef] = None, customization: Optional[Dict[str, Dict[str, Any]]] = None):
+    def __init__(self, data_to_edit: Union[dict, dataclass], form_ui_def: Optional[FormUiDef] = None, customization: Optional[Dict[str, Dict[str, Any]]] = None):
         """
         Initialize the DictEdit instance with the given data and optional UI definition.
 
         Args:
-            d (Union[dict, dataclass]): The dictionary or dataclass to be edited.
+            data_to_edit (Union[dict, dataclass]): The dictionary or dataclass to be edited.
             form_ui_def (Optional[FormUiDef]): The UI definition for the form. If not provided,
                                                it will be generated automatically.
             customization (Optional[Dict[str, Dict[str, Any]]]): Customizations for the form fields.
         """
-        self.d = asdict(d) if is_dataclass(d) else d
+        self.data_to_edit=data_to_edit
+        self.d = asdict(data_to_edit) if is_dataclass(data_to_edit) else data_to_edit
         self.form_ui_def = form_ui_def or (
-            FormUiDef.from_dataclass(d)
-            if is_dataclass(d)
+            FormUiDef.from_dataclass(data_to_edit)
+            if is_dataclass(data_to_edit)
             else FormUiDef.from_dict(self.d)
         )
         if customization:
@@ -131,8 +132,8 @@ class DictEdit:
                 "w-full"
             ) as self.expansion:
                 self.inputs = self._create_inputs()
-            if 'ui_label' in self.d:
-                bind_from(self.expansion._props, 'label', self.d, 'ui_label', 
+            if is_dataclass(self.data_to_edit) and hasattr(self.data_to_edit, "ui_label"):
+                bind_from(self.expansion._props, 'label', self.data_to_edit, 'ui_label', 
                               backward=lambda x: f"{self.form_ui_def.title}: {x if x else DictEdit.empty}")
 
 
