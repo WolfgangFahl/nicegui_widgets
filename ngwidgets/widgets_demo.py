@@ -3,6 +3,7 @@ Created on 2023-09-13
 
 @author: wf
 """
+from datetime import datetime
 from fastapi.responses import Response
 from nicegui import app, Client, ui
 
@@ -140,17 +141,21 @@ class NiceGuiWidgetsDemoWebserver(InputWebserver):
         """
         show the DictEdit example
         """
+        # Updated sample_dict with a datetime field for enrollment_date
         sample_dict = {
             "given_name": "Alice",
             "family_name": "Wonderland",
             "age": 30,
             "is_student": False,
+            "enrollment_date": datetime.now()  # Set default to current time
         }
-
+    
         def show():
             customization = {
+                "_form_": {"title": "Student", "icon": "person"},
                 "given_name": {"label": "Given Name", "size": 50},
                 "family_name": {"label": "Family Name", "size": 50},
+                "enrollment_date": {"label": "Enrollment Date", "widget": "datetime"}  # Customization for datetime
             }
             with ui.grid(columns=3):
                 self.dict_edit = DictEdit(sample_dict, customization=customization)

@@ -4,56 +4,64 @@ Created on 2023-06-22
 @author: wf
 """
 from typing import Any, Callable, Dict, Optional, Union
-from dataclasses import dataclass, asdict, is_dataclass
+from dataclasses import dataclass, asdict, field, fields, is_dataclass
 from nicegui import ui
 from nicegui.elements.input import Input
 from nicegui.binding import bind_from
-
+from datetime import datetime, date
 
 @dataclass
 class FieldUiDef:
     """
     A generic user interface definition for a field.
     """
-
     field_name: str
     label: str
     size: int = 80
+    field_type: Optional[type] = None
     validation: Optional[Callable[[Any], bool]] = None
 
     @staticmethod
-    def from_field(
-        field_name: str, label: Optional[str] = None, size: int = 80
-    ) -> "FieldUiDef":
-        """Automatically creates a FieldUiDef from a field name."""
-        return FieldUiDef(field_name=field_name, label=label or field_name, size=size)
+    def from_field(field) -> "FieldUiDef":
+        """Automatically creates a FieldUiDef from a dataclass field"""
+        return FieldUiDef(field_name=field.name, label=field.name,field_type=field.type)
 
+    @staticmethod
+    def from_key_value(key:str, value) -> "FieldUiDef":
+        """Automatically create a FieldUiDef from a key,value pair"""
+        # Choose a default type for None values, e.g., str
+        field_type = type(value) if value is not None else str
+        return FieldUiDef(
+            field_name=key,
+            label=key,
+            field_type=field_type
+        )
 
 @dataclass
 class FormUiDef:
     """
     A definition for the entire form's UI.
     """
-
     title: str
-    ui_fields: Dict[str, FieldUiDef]
+    icon: Optional[str] = "house"
+    ui_fields: Dict[str, FieldUiDef] = field(default_factory=dict)
 
     @staticmethod
-    def from_dataclass(data: dataclass, default_size: int = 80) -> "FormUiDef":
+    def from_dataclass(data: dataclass) -> "FormUiDef":
         """Automatically creates a FormUiDef from a dataclass."""
-        fields = {
-            field_name: FieldUiDef.from_field(field_name, size=default_size)
-            for field_name in asdict(data).keys()
-        }
-        return FormUiDef(title=data.__class__.__name__, ui_fields=fields)
+        ui_fields = {}
+        for field in fields(data):
+            fields[field.name] = FieldUiDef.from_field(field)
+        return FormUiDef(title=data.__class__.__name__, ui_fields=ui_fields)
 
     @staticmethod
-    def from_dict(dictionary: dict, default_size: int = 80) -> "FormUiDef":
+    def from_dict(dictionary: dict) -> "FormUiDef":
         """Automatically creates a FormUiDef from a dictionary."""
-        fields = {
-            k: FieldUiDef.from_field(k, size=default_size) for k in dictionary.keys()
+        ui_fields = {
+            key: FieldUiDef.from_key_value(key, value) 
+            for key, value in dictionary.items()
         }
-        return FormUiDef(title="Dictionary Form", ui_fields=fields)
+        return FormUiDef(title="Dictionary Form", ui_fields=ui_fields)
 
 
 class DictEdit:
@@ -104,8 +112,12 @@ class DictEdit:
                 'family_name': {'label': 'Family Name', 'size': 50}
             }
         """
+        if "_form_" in customization:
+            form_mod=customization["_form_"]
+            self.form_ui_def.title=form_mod.get("title",self.form_ui_def.title)
+            self.form_ui_def.icon=form_mod.get("icon",self.form_ui_def.icon)
         for field_name, mods in customization.items():
-            field_def = self.form_ui_def.ui_fields.get(field_name)
+            field_def = self.form_ui_def.ui_fields.get(field_name,None)
             if field_def:
                 field_def.label = mods.get("label", field_def.label)
                 field_def.size = mods.get("size", field_def.size)
@@ -115,7 +127,7 @@ class DictEdit:
     def setup(self):
         """Sets up the UI by creating a card and expansion for the form based on form_ui_def."""
         with ui.card() as self.card:
-            with ui.expansion(text=self.form_ui_def.title, icon="house").classes(
+            with ui.expansion(text=self.form_ui_def.title, icon=self.form_ui_def.icon).classes(
                 "w-full"
             ) as self.expansion:
                 self.inputs = self._create_inputs()
@@ -124,7 +136,7 @@ class DictEdit:
                               backward=lambda x: f"{self.form_ui_def.title}: {x if x else DictEdit.empty}")
 
 
-    def _create_inputs(self) -> Dict[str, Input]:
+    def _create_inputs1(self) -> Dict[str, Input]:
         """Creates input elements for the form based on the FormUiDef."""
         inputs = {}
         for field_def in self.form_ui_def.ui_fields.values():
@@ -133,6 +145,32 @@ class DictEdit:
             input_field.bind_value(self.d, field_def.field_name).props(
                 f"size={field_def.size}"
             )
+            if field_def.validation:
+                input_field.validation = {"Invalid input": field_def.validation}
+            inputs[field_def.field_name] = input_field
+        return inputs
+    
+    def _create_inputs(self) -> Dict[str, Input]:
+        """Creates input elements for the form based on the FormUiDef."""
+        inputs = {}
+        for field_def in self.form_ui_def.ui_fields.values():
+            value = self.d.get(field_def.field_name)
+            if field_def.field_type is str:
+                input_field = ui.input(label=field_def.label, value=value).props(f"size={field_def.size}")  # Text input for strings
+            elif field_def.field_type in [int, float]:
+                input_field = ui.number(label=field_def.label, value=value)  # Number input for ints and floats
+            elif field_def.field_type is bool:
+                input_field = ui.checkbox(field_def.label, value=value)  # Checkbox for booleans
+            elif field_def.field_type in [datetime, date]:
+                with ui.input('Date') as input_field:
+                    with input_field.add_slot('append'):
+                        ui.icon('edit_calendar').on('click', lambda: menu.open()).classes('cursor-pointer')
+                    with ui.menu() as menu:
+                        ui.date().bind_value(input_field)
+            else:
+                input_field = ui.input(label=field_def.label, value=value)  # Default to text input
+    
+            input_field.bind_value(self.d, field_def.field_name)
             if field_def.validation:
                 input_field.validation = {"Invalid input": field_def.validation}
             inputs[field_def.field_name] = input_field
