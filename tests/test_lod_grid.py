@@ -20,7 +20,7 @@ class TestLodGrid(Basetest):
             {"name": "Carol", "age": 42, "parent": "Frank"},
         ]
         grid_config=GridConfig(key_col="name")
-        self.lod_grid = ListOfDictsGrid(self.lod,grid_config=grid_config)
+        self.lod_grid = ListOfDictsGrid(self.lod,config=grid_config)
 
     def test_lod_index(self):
         """
