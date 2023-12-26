@@ -15,7 +15,7 @@ from ngwidgets.pdfviewer import pdfviewer
 from ngwidgets.tristate import Tristate
 from ngwidgets.version import Version
 from ngwidgets.webserver import WebserverConfig
-from ngwidgets.widgets import HideShow
+from ngwidgets.widgets import HideShow, Lang
 from ngwidgets.components_view import ComponentsView
 from ngwidgets.projects import Projects
 from dataclasses import dataclass
@@ -74,6 +74,11 @@ class NiceGuiWidgetsDemoWebserver(InputWebserver):
             await client.connected(timeout=self.timeout * 4)
             return await self.show_components(solution_id)
 
+        @ui.page("/langs")
+        async def show_langs(client: Client):
+            await client.connected(timeout=self.timeout)
+            return await self.show_langs()
+
         @ui.page("/color_schema")
         async def show_color_schema(client: Client):
             await client.connected(timeout=self.timeout)
@@ -130,6 +135,29 @@ class NiceGuiWidgetsDemoWebserver(InputWebserver):
         def show():
             self.config.color_schema.display()
             pass
+
+        await self.setup_content_div(show)
+        
+    async def show_langs(self):
+        """
+        show languages selection
+        """
+        def show():
+            #Default language set to English 
+            default_lang = 'en'
+            
+            # Get available languages
+            languages = Lang.get_language_dict()
+            with ui.card().style('width: 12%'):
+                with ui.row():
+                    ui.label("Lang code:")
+                    # Create a label to display the chosen language with the default language
+                    lang_label=ui.label(default_lang)
+                with ui.row():
+                    ui.label("Select:")
+                    # Create a dropdown for language selection with the default language selected
+                    # Bind the label text to the selection's value, so it updates automatically
+                    ui.select(languages, value=default_lang).bind_value(lang_label, 'text')
 
         await self.setup_content_div(show)
 
@@ -386,17 +414,26 @@ class NiceGuiWidgetsDemoWebserver(InputWebserver):
         """
 
         def setup_home():
-            ui.html(
-                """<ul>
-        <li><a href='/solutions'>nicegui solutions bazaar</a></li>
-        <li><a href='/color_schema'>ColorSchema</a></li>
-        <li><a href='/dictedit'>dictedit</a></li>
-        <li><a href='/grid'>grid</a></li>
-        <li><a href='/hideshow'>HideShow Demo</a></li>
-        <li><a href='/tristate'>Tristate Demo</a></li>
-        <li><a href='/pdfviewer'>pdfviewer</a></li>
-        </ul>
-        """
-            )
+            # Define the links and labels in a dictionary
+            links = {
+                "nicegui solutions bazaar": "/solutions",
+                "ColorSchema": "/color_schema",
+                "DictEdit": "/dictedit",
+                "Lang": "/langs",
+                "ListOfDictsGrid": "/grid",
+                "HideShow Demo": "/hideshow",
+                "Tristate Demo": "/tristate",
+                "pdfviewer": "/pdfviewer"
+            }
+            
+            # Generate the HTML using the dictionary
+            html_content = "<ul>"
+            for label, link in links.items():
+                html_content += f'<li><a href="{link}">{label}</a></li>'
+            html_content += "</ul>"
+
+            # html_content now contains the HTML code to render the list of links
+            ui.html(html_content)
+
 
         await self.setup_content_div(setup_home)

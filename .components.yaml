@@ -1,4 +1,7 @@
-# Components
+# Components of https://github.com/WolfgangFahl/nicegui_widgets
+# to be shown in nicegui solution bazaar as per
+# https://github.com/WolfgangFahl/nicegui_widgets/issues/52
+# see http://ngdemo.bitplan.com/solutions
 # WF 2023-12-16
 components:
 - name: color_schema.py
@@ -9,26 +12,84 @@ components:
   description: >
     ColorSchema enables NiceGUI color customization.
     Includes palettes from https://www.materialpalette.com: RED, PINK, PURPLE,
-    DEEP PURPLE, INDIGO, BLUE, LIGHT BLUE, CYAN, TEAL,
-    GREEN, LIGHT GREEN, LIME, YELLOW, AMBER, ORANGE,
-    DEEP ORANGE, BROWN, GREY, BLUE GREY.
+    DEEP PURPLE, ...
 - name: dict_edit.py
   source: /ngwidgets/dict_edit.py
   issue: 47
   demo_url: http://ngdemo.bitplan.com/dictedit
   demo_image_url: https://github.com/WolfgangFahl/nicegui_widgets/assets/1336221/405053ea-0b2e-42cf-b637-191e9541603d
+  description: >
+    DictEdit is a UI component for editing dictionaries
+    or dataclasses, supporting dynamic fields with
+    customizable options and validations.
 - name: file_selector.py
   source: /ngwidgets/file_selector.py
   issue: 7
   demo_url: http://nicescad.bitplan.com/
   demo_image_url: https://github.com/WolfgangFahl/nicegui_widgets/assets/1336221/5f27ddb9-3827-4cf2-bfb3-f237718ebe38
+  description: >
+    FileSelector facilitates directory and file
+    navigation with filtering and custom handling.
+    Supports extensions and callback integration.
 - name: lod_grid.py
   source: /ngwidgets/lod_grid.py
   issue: 28
   demo_url: http://nicescad.bitplan.com/grid
   demo_image_url: https://github.com/WolfgangFahl/nicegui_widgets/assets/1336221/55e850ba-bc92-4879-a943-183501280afe
+  description: >
+    ListOfDictsGrid offers a configurable interactive ui.ag_grid for list of
+    dictionaries hiding the complexities of some ag_grid details.
 - name: tristate.py
   source: /ngwidgets/tristate.py
   issue: 49
   demo_url: http://ngdemo.bitplan.com/tristate
   demo_image_url: https://github.com/WolfgangFahl/nicegui_widgets/assets/1336221/50998f00-c6a0-4df0-b233-b40ddc15e26a
+  description: >
+      Tristate provides a tri-state toggle input for
+      NiceGUI, cycling through predefined icon sets.
+      Configurable with various Unicode icons.
+- name: users.py
+  source: /ngwidgets/users.py
+  issue: 18
+  demo_url: http://ngdemo.bitplan.com
+  demo_image_url: https://github.com/WolfgangFahl/nicegui_widgets/assets/1336221/40f0ef1f-21d9-43ac-bb63-6dd6df229ffc
+  description: >
+    The Users class handles secure storage and
+    verification of user credentials using bcrypt
+    hashing, all managed within a JSON file.
+- name: Lang
+  source: /ngwidgets/widgets.py
+  issue: 53
+  demo_url: http://ngdemo.bitplan.com/langs
+  demo_image_url: https://github.com/WolfgangFahl/nicegui_widgets/assets/1336221/89246655-a8ea-4a80-a3d4-6d22d9db10a5
+  description: >
+    Lang is a class representing languages, providing utility methods
+    related to language data. It includes a method to get a dictionary
+    of supported languages with their codes and names/representations in HTML entity format.
+- name: Link
+  source: /ngwidgets/widgets.py
+  issue: 21
+  demo_url: http://ngdemo.bitplan.com/about
+  demo_image_url: https://github.com/WolfgangFahl/nicegui_widgets/assets/1336221/96c63a66-f6f9-45b0-a2c6-4eae91d10115
+  description: >
+    Link is a utility class for creating HTML links.
+    It supports customizing URLs, texts, tooltips, targets, and
+    styles with optional URL encoding. Best used with ui.html() elements
+- name: About
+  source: /ngwidgets/widgets.py
+  issue: 21
+  demo_url: http://ngdemo.bitplan.com/about
+  demo_image_url: https://github.com/WolfgangFahl/nicegui_widgets/assets/1336221/96c63a66-f6f9-45b0-a2c6-4eae91d10115
+  description: >
+    About is a class used to generate an "About" section for applications.
+    It dynamically constructs a UI element displaying version details,
+    documentation links, and other metadata with customizable styling.
+- name: HideShow
+  source: /ngwidgets/widgets.py
+  issue: 44
+  demo_url: http://ngdemo.bitplan.com/hideshow
+  demo_image_url: https://github.com/WolfgangFahl/nicegui_widgets/assets/1336221/9c8c3769-5750-4836-ade1-24f84dce676b
+  description: >
+    HideShow is a class representing a hideable/showable section in a NiceGUI application.
+    As an alternative to ui.expansion() it allows for dynamic toggling of content visibility,
+    with customizable labels and initialization settings for user interfaces.
