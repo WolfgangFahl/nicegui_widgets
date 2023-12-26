@@ -86,6 +86,8 @@ class ComponentView:
                     # Title
                     title = f"{self.component.name}"
                     ui.label(title).classes("text-2xl")
+                    if self.description:
+                        ui.label(self.description)
                     html_markup = ""
                     delim = ""
                     if self.component.demo_url:

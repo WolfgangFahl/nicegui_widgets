@@ -31,6 +31,7 @@ class Component:
 
     Attributes:
         name (str): The name of the component.
+        description(str): a multiline description of the component
         source (Optional[str]): The source code URL of the component, if available.
         demo_url (Optional[str]): The URL of an online demo of the component, if available.
         demo_image_url (Optional[str]): The URL of a picture and/or video demonstrating the component, if available.
@@ -40,6 +41,7 @@ class Component:
     """
 
     name: str
+    description: Optional[str] = None
     source: Optional[str] = None
     demo_url: Optional[str] = None
     demo_image_url: Optional[str] = None

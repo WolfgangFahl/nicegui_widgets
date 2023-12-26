@@ -7,7 +7,7 @@ from tqdm import tqdm
 @dataclass
 class Progressbar:
     """
-    Generic progress bar.
+    Generic progress bar
     """
 
     _total: int
