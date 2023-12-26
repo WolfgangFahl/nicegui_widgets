@@ -86,8 +86,6 @@ class ComponentView:
                     # Title
                     title = f"{self.component.name}"
                     ui.label(title).classes("text-2xl")
-                    if self.component.description:
-                        ui.label(self.component.description)
                     html_markup = ""
                     delim = ""
                     if self.component.demo_url:
@@ -109,3 +107,5 @@ class ComponentView:
                     ui.html(html_markup)
                     if self.component.demo_image_url:
                         ui.image(self.component.demo_image_url)
+                    if self.component.description:
+                        ui.label(self.component.description)
