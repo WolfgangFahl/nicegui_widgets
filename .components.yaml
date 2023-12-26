@@ -1,23 +1,28 @@
 # Components
 # WF 2023-12-16
 components:
-- name: dict_edit.py
-  source: /ngwidgets/dict_edit.py
-  issue: 47
-  demo_url: http://ngdemo.bitplan.com/dictedit
-  demo_image_url: https://github.com/WolfgangFahl/nicegui_widgets/assets/1336221/405053ea-0b2e-42cf-b637-191e9541603d
 - name: color_schema.py
   source: /ngwidgets/color_schema.py
   issue: 15
   demo_url: http://ngdemo.bitplan.com/color_schema
   demo_image_url: https://github.com/WolfgangFahl/nicegui_widgets/assets/1336221/2bb926d4-da56-4201-a04c-af032d4de08e
-- name: tristate.py
-  source: /ngwidgets/tristate.py
-  issue: 49
-  demo_url: http://ngdemo.bitplan.com/tristate
-  demo_image_url: https://github.com/WolfgangFahl/nicegui_widgets/assets/1336221/50998f00-c6a0-4df0-b233-b40ddc15e26a
+- name: dict_edit.py
+  source: /ngwidgets/dict_edit.py
+  issue: 47
+  demo_url: http://ngdemo.bitplan.com/dictedit
+  demo_image_url: https://github.com/WolfgangFahl/nicegui_widgets/assets/1336221/405053ea-0b2e-42cf-b637-191e9541603d
 - name: file_selector.py
   source: /ngwidgets/file_selector.py
   issue: 7
   demo_url: http://nicescad.bitplan.com/
   demo_image_url: https://github.com/WolfgangFahl/nicegui_widgets/assets/1336221/5f27ddb9-3827-4cf2-bfb3-f237718ebe38
+- name: lod_grid.py
+  source: /ngwidgets/lod_grid.py
+  issue: 28
+  demo_url: http://nicescad.bitplan.com/grid
+  demo_image_url: https://github.com/WolfgangFahl/nicegui_widgets/assets/1336221/55e850ba-bc92-4879-a943-183501280afe
+- name: tristate.py
+  source: /ngwidgets/tristate.py
+  issue: 49
+  demo_url: http://ngdemo.bitplan.com/tristate
+  demo_image_url: https://github.com/WolfgangFahl/nicegui_widgets/assets/1336221/50998f00-c6a0-4df0-b233-b40ddc15e26a

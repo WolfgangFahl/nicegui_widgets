@@ -17,7 +17,7 @@ class Version:
     name = "ngwidgets"
     version = ngwidgets.__version__
     date = "2023-09-10"
-    updated = "2023-12-25"
+    updated = "2023-12-26"
     description = "NiceGUI widgets"
 
     authors = "Wolfgang Fahl"

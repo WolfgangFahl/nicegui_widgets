@@ -9,7 +9,7 @@ from nicegui import app, Client, ui
 
 from ngwidgets.dict_edit import DictEdit
 from ngwidgets.input_webserver import InputWebserver
-from ngwidgets.lod_grid import ListOfDictsGrid
+from ngwidgets.lod_grid import ListOfDictsGrid, GridConfig
 from ngwidgets.projects_view import ProjectsView
 from ngwidgets.pdfviewer import pdfviewer
 from ngwidgets.tristate import Tristate
@@ -20,19 +20,21 @@ from ngwidgets.components_view import ComponentsView
 from ngwidgets.projects import Projects
 from dataclasses import dataclass
 
+
 @dataclass
 class Element:
     name: str
     wikidata_id: str
     atomic_number: int
-    
-    @property 
-    def ui_label(self)->str:
+
+    @property
+    def ui_label(self) -> str:
         if self.name and self.atomic_number:
             return f"{self.name} ({self.atomic_number})"
         else:
             return DictEdit.empty
-    
+
+
 class NiceGuiWidgetsDemoWebserver(InputWebserver):
     """
     webserver to demonstrate ngwidgets capabilities
@@ -139,14 +141,147 @@ class NiceGuiWidgetsDemoWebserver(InputWebserver):
         await self.setup_content_div(show)
 
     async def show_grid(self):
+        """
+        show the lod grid
+        """
+        next_name = [0]  # Wrap next_name in a list to make it mutable from the nested function
+        self.names = [
+            "Adam", "Brian", "Cindy", "Diana", "Evan", "Fiona", "George",
+            "Hannah", "Ian", "Jack", "Kara", "Liam", "Mona", "Nora",
+            "Oliver", "Pam", "Quincy", "Rachel", "Steve", "Tina",
+            "Uma", "Victor", "Wendy", "Xavier", "Yvonne", "Zane",
+            "Ashley", "Ben", "Charlotte", "Derek"  # Added more names for a total of 30
+        ]
+
+        def gen_name() -> str:
+            """
+            name generator
+            """
+            new_name = self.names[next_name[0]]
+            next_name[0] += 1  # Increment the index
+            if next_name[0] >= len(self.names):
+                next_name[0] = 0  # Reset the index if it reaches the end of the names list
+            return new_name
+
         lod = [
-            {"name": "Alice", "age": 18, "parent": "David"},
-            {"name": "Bob", "age": 21, "parent": "Eve"},
-            {"name": "Carol", "age": 42, "parent": "Frank"},
+            {
+                "name": "Alice",
+                "age": 18,
+                "parent": "David",
+                "married": "2023-05-24",
+                "weight": 96.48,
+                "member": False,
+            },
+            {
+                "name": "Bob",
+                "age": 21,
+                "parent": "Eve",
+                "married": "2023-01-05",
+                "weight": 87.85,
+                "member": True,
+            },
+            {
+                "name": "Carol",
+                "age": 42,
+                "parent": "Frank",
+                "married": "2007-09-27",
+                "weight": 51.81,
+                "member": False,
+            },
+            {
+                "name": "Dave",
+                "age": 35,
+                "parent": "Alice",
+                "married": "2019-04-12",
+                "weight": 72.28,
+                "member": True,
+            },
+            {
+                "name": "Ella",
+                "age": 29,
+                "parent": "Bob",
+                "married": "2013-06-26",
+                "weight": 58.09,
+                "member": False,
+            },
+            {
+                "name": "Frank",
+                "age": 28,
+                "parent": "Bob",
+                "married": "2027-05-25",
+                "weight": 81.32,
+                "member": True,
+            },
+            {
+                "name": "Grace",
+                "age": 21,
+                "parent": "Ella",
+                "married": "2023-07-02",
+                "weight": 95.36,
+                "member": False,
+            },
+            {
+                "name": "Hannah",
+                "age": 49,
+                "parent": "Frank",
+                "married": "1994-01-14",
+                "weight": 66.14,
+                "member": True,
+            },
+            {
+                "name": "Ian",
+                "age": 43,
+                "parent": "Bob",
+                "married": "2015-05-15",
+                "weight": 66.94,
+                "member": False,
+            },
+            {
+                "name": "Jill",
+                "age": 22,
+                "parent": "Carol",
+                "married": "2019-06-05",
+                "weight": 75.45,
+                "member": False,
+            },
+            {
+                "name": "Kevin",
+                "age": 39,
+                "parent": "Dave",
+                "married": "2008-12-09",
+                "weight": 95.58,
+                "member": True,
+            },
+            {
+                "name": "Liam",
+                "age": 46,
+                "parent": "Bob",
+                "married": "2001-09-15",
+                "weight": 86.69,
+                "member": True,
+            },
+            {
+                "name": "Mona",
+                "age": 31,
+                "parent": "Alice",
+                "married": "2023-07-01",
+                "weight": 88.72,
+                "member": False,
+            },
         ]
 
         def show():
-            self.lod_grid = ListOfDictsGrid(lod=lod, key_col="name")
+            with ui.grid(columns=1) as self.grid_container:
+                grid_config=GridConfig(key_col="name",
+                    keygen_callback=gen_name,  # Use name generator for new names
+                    editable=True,
+                    multiselect=True,
+                    with_buttons=True,
+                    debug=self.args.debug)
+                self.lod_grid = ListOfDictsGrid(
+                    lod=lod,
+                    config=grid_config
+                )
 
         await self.setup_content_div(show)
 
@@ -160,24 +295,27 @@ class NiceGuiWidgetsDemoWebserver(InputWebserver):
             "family_name": "Wonderland",
             "age": 30,
             "is_student": False,
-            "enrollment_date": datetime.now()  # Set default to current time
+            "enrollment_date": datetime.now(),  # Set default to current time
         }
-        
-        sample_element=Element("hydrogen","Q556",1)
-    
+
+        sample_element = Element("hydrogen", "Q556", 1)
+
         def show():
             customization = {
                 "_form_": {"title": "Student", "icon": "person"},
                 "given_name": {"label": "Given Name", "size": 50},
                 "family_name": {"label": "Family Name", "size": 50},
-                "enrollment_date": {"label": "Enrollment Date", "widget": "datetime"}  # Customization for datetime
+                "enrollment_date": {
+                    "label": "Enrollment Date",
+                    "widget": "datetime",
+                },  # Customization for datetime
             }
             with ui.grid(columns=3):
                 self.dict_edit1 = DictEdit(sample_dict, customization=customization)
                 self.dict_edit1.expansion.open()
                 self.dict_edit2 = DictEdit(sample_element)
                 self.dict_edit2.expansion.open()
-                
+
         await self.setup_content_div(show)
 
     async def show_hide_show_demo(self):
@@ -211,6 +349,9 @@ class NiceGuiWidgetsDemoWebserver(InputWebserver):
             )
 
         def on_icon_set_change(event):
+            """
+            react on change icon set
+            """
             new_icon_set = event.value
             self.tristate.icon_set = Tristate.ICON_SETS[new_icon_set]
             self.tristate.current_icon_index = 0  # Reset to first icon of new set
