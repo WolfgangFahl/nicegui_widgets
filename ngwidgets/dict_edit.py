@@ -150,21 +150,7 @@ class DictEdit:
                     "ui_label",
                     backward=lambda x: f"{self.form_ui_def.title}: {x if x else DictEdit.empty}",
                 )
-
-    def _create_inputs1(self) -> Dict[str, Input]:
-        """Creates input elements for the form based on the FormUiDef."""
-        inputs = {}
-        for field_def in self.form_ui_def.ui_fields.values():
-            value = self.d.get(field_def.field_name)
-            input_field = ui.input(label=field_def.label, value=value)
-            input_field.bind_value(self.d, field_def.field_name).props(
-                f"size={field_def.size}"
-            )
-            if field_def.validation:
-                input_field.validation = {"Invalid input": field_def.validation}
-            inputs[field_def.field_name] = input_field
-        return inputs
-
+                
     def _create_inputs(self) -> Dict[str, Input]:
         """Creates input elements for the form based on the FormUiDef."""
         inputs = {}
