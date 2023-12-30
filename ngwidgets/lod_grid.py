@@ -80,7 +80,7 @@ class ListOfDictsGrid:
                 html_columns=self.config.html_columns,
             ).classes(self.config.classes)
             self.ag_grid.theme = self.config.theme
-            self.auto_size_columns = (self.config.auto_size_columns,)
+            self.auto_size_columns = self.config.auto_size_columns
             self.setDefaultColDef()
             if lod is not None:
                 self.load_lod(lod, self.config.column_defs)
@@ -134,7 +134,7 @@ class ListOfDictsGrid:
         else:
             # If not in debug mode, notify the user with a general error message.
             # Ensure that ui.notify or a similar method is available and properly configured.
-            ui.notify("Unhandled exception occurred", type="error")
+            ui.notify(f"Unhandled exception {str(ex)} occurred in ListOfDictsGrid", type="error")
 
     def update_index(self, lenient: bool = False):
         """
@@ -238,7 +238,8 @@ class ListOfDictsGrid:
             self.update_index(lenient=self.config.lenient)
             if self.config.all_cols_html:
                 # Set html_columns based on all_rows_html flag
-                self.html_columns = list(range(len(columnDefs)))
+                html_columns=list(range(len(columnDefs)))
+                self.html_columns = html_columns
         except Exception as ex:
             self.handle_exception(ex)
 
