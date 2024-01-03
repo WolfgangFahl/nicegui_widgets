@@ -3,7 +3,6 @@ Created on 2023-10-3
 
 @author: wf
 """
-import asyncio
 import datetime
 import sys
 import traceback
@@ -110,6 +109,24 @@ class ListOfDictsGrid:
     @auto_size_columns.setter
     def auto_size_columns(self, value):
         self.ag_grid._props["auto_size_columns"] = value
+
+    def set_checkbox_selection(self, checkbox_col: str):
+        """
+        Set the checkbox selection for a specified column.
+    
+        Args:
+            checkbox_col (str): The field name of the column where checkboxes should be enabled.
+        """
+        if not self.ag_grid.options.get('columnDefs'):
+            raise Exception("Column definitions are not set. Load the data first using load_lod.")
+    
+        # Go through each column definition and set the checkboxSelection
+        for col_def in self.ag_grid.options['columnDefs']:
+            if col_def['field'] == checkbox_col:
+                col_def['checkboxSelection'] = True
+            else:
+                # Ensure other columns do not have checkboxSelection enabled
+                col_def.pop('checkboxSelection', None)
 
     def handle_exception(self, ex: Exception) -> None:
         """
