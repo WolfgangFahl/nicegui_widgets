@@ -153,14 +153,15 @@ class InputWebserver(NiceGuiWebserver):
         """
         Generates the settings page
         """
-        self.setup_menu()
-        ui.checkbox("debug", value=self.debug).bind_value(self, "debug")
-        ui.checkbox("debug with trace", value=True).bind_value(self, "do_trace")
-        ui.checkbox("render on load", value=self.render_on_load).bind_value(
-            self, "render_on_load"
-        )
-        self.configure_settings()
-        await self.setup_footer()
+        def show():
+            with ui.row():
+                ui.checkbox("debug", value=self.debug).bind_value(self, "debug")
+                ui.checkbox("debug with trace", value=True).bind_value(self, "do_trace")
+                ui.checkbox("render on load", value=self.render_on_load).bind_value(
+                    self, "render_on_load"
+                )
+            self.configure_settings()
+        await self.setup_content_div(show)
 
     def configure_settings(self):
         """
