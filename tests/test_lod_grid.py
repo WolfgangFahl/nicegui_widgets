@@ -33,6 +33,9 @@ class TestLodGrid(Basetest):
         self.assertTrue("Alice" in self.lod_grid.lod_index)
 
     def test_update_cell(self):
+        """
+        test the update_cell API function
+        """
         new_age = 19
         self.lod_grid.update_cell("Alice", "age", new_age)
         alice_row = self.lod_grid.lod_index["Alice"]

@@ -214,8 +214,8 @@ class ListOfDictsGrid:
         """
         data_by_key = {}
         key_col = self.config.key_col  # Retrieve key column name from the GridConfig instance
-        for row in self.lod:
-            key_value = row.get(key_col)
+        for row in self.get_row_data():
+            key_value = row.get(key_col,None)
             if key_value is not None:
                 data_by_key[key_value] = row
         return data_by_key
