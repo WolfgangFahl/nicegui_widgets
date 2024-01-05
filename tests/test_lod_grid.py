@@ -32,8 +32,8 @@ class TestLodGrid(Basetest):
             print(self.lod_grid.lod_index)
         self.assertTrue("Alice" in self.lod_grid.lod_index)
 
-    def test_update_row(self):
+    def test_update_cell(self):
         new_age = 19
-        self.lod_grid.update_row("Alice", "age", new_age)
+        self.lod_grid.update_cell("Alice", "age", new_age)
         alice_row = self.lod_grid.lod_index["Alice"]
         self.assertEqual(new_age, alice_row["age"])

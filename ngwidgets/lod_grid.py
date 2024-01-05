@@ -7,7 +7,7 @@ import datetime
 import sys
 import traceback
 from dataclasses import dataclass, field
-from typing import Callable, Dict, List, Optional
+from typing import Any,Callable, Dict, List, Optional
 
 from nicegui import ui
 
@@ -182,23 +182,43 @@ class ListOfDictsGrid:
         row = self.lod_index.get(key_value, None)
         return row
 
-    def update_row(self, key_value, row_key, value):
+    def update_cell(self, key_value: Any, col_key: str, value: Any) -> None:
         """
-        Update a row in the grid.
-        """
-        row = self.get_row_for_key(key_value)
-        if row:
-            row_data = self.get_row_data()
-            for grid_row in row_data:
-                if row[self.config.key_col] == grid_row[self.config.key_col]:
-                    grid_row[row_key] = value
+        Update a cell in the grid.
+        
+        Args:
+            key_value (Any): The value of the key column for the row to update.
+            row_key (str): The column key of the cell to update.
+            value (Any): The new value for the specified cell.
 
+        """
+        rows_by_key = self.get_rows_by_key()
+        row = rows_by_key.get(key_value,None)
+        if row:
+            row[col_key] = value
+                    
     def get_row_data(self):
         """
         get the complete row data
         """
         row_data = self.ag_grid.options["rowData"]
         return row_data
+    
+    def get_rows_by_key(self) -> Dict[Any, Dict[str, Any]]:
+        """
+        Organize rows in a dictionary of dictionaries, indexed by the key column value specified in GridConfig.
+    
+        Returns:
+            Dict[Any, Dict[str, Any]]: A dictionary of dictionaries, with each sub-dictionary representing a row,
+                                       indexed by the key column values.
+        """
+        data_by_key = {}
+        key_col = self.config.key_col  # Retrieve key column name from the GridConfig instance
+        for row in self.lod:
+            key_value = row.get(key_col)
+            if key_value is not None:
+                data_by_key[key_value] = row
+        return data_by_key
 
     async def onSizeColumnsToFit(self, _msg: dict):
         """
