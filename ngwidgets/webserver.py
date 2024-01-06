@@ -181,7 +181,28 @@ class NiceGuiWebserver(object):
             button._props["icon"] = icon
             button.toggle_icon = toggle_icon
         button.update()
-
+        
+    def round_label(self, title: str, background_color: str = "#e6e6e6",**kwargs) -> ui.label:
+        """
+        Creates a label with rounded corners and optional background color.
+    
+        Args:
+            title (str): The text to be displayed in the label.
+            background_color (str): Hex color code for the label's background.
+                                    Defaults to a light grey color ("#e6e6e6").
+            **kwargs: Additional keyword arguments passed to the select widget creation.
+    
+        Returns:
+            ui.label: A NiceGUI label element with rounded corners and the specified background color.
+        """
+        background_style = (
+            f"background-color: {background_color};" if background_color else ""
+        )
+        round_label=ui.label(title,**kwargs).classes("rounded p-2").style(
+            f"margin-right: 10px; {background_style}"
+        )
+        return round_label
+    
     def add_select(
         self,
         title: str,
@@ -204,12 +225,7 @@ class NiceGuiWebserver(object):
             Any: The created nicegui ui.select widget.
         """
         with ui.element("div").style("display: flex; align-items: center;"):
-            background_style = (
-                f"background-color: {background_color};" if background_color else ""
-            )
-            ui.label(title).classes("rounded p-2").style(
-                f"margin-right: 10px; {background_style}"
-            )
+            self.round_label(title,background_color)
             s = ui.select(selection, **kwargs)
             return s
 
