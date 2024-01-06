@@ -310,8 +310,53 @@ class NiceGuiWidgetsDemoWebserver(InputWebserver):
                     lod=lod,
                     config=grid_config
                 )
+                self.lod_grid.set_checkbox_selection("name")            
+                # setup some grid event listeners
+                # https://www.ag-grid.com/javascript-data-grid/grid-events/
+                self.lod_grid.ag_grid.on('cellClicked', self.on_cell_clicked)
+                self.lod_grid.ag_grid.on('cellDoubleClicked', self.on_cell_double_clicked)
+                self.lod_grid.ag_grid.on('rowSelected', self.on_row_selected)
+                self.lod_grid.ag_grid.on("selectionChanged", self.on_selection_changed)
+                self.lod_grid.ag_grid.on("cellValueChanged", self.on_cell_value_changed)
 
         await self.setup_content_div(show)
+    
+    async def on_cell_clicked(self, event):
+        await self.on_grid_event(event, "cellClicked")
+
+    async def on_cell_double_clicked(self, event):
+        await self.on_grid_event(event, "cellDoubleClicked")
+
+    async def on_row_selected(self, event):
+        await self.on_grid_event(event, "rowSelected")
+
+    async def on_selection_changed(self, event):
+        await self.on_grid_event(event, "selectionChanged")
+        
+    async def on_cell_value_changed(self, event):
+        await self.on_grid_event(event, "cellValueChanged")
+
+    async def on_grid_event(self, event, source):
+        """
+        React on ag_grid event
+        See https://www.ag-grid.com/javascript-data-grid/grid-events/
+         
+        """
+        args=event.args
+        # Custom logic or message formatting can be based on the source
+        if source in ["cellDoubleClicked","cellClicked"]:
+            msg=f"{source}: row:  {args['rowId']} column {args['colId']}"
+        elif source == "cellValueChanged":
+            msg=f"{source}: {args['oldValue']} → {args['newValue']} row:  {args['rowId']} column {args['colId']}"
+        else:
+            msg = f'grid event from {source}: {event.args}'
+        # lambda event: ui.notify(f'selected row: {event.args["rowIndex"]}'))
+        # lambda event: ui.notify(f'Cell value: {event.args["value"]}'))
+        # self.on_property_grid_selection_change
+        print(msg)
+        
+        ui.notify(msg)
+        
 
     async def show_dictedit(self):
         """
