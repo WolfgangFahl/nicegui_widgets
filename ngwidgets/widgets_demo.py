@@ -5,7 +5,7 @@ Created on 2023-09-13
 """
 from datetime import datetime
 from fastapi.responses import Response
-from nicegui import app, Client, ui
+from nicegui import app, Client, run, ui
 
 from ngwidgets.dict_edit import DictEdit
 from ngwidgets.input_webserver import InputWebserver
@@ -108,6 +108,10 @@ class NiceGuiWidgetsDemoWebserver(InputWebserver):
         async def show_pdf_viewer(client: Client):
             await client.connected(timeout=self.timeout)
             return await self.show_pdf_viewer()
+        
+        @ui.page("/issue1786")
+        async def show_issue_1786(client:Client):
+            return await self.show_issue_1786()
 
     async def load_pdf(self):
         self.pdf_viewer.load_pdf(self.pdf_url)
@@ -136,6 +140,35 @@ class NiceGuiWidgetsDemoWebserver(InputWebserver):
             self.config.color_schema.display()
             pass
 
+        await self.setup_content_div(show)
+     
+        
+    async def show_issue_1786(self):
+        """
+        https://github.com/zauberzeug/nicegui/discussions/1786
+        """
+        def foreground_no_slot(event):
+            ui.notify(f"{event.sender.text} clicked")
+      
+        async def background_no_slot(event):
+            await run.io_bound(foreground_no_slot,event)     
+      
+        def foreground_with_slot(event):
+            with self.button_row:
+                ui.notify(f"{event.sender.text} clicked")
+      
+        async def background_with_slot(event):
+            await run.io_bound(foreground_with_slot,event)     
+            
+            
+        def show():
+            with ui.row() as self.button_row:
+                ui.button("foreground no slot",on_click=foreground_no_slot)
+                ui.button("background no slot",on_click=background_no_slot)
+                ui.button("foreground with slot",on_click=foreground_with_slot)
+                ui.button("background with slot",on_click=background_with_slot)
+            
+            
         await self.setup_content_div(show)
         
     async def show_langs(self):
