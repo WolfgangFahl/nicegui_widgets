@@ -137,9 +137,9 @@ class NiceGuiWebserver(object):
 
         see https://fonts.google.com/icons?icon.set=Material+Icons for potential icon names
         """
-        with ui.button(name, icon=icon_name) as button:
-            button.on("click", lambda: (ui.open(target, new_tab=new_tab)))
-        return button
+        with ui.link(text=" ", target=target, new_tab=new_tab) as link_btn:
+            ui.button(name, icon=icon_name)
+        return link_btn
 
     def tool_button(
         self, tooltip: str, icon: str, handler: callable = None, toggle_icon: str = None
