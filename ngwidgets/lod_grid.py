@@ -335,6 +335,13 @@ class ListOfDictsGrid:
         """
         selected_rows = await self.ag_grid.get_selected_rows()
         return selected_rows
+    
+    def select_all_rows(self):
+        """
+        select all my ag_grid rows
+        """
+        self.ag_grid.call_api_method("selectAll")
+    
 
     async def delete_selected_rows(self, _args):
         """
@@ -405,5 +412,5 @@ class ListOfDictsGrid:
             ui.button(
                 "All",
                 icon="select_all",
-                on_click=lambda: self.ag_grid.call_api_method("selectAll"),
+                on_click=self.select_all_rows,
             )
