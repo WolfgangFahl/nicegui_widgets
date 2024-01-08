@@ -109,7 +109,38 @@ class ListOfDictsGrid:
     @auto_size_columns.setter
     def auto_size_columns(self, value):
         self.ag_grid._props["auto_size_columns"] = value
-
+        
+        
+    def get_column_def(self,col:str)->Dict:
+        """
+        get the column definition for the given column
+        
+        Args:
+            col (str): The field name of the column where checkboxes should be enabled.
+        
+        Returns:
+            Dict: the column definition
+        """
+        if not self.ag_grid.options.get('columnDefs'):
+            raise Exception("Column definitions are not set. Load the data first using load_lod.")
+        # Go through each column definition 
+        for col_def in self.ag_grid.options['columnDefs']:
+            if col_def['field'] == col:
+                return col_def
+        return None
+    
+    def set_checkbox_renderer(self,checkbox_col:str):
+        """
+        set cellRenderer to checkBoxRenderer for the given column
+        
+        Args:
+            checkbox_col (str): The field name of the column where 
+            rendering as checkboxes should be enabled.
+      
+        """
+        col_def=self.get_column_def(checkbox_col)
+        col_def["cellRenderer"]="checkboxRenderer"
+      
     def set_checkbox_selection(self, checkbox_col: str):
         """
         Set the checkbox selection for a specified column.
@@ -117,17 +148,10 @@ class ListOfDictsGrid:
         Args:
             checkbox_col (str): The field name of the column where checkboxes should be enabled.
         """
-        if not self.ag_grid.options.get('columnDefs'):
-            raise Exception("Column definitions are not set. Load the data first using load_lod.")
-    
-        # Go through each column definition and set the checkboxSelection
-        for col_def in self.ag_grid.options['columnDefs']:
-            if col_def['field'] == checkbox_col:
-                col_def['checkboxSelection'] = True
-            else:
-                # Ensure other columns do not have checkboxSelection enabled
-                col_def.pop('checkboxSelection', None)
-
+        col_def=self.get_column_def(checkbox_col)
+        if col_def:
+            col_def['checkboxSelection'] = True
+   
     def handle_exception(self, ex: Exception) -> None:
         """
         Handles exceptions thrown during grid initialization or operation.

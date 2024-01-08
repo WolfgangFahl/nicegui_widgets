@@ -343,7 +343,9 @@ class NiceGuiWidgetsDemoWebserver(InputWebserver):
                     lod=lod,
                     config=grid_config
                 )
-                self.lod_grid.set_checkbox_selection("name")            
+                self.lod_grid.set_checkbox_selection("name") 
+                self.lod_grid.set_checkbox_renderer("member")
+                           
                 # setup some grid event listeners
                 # https://www.ag-grid.com/javascript-data-grid/grid-events/
                 self.lod_grid.ag_grid.on('cellClicked', self.on_cell_clicked)
