@@ -205,7 +205,25 @@ class ListOfDictsGrid:
         """
         row = self.lod_index.get(key_value, None)
         return row
-
+    
+    def get_cell_value(self,key_value:Any,col_key:str)->Any:
+        """
+        get the value for the given cell
+        
+        Args:
+            key_value (Any): The value of the key column for the row to update.
+            row_key (str): The column key of the cell to update.
+            
+        Returns:
+            Any: the value of the cell or None if the row doesn't exist 
+        """
+        rows_by_key = self.get_rows_by_key()
+        row = rows_by_key.get(key_value,None)
+        value=None
+        if row:
+            value=row.get(col_key,None)
+        return value
+        
     def update_cell(self, key_value: Any, col_key: str, value: Any) -> None:
         """
         Update a cell in the grid.
