@@ -38,7 +38,7 @@ class NiceguiProgressbar(Progressbar):
     def __init__(self, total, desc: str, unit: str):
         super().__init__(total, desc, unit)
         self.value = 0
-        self.progress = ui.linear_progress(value=0).props("instant-feedback")
+        self.progress = ui.linear_progress(value=0,show_value=False).props("instant-feedback")
         with self.progress:
             self.label = ui.label().classes("text-lg text-white absolute-center")
             self.label.bind_text_from(
@@ -47,19 +47,28 @@ class NiceguiProgressbar(Progressbar):
         self.progress.visible = False
 
     def reset(self):
+        """
+        reset
+        """
         self.value = 0
         self.progress.value = 0
 
     def set_description(self, desc: str):
+        """
+        set my description
+        """
         self.desc = desc
         self.progress.visible = True
-
-    def update(self, step):
-        self.value += step
+        
+    def update_value(self,new_value):
+        self.value=new_value
         self.progress.visible = True
         percent = round(self.value / self.total, 2)
         self.progress.value = percent
 
+    def update(self, step):
+        self.update_value(self.value+step)
+    
 
 class TqdmProgressbar(Progressbar):
     """
@@ -77,7 +86,12 @@ class TqdmProgressbar(Progressbar):
         self.progress.set_description(desc)
 
     def update(self, step):
-        self.progress.update(step)
+        self.update_value(self.value + step)
+
+    def update_value(self, new_value):
+        increment = new_value - self.value
+        self.value = new_value
+        self.progress.update(increment)
 
     def update_total(self):
         self.progress.total = self.total
