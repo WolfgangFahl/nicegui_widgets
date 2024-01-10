@@ -10,8 +10,8 @@ class Progressbar:
     """
     Generic progress bar
     """
-
     _total: int
+    value: int
     desc: str
     unit: str
 
@@ -48,8 +48,7 @@ class NiceguiProgressbar(Progressbar):
             label_color(str): the color to use for the label       
         The progress bar is initially set to invisible and its value to 0.
         """
-        super().__init__(total, desc, unit)
-        self.value = 0
+        super().__init__(total,0, desc, unit)
         self.progress = ui.linear_progress(value=0,size="20px",show_value=False).props("instant-feedback")
         # Set the label color based on the provided color schema
         self.label_style = f'color: {label_color};'
@@ -91,7 +90,7 @@ class TqdmProgressbar(Progressbar):
     """
 
     def __init__(self, total, desc, unit):
-        super().__init__(total, desc, unit)
+        super().__init__(total, 0, desc, unit)
         self.reset()
 
     def reset(self):
