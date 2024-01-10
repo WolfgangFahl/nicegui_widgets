@@ -95,7 +95,8 @@ class TqdmProgressbar(Progressbar):
 
     def reset(self):
         self.progress = tqdm(total=self.total, desc=self.desc, unit=self.unit)
-
+        self.value=0
+        
     def set_description(self, desc: str):
         self.progress.set_description(desc)
 
