@@ -1,6 +1,7 @@
 from dataclasses import dataclass
 
 from nicegui import ui
+from ngwidgets.color_schema import ColorSchema
 from tqdm import tqdm
 
 
@@ -35,12 +36,26 @@ class NiceguiProgressbar(Progressbar):
     Nicegui progress bar wrapper.
     """
 
-    def __init__(self, total, desc: str, unit: str):
+    def __init__(self, total, desc: str, unit: str,label_color = '#8D92C4 '  
+     ):
+        """
+        Initialize the NiceguiProgressbar instance.
+
+        Args:
+            total (int): The total value (maximum) of the progress bar.
+            desc (str): A short description of the task for which the progress is being shown.
+            unit (str): The unit of measurement for the progress (e.g., 'step', 'item').
+            label_color(str): the color to use for the label       
+        The progress bar is initially set to invisible and its value to 0.
+        """
         super().__init__(total, desc, unit)
         self.value = 0
-        self.progress = ui.linear_progress(value=0,show_value=False).props("instant-feedback")
+        self.progress = ui.linear_progress(value=0,size="20px",show_value=False).props("instant-feedback")
+        # Set the label color based on the provided color schema
+        self.label_style = f'color: {label_color};'
+
         with self.progress:
-            self.label = ui.label().classes("text-lg text-white absolute-center")
+            self.label = ui.label().classes("text-lg absolute-center").style(self.label_style)
             self.label.bind_text_from(
                 self, "value", backward=lambda v: f"{self.desc} {v}/{self.total}"
             )

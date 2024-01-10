@@ -19,6 +19,7 @@ from ngwidgets.widgets import HideShow, Lang
 from ngwidgets.components_view import ComponentsView
 from ngwidgets.projects import Projects
 from dataclasses import dataclass
+from ngwidgets.progress import NiceguiProgressbar
 
 
 @dataclass
@@ -74,6 +75,11 @@ class NiceGuiWidgetsDemoWebserver(InputWebserver):
             await client.connected(timeout=self.timeout * 4)
             return await self.show_components(solution_id)
 
+        @ui.page("/progress")
+        async def show_progress(client: Client):
+            await client.connected(timeout=self.timeout)
+            return await self.show_progress()
+        
         @ui.page("/langs")
         async def show_langs(client: Client):
             await client.connected(timeout=self.timeout)
@@ -132,6 +138,32 @@ class NiceGuiWidgetsDemoWebserver(InputWebserver):
     async def show_solutions(self):
         def show():
             self.projects_view = ProjectsView(self)
+
+        await self.setup_content_div(show)
+        
+    async def show_progress(self):
+        def show():
+            self.progress_bar = NiceguiProgressbar(total=100, desc="working", unit="step")
+            self.progress_bar.progress.visible = True
+
+            def update_progress(step=1):
+                # Update the progress
+                self.progress_bar.update(step)
+                # Reset the progress bar if it reaches the total
+                if self.progress_bar.value >= self.progress_bar.total:
+                    self.progress_bar.reset()
+
+            def toggle_auto():
+                if not hasattr(self, 'auto_timer'):
+                    self.auto_timer = ui.timer(interval=0.3, callback=lambda: update_progress(), active=True)
+                else:
+                    self.auto_timer.active = not self.auto_timer.active
+
+            # Buttons for controlling the progress bar
+            with ui.row():
+                ui.button('--', on_click=lambda: update_progress(-1))
+                ui.button('++', on_click=lambda: update_progress(1))
+                ui.button('Auto', on_click=toggle_auto)
 
         await self.setup_content_div(show)
 
@@ -499,11 +531,12 @@ class NiceGuiWidgetsDemoWebserver(InputWebserver):
                 "nicegui solutions bazaar": "/solutions",
                 "ColorSchema": "/color_schema",
                 "DictEdit": "/dictedit",
+                "HideShow Demo": "/hideshow",
                 "Lang": "/langs",
                 "ListOfDictsGrid": "/grid",
-                "HideShow Demo": "/hideshow",
                 "Tristate Demo": "/tristate",
-                "pdfviewer": "/pdfviewer"
+                "pdfviewer": "/pdfviewer",
+                "Progressbar": "/progress"
             }
             
             # Generate the HTML using the dictionary

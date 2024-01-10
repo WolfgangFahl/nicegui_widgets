@@ -23,13 +23,11 @@ class WebserverConfig:
     """
     configuration of a webserver
     """
-
     copy_right: str = "(c) 2023 Wolfgang Fahl"
     default_port: int = 9860
     version: Optional[Version] = None
     color_schema: ColorSchema = field(default_factory=ColorSchema.indigo)
     detailed_menu: bool = True
-
 
 class NiceGuiWebserver(object):
     """
