@@ -71,7 +71,7 @@ class InputWebserver(NiceGuiWebserver):
         """
         self.input_input.set_value(input_str)
         self.read_input(input_str)
-        if with_render:
+        if with_render or self.args.render_on_load:
             await self.render(None)
 
     async def reload_file(self):
