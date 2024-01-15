@@ -40,6 +40,7 @@ class YamlAble(Generic[T]):
             self._yaml_dumper.ignore_aliases = lambda *_args: True
             self._yaml_dumper.add_representer(type(None), self.represent_none)
             self._yaml_dumper.add_representer(str, self.represent_literal)
+            self._yaml_dumper.add_representer(tuple, self.represent_tuple)
 
     def represent_none(self, _, __) -> yaml.Node:
         """
@@ -54,6 +55,12 @@ class YamlAble(Generic[T]):
         if "\n" in data:
             return dumper.represent_scalar("tag:yaml.org,2002:str", data, style="|")
         return dumper.represent_scalar("tag:yaml.org,2002:str", data)
+    
+    def represent_tuple(self, dumper: yaml.Dumper, data: tuple) -> yaml.Node:
+        """
+        Custom representer for converting tuples to regular YAML lists.
+        """
+        return dumper.represent_sequence('tag:yaml.org,2002:seq', data)
 
     def to_yaml(
         self,

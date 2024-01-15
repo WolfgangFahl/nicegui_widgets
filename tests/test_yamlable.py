@@ -24,11 +24,12 @@ class MockDataClass(YamlAble["MockDataClass"]):
         description (str, optional): Description attribute. Defaults to None.
         url (str, optional): URL attribute. Defaults to None.
     """
-
     name: str
     id: int
     description: str = None
     url: str = None
+    sample_tuple: tuple = (1, 2, 3)  # Add a tuple attribute for testing
+
 
 
 class TestYamlAble(Basetest):
@@ -105,3 +106,16 @@ class TestYamlAble(Basetest):
             yaml_str,
             "The description should be included as a block scalar.",
         )
+        
+    def test_tuple_serialization(self) -> None:
+        """
+        Test that tuples in the dataclass are serialized as regular YAML lists.
+        """
+        self.mock_data.sample_tuple = (1, 2, 3)
+        yaml_str = self.mock_data.to_yaml()
+        debug=self.debug
+        if debug:
+            print(yaml_str)
+        self.assertIn("- 1\n- 2\n- 3", yaml_str, "Tuples should be serialized as regular YAML lists.")
+        self.assertNotIn("!!python/tuple", yaml_str, "Python tuple notation should not appear in the YAML output.")
+
