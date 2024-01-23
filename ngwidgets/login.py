@@ -25,6 +25,18 @@ class Login(object):
         """
         result = app.storage.user.get("authenticated", False)
         return result
+    
+    async def logout(self):
+        """
+        logout
+        """
+        app.storage.user.update({"username": None, "authenticated": False})
+        
+    def get_username(self) -> str:
+        """
+        Get the username of the currently logged-in user
+        """
+        return app.storage.user.get("username", "?")
 
     async def login(self, _client: Client):
         """
