@@ -271,6 +271,12 @@ class NiceGuiWebserver(object):
             ui.label(self.config.copy_right)
             ui.link("Powered by nicegui", "https://nicegui.io/").style("color: #fff")
 
+    def prepare_ui(self):
+        """
+        overridable function
+        """
+        pass
+    
     async def setup_content_div(
         self,
         setup_content: Optional[Callable] = None,
@@ -288,6 +294,7 @@ class NiceGuiWebserver(object):
         Note:
             This method is asynchronous and should be awaited when called.
         """
+        self.prepare_ui()
         # Setting up the menu
         self.setup_menu()
 
