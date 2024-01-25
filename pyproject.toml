@@ -40,6 +40,10 @@ dependencies = [
 	"pytz",
 	# https://pypi.org/project/dacite/
 	"dacite>=1.8.1"
+	# https://pypi.org/project/dataclasses-json/
+    "dataclasses-json>=0.6.3",
+    #https://pypi.org/project/PyYAML/
+    "PyYAML>=6.0.1"
 ]
 
 requires-python = ">=3.9"
