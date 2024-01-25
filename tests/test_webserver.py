@@ -13,7 +13,7 @@ class TestDemoWebserver(WebserverTest):
     test the demo webserver
     """
 
-    def setUp(self, debug=True, profile=True):
+    def setUp(self, debug=False, profile=True):
         server_class = NiceGuiWidgetsDemoWebserver
         cmd_class = NiceguiWidgetsCmd
         WebserverTest.setUp(self, server_class, cmd_class, debug=debug, profile=profile)
@@ -31,11 +31,13 @@ class TestDemoWebserver(WebserverTest):
         Tests the API by requesting specified paths and evaluating the responses.
         """
         paths=["/solutions.yaml"]
+        debug=self.debug
+        debug=True
         for path in paths:
             response=self.get_response(path)
             yaml_str=response.text
             projects = Projects.from_yaml(yaml_str)
-            if self.debug:
+            if debug:
                 for project in projects.projects:
                     print(project)
             pass

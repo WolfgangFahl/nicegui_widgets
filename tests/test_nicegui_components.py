@@ -21,7 +21,7 @@ class TestNiceguiProjects(Basetest):
     Test cases for the nicegui_projects module.
     """
 
-    def setUp(self, debug=True, profile=True):
+    def setUp(self, debug=False, profile=True):
         Basetest.setUp(self, debug=debug, profile=profile)
         self.pypi_test_projects = [
             ("dynamic-competence-map","https://pypi.org/project/dynamic-competence-map/"),
@@ -230,8 +230,8 @@ class TestNiceguiProjects(Basetest):
             )
         ]
         for expected, url in cases:
-            components = Components.load_from_url(url)
+            components = Components.load_from_yaml_url(url)
             if self.debug:
                 for index, component in enumerate(components.components):
-                    print(f"{index}:{component}")
+                    print(f"{index}:{component.to_yaml()}")
             self.assertTrue(len(components.components) >= expected)

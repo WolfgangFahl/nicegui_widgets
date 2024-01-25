@@ -19,12 +19,12 @@ Prompts for LLM:
 
 Main author: OpenAI's language model (instructed by WF)
 """
-from ngwidgets.yamlable import YamlAble
+from ngwidgets.yamlable import lod_storable
 from dataclasses import dataclass, field
 from typing import List, Optional
 
 
-@dataclass
+@lod_storable
 class Component:
     """
     Represents a single component with its associated metadata.
@@ -50,8 +50,8 @@ class Component:
     fixed: Optional[str] = None
 
 
-@dataclass
-class Components(YamlAble["Components"]):
+@lod_storable
+class Components():
     """
     Components
     """

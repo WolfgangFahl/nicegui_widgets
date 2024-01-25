@@ -49,8 +49,9 @@ from typing import Dict, List, Optional
 from bs4 import BeautifulSoup, ResultSet, Tag
 from github import Github
 from ngwidgets.components import Components
-from ngwidgets.yamlable import YamlAble
+from ngwidgets.yamlable import lod_storable
 from ngwidgets.progress import Progressbar
+from lodstorage import lod
 
 
 class GitHubAccess:
@@ -116,8 +117,8 @@ class GitHubAccess:
         return repo_dict
 
 
-@dataclass
-class Project(YamlAble["Project"]):
+@lod_storable
+class Project():
     """
     A data class representing a software project, potentially from PyPI or GitHub.
 
@@ -146,7 +147,6 @@ class Project(YamlAble["Project"]):
         solution_tags(str): a list of comma separated tags for checking the conformance of the project
         to the solution bazaar guidelines
     """
-
     name: Optional[str] = None
     package: Optional[str] = None
     demo: Optional[str] = None
@@ -245,12 +245,12 @@ class Project(YamlAble["Project"]):
                     file_path, cache_valid_secs
                 ):
                     load_from_url = False
-                    components = Components.load_from_file(str(file_path))
+                    components = Components.load_from_yaml_file(str(file_path))
 
         if load_from_url:
-            components = Components.load_from_url(self.components_url)
+            components = Components.load_from_yaml_url(self.components_url)
             if cache_directory:
-                components.save_to_file(str(file_path))
+                components.save_to_yaml_file(str(file_path))
 
         return components
 
@@ -375,8 +375,8 @@ class Project(YamlAble["Project"]):
         return project
 
 
-@dataclass
-class Projects(YamlAble["Projects"]):
+@lod_storable
+class Projects():
     """
     handle a list of python projects on a specific topic
     """
