@@ -42,7 +42,7 @@ import re
 import unicodedata
 import urllib
 import yaml
-from dataclasses import dataclass, field, fields
+from dataclasses import field
 from datetime import datetime
 from pathlib import Path
 from typing import Dict, List, Optional
@@ -51,7 +51,6 @@ from github import Github
 from ngwidgets.components import Components
 from ngwidgets.yamlable import lod_storable
 from ngwidgets.progress import Progressbar
-from lodstorage import lod
 
 
 class GitHubAccess:
