@@ -3,19 +3,19 @@ Created on 2023-09-10
 
 @author: wf
 """
+from dataclasses import dataclass, field
+
+from nicegui import core, ui, Client
+from pydevd_file_utils import setup_client_server_paths
+
+from ngwidgets.color_schema import ColorSchema
+from ngwidgets.version import Version
 import asyncio
 import os
 import sys
 import traceback
 import urllib.request
-from dataclasses import dataclass, field
 from typing import Any, Callable, Dict, List, Optional, Union
-
-from nicegui import core, ui
-from pydevd_file_utils import setup_client_server_paths
-
-from ngwidgets.color_schema import ColorSchema
-from ngwidgets.version import Version
 
 
 @dataclass
@@ -23,11 +23,17 @@ class WebserverConfig:
     """
     configuration of a webserver
     """
-    copy_right: str = "(c) 2023 Wolfgang Fahl"
+    # the class to be use to instantiate solutions per client
+    solution_class: Optional[type] = None  
+
+    # set your copyright string here
+    copy_right: str = ""
     default_port: int = 9860
     version: Optional[Version] = None
     color_schema: ColorSchema = field(default_factory=ColorSchema.indigo)
     detailed_menu: bool = True
+    timeout: Optional[bool] = None
+ 
 
 class NiceGuiWebserver(object):
     """
@@ -39,12 +45,51 @@ class NiceGuiWebserver(object):
         Constructor
         """
         self.debug = False
-        self.log_view = None
         self.do_trace = True
         if config is None:
             config = WebserverConfig()
         self.config = config
         self.app = core.app
+
+    async def page(self, 
+        client: Client, 
+        wanted_action: Callable,
+        *args, **kwargs):
+        """
+        Handle a page request for a specific client. This method ensures that a specific type of WebSolution
+        (or its subclass) is created for each client and used throughout the client's interaction.
+
+        Args:
+            client (Client): The client making the request.
+            wanted_action(Callable): The function of the solution to perform. Might be overriden so we check the solution_instance
+            *args, **kwargs: Additional arguments to pass to the action.
+   
+        Returns:
+            The result of the action performed.
+        """
+        solution_class=self.config.solution_class
+        if not solution_class:
+            raise TypeError("no solution_class configured")
+        solution_instance = solution_class(self, client)
+        
+        # Check if the solution_instance is an instance of solution_class or its subclass
+        if not isinstance(solution_instance, solution_class):
+            raise TypeError(f"solution_instance must be an instance of {solution_class.__name__} or its subclass, not {type(solution_instance).__name__}.")
+               
+        # Check if the action_callable is a method of solution_instance
+        if not callable(wanted_action) or not hasattr(solution_instance, wanted_action.__name__):
+            raise AttributeError(f"The provided callable {wanted_action.__qualname__} is not a method of {solution_instance.__class__.__name__}.")  
+        # replace action by the one from the instance for inheritance handling
+        action=getattr(solution_instance,wanted_action.__name__)
+    
+        await solution_instance.prepare()
+ 
+        # call any preparation code needed before the actual nicegui.ui calls
+        # are done
+        solution_instance.prepare_ui()
+        
+        return await action(*args, **kwargs)
+
 
     @classmethod
     def optionalDebug(self, args):
@@ -98,26 +143,56 @@ class NiceGuiWebserver(object):
             reload=False,
             storage_secret=storage_secret,
         )
+        
+    def configure_run(self):
+        """
+        Configures specific before run steps of a web server.
+        This method is intended to be overridden 
+        by subclasses to provide custom run behavior.
+        The base method does nothing and can be extended in subclasses.
+        """
+        pass
 
     def stop(self):
         """
         stop the server
         """
+        
+class WebSolution:
+    """
+    the user/client specific web context of a solution
+    """
 
-    def handle_exception(self, e: BaseException, trace: Optional[bool] = False):
-        """Handles an exception by creating an error message.
-
-        Args:
-            e (BaseException): The exception to handle.
-            trace (bool, optional): Whether to include the traceback in the error message. Default is False.
+    def __init__(self, 
+        webserver: NiceGuiWebserver, 
+        client:Client):
         """
-        if trace:
-            self.error_msg = str(e) + "\n" + traceback.format_exc()
-        else:
-            self.error_msg = str(e)
-        if self.log_view:
-            self.log_view.push(self.error_msg)
-        print(self.error_msg, file=sys.stderr)
+        construct a client specific WebSolution
+        """
+        self.webserver = webserver
+        self.config=self.webserver.config
+        self.args=self.webserver.args
+        self.client=client
+        self.log_view = None
+        self.container = None
+        
+    async def prepare(self):
+        """
+        make sure this solution context is ready for use
+        """
+        timeout=self.config.timeout
+        if timeout is not None:
+            await self.client.connected(timeout=timeout)
+            
+    def prepare_ui(self):
+        """
+        call any code necessary before the first nicegui.ui call is
+        done e.g. handling command line arguments
+        
+        The base method does nothing and serves as a placeholder for subclasses to define their own UI preparation logic.
+        """
+        pass
+
 
     def link_button(self, name: str, target: str, icon_name: str, new_tab: bool = True):
         """
@@ -179,28 +254,32 @@ class NiceGuiWebserver(object):
             button._props["icon"] = icon
             button.toggle_icon = toggle_icon
         button.update()
-        
-    def round_label(self, title: str, background_color: str = "#e6e6e6",**kwargs) -> ui.label:
+
+    def round_label(
+        self, title: str, background_color: str = "#e6e6e6", **kwargs
+    ) -> ui.label:
         """
         Creates a label with rounded corners and optional background color.
-    
+
         Args:
             title (str): The text to be displayed in the label.
             background_color (str): Hex color code for the label's background.
                                     Defaults to a light grey color ("#e6e6e6").
             **kwargs: Additional keyword arguments passed to the select widget creation.
-    
+
         Returns:
             ui.label: A NiceGUI label element with rounded corners and the specified background color.
         """
         background_style = (
             f"background-color: {background_color};" if background_color else ""
         )
-        round_label=ui.label(title,**kwargs).classes("rounded p-2").style(
-            f"margin-right: 10px; {background_style}"
+        round_label = (
+            ui.label(title, **kwargs)
+            .classes("rounded p-2")
+            .style(f"margin-right: 10px; {background_style}")
         )
         return round_label
-    
+
     def add_select(
         self,
         title: str,
@@ -223,7 +302,7 @@ class NiceGuiWebserver(object):
             Any: The created nicegui ui.select widget.
         """
         with ui.element("div").style("display: flex; align-items: center;"):
-            self.round_label(title,background_color)
+            self.round_label(title, background_color)
             s = ui.select(selection, **kwargs)
             return s
 
@@ -248,7 +327,12 @@ class NiceGuiWebserver(object):
                 raise Exception(f"File does not exist: {input_str}")
 
     def setup_menu(self, detailed: bool = None):
-        """Adds a link to the project's GitHub page in the web server's menu."""
+        """
+        set up the default menu home/settings and about
+        
+        Args:
+            detailed(bool): if True add github,chat and help links
+        """
         version = self.config.version
         if detailed is None:
             detailed = self.config.detailed_menu
@@ -271,12 +355,6 @@ class NiceGuiWebserver(object):
             ui.label(self.config.copy_right)
             ui.link("Powered by nicegui", "https://nicegui.io/").style("color: #fff")
 
-    def prepare_ui(self):
-        """
-        overridable function
-        """
-        pass
-    
     async def setup_content_div(
         self,
         setup_content: Optional[Callable] = None,
@@ -294,11 +372,11 @@ class NiceGuiWebserver(object):
         Note:
             This method is asynchronous and should be awaited when called.
         """
-        self.prepare_ui()
         # Setting up the menu
         self.setup_menu()
 
         with ui.element("div").classes("w-full h-full") as self.content_div:
+            self.container=self.content_div
             # Execute setup_content if provided
             if setup_content:
                 try:
@@ -313,3 +391,21 @@ class NiceGuiWebserver(object):
                         raise ex
 
         await self.setup_footer()
+
+    def handle_exception(self, e: BaseException, trace: Optional[bool] = None):
+        """Handles an exception by creating an error message.
+
+        Args:
+            e (BaseException): The exception to handle.
+            trace (bool, optional): Whether to include the traceback in the error message. Default is False.
+        """
+        if trace is None and self.webserver:
+            trace = self.webserver.do_trace
+        if trace:
+            self.error_msg = str(e) + "\n" + traceback.format_exc()
+        else:
+            self.error_msg = str(e)
+        if self.log_view:
+            self.log_view.push(self.error_msg)
+        print(self.error_msg, file=sys.stderr)
+

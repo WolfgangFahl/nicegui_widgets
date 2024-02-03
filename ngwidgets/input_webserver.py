@@ -10,7 +10,7 @@ from nicegui import Client, ui
 
 from ngwidgets.local_filepicker import LocalFilePicker
 from ngwidgets.log_view import LogElementHandler
-from ngwidgets.webserver import NiceGuiWebserver, WebserverConfig
+from ngwidgets.webserver import NiceGuiWebserver, WebserverConfig, WebSolution
 from ngwidgets.widgets import About
 
 
@@ -24,21 +24,41 @@ class InputWebserver(NiceGuiWebserver):
         constructor
         """
         NiceGuiWebserver.__init__(self, config=config)
-        self.is_local = False
-        self.input = ""
         self.logger = logging.getLogger()
 
         @ui.page("/")
-        async def home(client: Client):
-            return await self.home(client)
-
+        async def home_page(client: Client):
+            return await self.page(client, InputWebSolution.home)
+    
         @ui.page("/settings")
-        async def settings():
-            return await self.settings()
-
+        async def settings_page(client: Client):
+            return await self.page(client, InputWebSolution.settings)
+    
         @ui.page("/about")
-        async def about():
-            return await self.about()
+        async def about_page(client: Client):
+            return await self.page(client, InputWebSolution.about)
+
+        
+class InputWebSolution(WebSolution):
+    """
+    A WebSolution that is focused on handling a single input.
+    
+    Attributes:
+        is_local (bool): Indicates if the input source is local or remote.
+        input (str): The input data or path to be processed.
+    """
+    
+    def __init__(self, webserver: NiceGuiWebserver, client: Client):
+        """
+        Initializes the InputWebSolution instance with the webserver and client.
+
+        Args:
+            webserver (NiceGuiWebserver): The webserver instance this solution is part of.
+            client (Client): The client interacting with this solution.
+        """
+        super().__init__(webserver, client)
+        self.is_local = False
+        self.input = ""
 
     def input_changed(self, cargs):
         """
@@ -108,7 +128,7 @@ class InputWebserver(NiceGuiWebserver):
 
     pass
 
-    async def home(self, _client: Client):
+    async def home(self):
         """
         provide the main content page
 
@@ -122,6 +142,9 @@ class InputWebserver(NiceGuiWebserver):
         await self.setup_content_div(self.setup_about)
 
     def setup_about(self):
+        """
+        display an About 
+        """
         self.about_div = About(self.config.version)
 
     async def setup_footer(
@@ -138,7 +161,7 @@ class InputWebserver(NiceGuiWebserver):
             self.log_view = ui.log(max_lines=max_lines).classes(log_classes)
             if handle_logging:
                 self.log_view_handler = LogElementHandler(self.log_view)
-                self.logger.addHandler(self.log_view_handler)
+                self.webserver.logger.addHandler(self.log_view_handler)
         else:
             self.log_view = None
         await super().setup_footer()
@@ -153,6 +176,7 @@ class InputWebserver(NiceGuiWebserver):
         """
         Generates the settings page
         """
+
         def show():
             with ui.row():
                 ui.checkbox("debug", value=self.debug).bind_value(self, "debug")
@@ -161,32 +185,30 @@ class InputWebserver(NiceGuiWebserver):
                     self, "render_on_load"
                 )
             self.configure_settings()
+
         await self.setup_content_div(show)
 
     def configure_settings(self):
         """
-        overrideable settings configuration
+        Configures settings specific to this web solution. 
+        This method is intended to be overridden by subclasses to provide custom settings behavior.
+        The base method does nothing and can be extended in subclasses.
         """
-        pass
 
     def configure_menu(self):
         """
-        overrideable menu configuration
-        """
-
-    def configure_run(self):
-        """
-        overrideable configuration
+        Configures the menu items specific to this web solution.
+        This method is intended to be overridden by subclasses to provide custom menu behavior.
+        The base method does nothing and can be extended in subclasses.
         """
         pass
-
-    def run(self, args):
+    
+    def prepare_ui(self):
         """
-        Runs the UI of the web server.
-
-        Args:
-            args (list): The command line arguments.
+        handle the command line arguments
         """
+        WebSolution.prepare_ui(self)
+        args=self.webserver.args
         self.input = args.input
         self.is_local = args.local
         if hasattr(args, "root_path"):
@@ -194,4 +216,3 @@ class InputWebserver(NiceGuiWebserver):
         else:
             self.root_path = None
         self.render_on_load = args.render_on_load
-        super().run(args)

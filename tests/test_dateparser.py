@@ -4,9 +4,10 @@ Created on 2023-12-03
 @author: wf
 """
 
+import json
+
 from ngwidgets.basetest import Basetest
 from ngwidgets.dateparser import DateParser
-import json
 
 
 class TestDateParser(Basetest):

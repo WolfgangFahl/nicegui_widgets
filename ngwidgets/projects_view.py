@@ -30,12 +30,9 @@ from datetime import datetime, timedelta
 
 from nicegui import run, ui
 
-from ngwidgets.projects import (
-    Project,
-    Projects,
-)
-from ngwidgets.widgets import Link
 from ngwidgets.progress import NiceguiProgressbar
+from ngwidgets.projects import Project, Projects
+from ngwidgets.widgets import Link
 
 
 class ProjectView:

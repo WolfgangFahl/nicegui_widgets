@@ -5,15 +5,17 @@ Test suite for the nicegui_projects module in the ngwidgets package.
 
 @author: wf
 """
-from dateutil.parser import parse
-from datetime import datetime
 import json
-from pathlib import Path
 from dataclasses import asdict
+from datetime import datetime
+from pathlib import Path
+
+from dateutil.parser import parse
+
 from ngwidgets.basetest import Basetest
 from ngwidgets.components import Components
 from ngwidgets.progress import TqdmProgressbar
-from ngwidgets.projects import PyPi, Project, Projects, GitHubAccess
+from ngwidgets.projects import GitHubAccess, Project, Projects, PyPi
 
 
 class TestNiceguiProjects(Basetest):
@@ -24,7 +26,10 @@ class TestNiceguiProjects(Basetest):
     def setUp(self, debug=False, profile=True):
         Basetest.setUp(self, debug=debug, profile=profile)
         self.pypi_test_projects = [
-            ("dynamic-competence-map","https://pypi.org/project/dynamic-competence-map/"),
+            (
+                "dynamic-competence-map",
+                "https://pypi.org/project/dynamic-competence-map/",
+            ),
             ("ngwidgets", "https://pypi.org/project/ngwidgets/"),
             ("nicescad", "https://pypi.org/project/nicescad/"),
             ("nicegui-extensions", "https://pypi.org/project/nicegui-extensions/"),
@@ -37,7 +42,7 @@ class TestNiceguiProjects(Basetest):
         pypi = PyPi(debug=self.debug)
         for project_name, url in self.pypi_test_projects:
             package_info = pypi.get_package_info(project_name)
-            
+
             project = Project.from_pypi(package_info)
             if pypi.debug:
                 print("Package Info:")
@@ -108,7 +113,7 @@ class TestNiceguiProjects(Basetest):
                 {
                     "github": "https://github.com/WolfgangFahl/dcm",
                     "component_count": 1,
-                }
+                },
             ),
             (
                 "justpy-org/justpy",

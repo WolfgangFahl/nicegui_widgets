@@ -19,9 +19,10 @@ Prompts for LLM:
 
 Main author: OpenAI's language model (instructed by WF)
 """
-from ngwidgets.yamlable import lod_storable
 from dataclasses import dataclass, field
 from typing import List, Optional
+
+from ngwidgets.yamlable import lod_storable
 
 
 @lod_storable
@@ -51,7 +52,7 @@ class Component:
 
 
 @lod_storable
-class Components():
+class Components:
     """
     Components
     """

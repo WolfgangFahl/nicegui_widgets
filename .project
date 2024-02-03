@@ -3,6 +3,7 @@
 	<name>nicegui_widgets</name>
 	<comment></comment>
 	<projects>
+		<project>nicegui</project>
 	</projects>
 	<buildSpec>
 		<buildCommand>

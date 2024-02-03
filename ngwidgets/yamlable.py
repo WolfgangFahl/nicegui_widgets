@@ -203,7 +203,7 @@ class YamlAble(Generic[T]):
         yaml_content: str = self.to_yaml()
         with open(filename, "w") as file:
             file.write(yaml_content)
-            
+
     @classmethod
     def load_from_json_file(cls: Type[T], filename: str) -> T:
         """

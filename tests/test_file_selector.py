@@ -3,10 +3,11 @@ Created on 2023-07-23
 
 @author: wf
 """
-from ngwidgets.basetest import Basetest
-from ngwidgets.file_selector import FileSelector
 import json
 import os
+
+from ngwidgets.basetest import Basetest
+from ngwidgets.file_selector import FileSelector
 
 
 class TestFileSelector(Basetest):

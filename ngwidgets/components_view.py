@@ -3,10 +3,11 @@ Created on 2023-12-16
 
 @author: wf
 """
-from ngwidgets.projects import Project, Projects
-from ngwidgets.components import Component, Components
-from ngwidgets.projects_view import ProjectView
 from nicegui import ui
+
+from ngwidgets.components import Component, Components
+from ngwidgets.projects import Project, Projects
+from ngwidgets.projects_view import ProjectView
 from ngwidgets.widgets import Link
 
 

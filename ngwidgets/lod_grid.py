@@ -7,7 +7,7 @@ import datetime
 import sys
 import traceback
 from dataclasses import dataclass, field
-from typing import Any,Callable, Dict, List, Optional
+from typing import Any, Callable, Dict, List, Optional
 
 from nicegui import ui
 
@@ -109,49 +109,50 @@ class ListOfDictsGrid:
     @auto_size_columns.setter
     def auto_size_columns(self, value):
         self.ag_grid._props["auto_size_columns"] = value
-        
-        
-    def get_column_def(self,col:str)->Dict:
+
+    def get_column_def(self, col: str) -> Dict:
         """
         get the column definition for the given column
-        
+
         Args:
             col (str): The field name of the column where checkboxes should be enabled.
-        
+
         Returns:
             Dict: the column definition
         """
-        if not self.ag_grid.options.get('columnDefs'):
-            raise Exception("Column definitions are not set. Load the data first using load_lod.")
-        # Go through each column definition 
-        for col_def in self.ag_grid.options['columnDefs']:
-            if col_def['field'] == col:
+        if not self.ag_grid.options.get("columnDefs"):
+            raise Exception(
+                "Column definitions are not set. Load the data first using load_lod."
+            )
+        # Go through each column definition
+        for col_def in self.ag_grid.options["columnDefs"]:
+            if col_def["field"] == col:
                 return col_def
         return None
-    
-    def set_checkbox_renderer(self,checkbox_col:str):
+
+    def set_checkbox_renderer(self, checkbox_col: str):
         """
         set cellRenderer to checkBoxRenderer for the given column
-        
+
         Args:
-            checkbox_col (str): The field name of the column where 
+            checkbox_col (str): The field name of the column where
             rendering as checkboxes should be enabled.
-      
+
         """
-        col_def=self.get_column_def(checkbox_col)
-        col_def["cellRenderer"]="checkboxRenderer"
-      
+        col_def = self.get_column_def(checkbox_col)
+        col_def["cellRenderer"] = "checkboxRenderer"
+
     def set_checkbox_selection(self, checkbox_col: str):
         """
         Set the checkbox selection for a specified column.
-    
+
         Args:
             checkbox_col (str): The field name of the column where checkboxes should be enabled.
         """
-        col_def=self.get_column_def(checkbox_col)
+        col_def = self.get_column_def(checkbox_col)
         if col_def:
-            col_def['checkboxSelection'] = True
-   
+            col_def["checkboxSelection"] = True
+
     def handle_exception(self, ex: Exception) -> None:
         """
         Handles exceptions thrown during grid initialization or operation.
@@ -175,7 +176,10 @@ class ListOfDictsGrid:
         else:
             # If not in debug mode, notify the user with a general error message.
             # Ensure that ui.notify or a similar method is available and properly configured.
-            ui.notify(f"Unhandled exception {str(ex)} occurred in ListOfDictsGrid", type="error")
+            ui.notify(
+                f"Unhandled exception {str(ex)} occurred in ListOfDictsGrid",
+                type="error",
+            )
 
     def update_index(self, lenient: bool = False):
         """
@@ -205,29 +209,29 @@ class ListOfDictsGrid:
         """
         row = self.lod_index.get(key_value, None)
         return row
-    
-    def get_cell_value(self,key_value:Any,col_key:str)->Any:
+
+    def get_cell_value(self, key_value: Any, col_key: str) -> Any:
         """
         get the value for the given cell
-        
+
         Args:
             key_value (Any): The value of the key column for the row to update.
             row_key (str): The column key of the cell to update.
-            
+
         Returns:
-            Any: the value of the cell or None if the row doesn't exist 
+            Any: the value of the cell or None if the row doesn't exist
         """
         rows_by_key = self.get_rows_by_key()
-        row = rows_by_key.get(key_value,None)
-        value=None
+        row = rows_by_key.get(key_value, None)
+        value = None
         if row:
-            value=row.get(col_key,None)
+            value = row.get(col_key, None)
         return value
-        
+
     def update_cell(self, key_value: Any, col_key: str, value: Any) -> None:
         """
         Update a cell in the grid.
-        
+
         Args:
             key_value (Any): The value of the key column for the row to update.
             row_key (str): The column key of the cell to update.
@@ -235,29 +239,31 @@ class ListOfDictsGrid:
 
         """
         rows_by_key = self.get_rows_by_key()
-        row = rows_by_key.get(key_value,None)
+        row = rows_by_key.get(key_value, None)
         if row:
             row[col_key] = value
-                    
+
     def get_row_data(self):
         """
         get the complete row data
         """
         row_data = self.ag_grid.options["rowData"]
         return row_data
-    
+
     def get_rows_by_key(self) -> Dict[Any, Dict[str, Any]]:
         """
         Organize rows in a dictionary of dictionaries, indexed by the key column value specified in GridConfig.
-    
+
         Returns:
             Dict[Any, Dict[str, Any]]: A dictionary of dictionaries, with each sub-dictionary representing a row,
                                        indexed by the key column values.
         """
         data_by_key = {}
-        key_col = self.config.key_col  # Retrieve key column name from the GridConfig instance
+        key_col = (
+            self.config.key_col
+        )  # Retrieve key column name from the GridConfig instance
         for row in self.get_row_data():
-            key_value = row.get(key_col,None)
+            key_value = row.get(key_col, None)
             if key_value is not None:
                 data_by_key[key_value] = row
         return data_by_key
@@ -317,7 +323,7 @@ class ListOfDictsGrid:
             self.update_index(lenient=self.config.lenient)
             if self.config.all_cols_html:
                 # Set html_columns based on all_rows_html flag
-                html_columns=list(range(len(columnDefs)))
+                html_columns = list(range(len(columnDefs)))
                 self.html_columns = html_columns
         except Exception as ex:
             self.handle_exception(ex)
@@ -331,17 +337,16 @@ class ListOfDictsGrid:
 
     async def get_selected_rows(self):
         """
-        get the currently selected rows 
+        get the currently selected rows
         """
         selected_rows = await self.ag_grid.get_selected_rows()
         return selected_rows
-    
+
     def select_all_rows(self):
         """
         select all my ag_grid rows
         """
         self.ag_grid.call_api_method("selectAll")
-    
 
     async def delete_selected_rows(self, _args):
         """
@@ -398,17 +403,9 @@ class ListOfDictsGrid:
         with ui.row():
             # icons per https://fonts.google.com/icons
             if self.config.editable:
-                ui.button(
-                    "New", 
-                    icon="add", 
-                    on_click=self.new_row
-                )
-                ui.button(
-                    "Delete", 
-                    icon="delete", 
-                    on_click=self.delete_selected_rows
-                )
-            #ui.button("Fit", icon="arrow_range", on_click=self.onSizeColumnsToFit)
+                ui.button("New", icon="add", on_click=self.new_row)
+                ui.button("Delete", icon="delete", on_click=self.delete_selected_rows)
+            # ui.button("Fit", icon="arrow_range", on_click=self.onSizeColumnsToFit)
             ui.button(
                 "All",
                 icon="select_all",

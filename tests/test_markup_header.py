@@ -3,8 +3,8 @@ Created on 2023-11-19
 
 @author: wf
 """
-from ngwidgets.markup_header import MarkupHeader
 from ngwidgets.basetest import Basetest
+from ngwidgets.markup_header import MarkupHeader
 
 
 class TestsMarkupHeader(Basetest):

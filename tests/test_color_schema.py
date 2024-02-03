@@ -3,10 +3,11 @@ Created on 2023-09-13
 
 @author: wf
 """
+import dataclasses
+import json
+
 from ngwidgets.basetest import Basetest
 from ngwidgets.color_schema import ColorSchema
-import json
-import dataclasses
 
 
 class TestColorSchema(Basetest):

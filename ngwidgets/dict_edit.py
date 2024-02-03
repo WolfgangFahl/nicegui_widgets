@@ -3,12 +3,13 @@ Created on 2023-06-22
 
 @author: wf
 """
+from dataclasses import asdict, dataclass, field, fields, is_dataclass
+from datetime import date, datetime
 from typing import Any, Callable, Dict, Optional, Union
-from dataclasses import dataclass, asdict, field, fields, is_dataclass
+
 from nicegui import ui
-from nicegui.elements.input import Input
 from nicegui.binding import bind_from
-from datetime import datetime, date
+from nicegui.elements.input import Input
 
 
 @dataclass
@@ -150,7 +151,7 @@ class DictEdit:
                     "ui_label",
                     backward=lambda x: f"{self.form_ui_def.title}: {x if x else DictEdit.empty}",
                 )
-                
+
     def _create_inputs(self) -> Dict[str, Input]:
         """Creates input elements for the form based on the FormUiDef."""
         inputs = {}

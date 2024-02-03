@@ -37,20 +37,22 @@ Main author: OpenAI's language model (instructed by WF)
 
 import json
 import os
-import time
 import re
+import time
 import unicodedata
 import urllib
-import yaml
 from dataclasses import field
 from datetime import datetime
 from pathlib import Path
 from typing import Dict, List, Optional
+
+import yaml
 from bs4 import BeautifulSoup, ResultSet, Tag
 from github import Github
+
 from ngwidgets.components import Components
-from ngwidgets.yamlable import lod_storable
 from ngwidgets.progress import Progressbar
+from ngwidgets.yamlable import lod_storable
 
 
 class GitHubAccess:
@@ -117,7 +119,7 @@ class GitHubAccess:
 
 
 @lod_storable
-class Project():
+class Project:
     """
     A data class representing a software project, potentially from PyPI or GitHub.
 
@@ -146,6 +148,7 @@ class Project():
         solution_tags(str): a list of comma separated tags for checking the conformance of the project
         to the solution bazaar guidelines
     """
+
     name: Optional[str] = None
     package: Optional[str] = None
     demo: Optional[str] = None
@@ -375,7 +378,7 @@ class Project():
 
 
 @lod_storable
-class Projects():
+class Projects:
     """
     handle a list of python projects on a specific topic
     """

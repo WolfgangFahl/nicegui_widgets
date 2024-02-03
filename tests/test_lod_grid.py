@@ -4,7 +4,7 @@ Created on 2023-11-02
 @author: wf
 """
 from ngwidgets.basetest import Basetest
-from ngwidgets.lod_grid import ListOfDictsGrid,GridConfig
+from ngwidgets.lod_grid import GridConfig, ListOfDictsGrid
 
 
 class TestLodGrid(Basetest):
@@ -19,8 +19,8 @@ class TestLodGrid(Basetest):
             {"name": "Bob", "age": 21, "parent": "Eve"},
             {"name": "Carol", "age": 42, "parent": "Frank"},
         ]
-        grid_config=GridConfig(key_col="name")
-        self.lod_grid = ListOfDictsGrid(self.lod,config=grid_config)
+        grid_config = GridConfig(key_col="name")
+        self.lod_grid = ListOfDictsGrid(self.lod, config=grid_config)
 
     def test_lod_index(self):
         """
