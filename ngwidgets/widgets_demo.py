@@ -19,7 +19,7 @@ from ngwidgets.projects import Projects
 from ngwidgets.projects_view import ProjectsView
 from ngwidgets.tristate import Tristate
 from ngwidgets.version import Version
-from ngwidgets.webserver import WebserverConfig, WebSolution
+from ngwidgets.webserver import WebserverConfig
 from ngwidgets.widgets import HideShow, Lang
 
 

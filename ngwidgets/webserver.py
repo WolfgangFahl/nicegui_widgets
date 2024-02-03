@@ -386,7 +386,7 @@ class WebSolution:
                         setup_content(**kwargs)
                 except Exception as ex:
                     if with_exception_handling:
-                        self.handle_exception(ex, self.do_trace)
+                        self.handle_exception(ex)
                     else:
                         raise ex
 
