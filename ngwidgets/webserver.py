@@ -58,9 +58,37 @@ class WebserverConfig:
 
     @classmethod
     def get(cls, config: "WebserverConfig") -> "WebserverConfig":
+        """
+        Retrieves or initializes a WebserverConfig instance based on the provided 'config' parameter. 
+        This method ensures that essential properties like 'storage_secret', 'config_path', and 'storage_path'
+        are set in the 'config' object. If a configuration file already exists at the 'yaml_path', it's loaded,
+        and its values are used to update the provided 'config'. However, certain key properties like 'version', 
+        'short_name', and 'default_port' can still be overridden by the provided 'config' if they are set.
+    
+        If the configuration file does not exist, this method will create the necessary directories and save 
+        the provided 'config' as the initial configuration to the 'yaml_path', which is derived from 'config_path'
+        and 'short_name' and typically located under the user's home directory in the '.solutions' folder.
+    
+        Args:
+            config (WebserverConfig): The configuration object with preferred or default settings.
+    
+        Returns:
+            WebserverConfig: The configuration loaded from the YAML file, or the provided 'config'
+                             if the YAML file does not exist.
+        """
         if os.path.exists(config.yaml_path):
             # Load the existing config
             server_config = cls.load_from_yaml_file(config.yaml_path)
+            if config.version: 
+                server_config.version=config.version
+            if config.copy_right:
+                server_config.copy_right=config.copy_right
+            if config.default_port!=9680:
+                server_config.default_port=config.default_port
+            if config.short_name!=server_config.short_name:
+                _msg=(f"config short_name mismatch {config.short_name}!={server_config.short_name}")
+                pass
+            server_config.short_name=config.short_name
         else:
             # Create the directories to make sure they  exist
             os.makedirs(config.config_path, exist_ok=True)
@@ -174,14 +202,13 @@ class NiceGuiWebserver(object):
         self.optionalDebug(args)
         # allow app specific configuration steps
         self.configure_run()
-        storage_secret = getattr(args, "storage_secret", None)
         ui.run(
             title=self.config.version.name,
             host=args.host,
             port=args.port,
             show=args.client,
             reload=False,
-            storage_secret=storage_secret,
+            storage_secret=self.config.storage_secret,
         )
 
     def configure_run(self):
@@ -192,7 +219,7 @@ class NiceGuiWebserver(object):
         The base method does nothing and can be extended in subclasses.
         """
         pass
-
+ 
     def stop(self):
         """
         stop the server
