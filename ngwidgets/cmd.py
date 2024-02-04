@@ -167,9 +167,9 @@ class WebserverCmd(object):
 
     RewriteEngine On
     RewriteCond %{{HTTP:Upgrade}} =websocket [NC]
-    RewriteRule /(.*) {ws_protocol}://localhost:{default_port}/$1 [P,L]
+    RewriteRule /(.*) ws://localhost:{default_port}/$1 [P,L]
     RewriteCond %{{HTTP:Upgrade}} !=websocket [NC]
-    RewriteRule /(.*) {http_protocol}://localhost:{default_port}/$1 [P,L]
+    RewriteRule /(.*) http://localhost:{default_port}/$1 [P,L]
 
     ProxyPassReverse / {http_protocol}://localhost:{default_port}/
 </VirtualHost>
@@ -182,8 +182,6 @@ class WebserverCmd(object):
             admin_email=admin_email,
             short_name=config.short_name,
             log_suffix="_ssl",
-            ws_protocol="wss",
-            http_protocol="https",
             default_port=config.default_port,
             ssl_config_part="Include ssl.conf"
         )
@@ -195,8 +193,6 @@ class WebserverCmd(object):
             admin_email=admin_email,
             short_name=config.short_name,
             log_suffix="",
-            ws_protocol="ws",
-            http_protocol="http",
             default_port=config.default_port,
             ssl_config_part=""
         )
