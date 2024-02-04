@@ -166,9 +166,9 @@ class WebserverCmd(object):
     CustomLog ${{APACHE_LOG_DIR}}/{short_name}{log_suffix}.log combined
 
     RewriteEngine On
-    RewriteCond %{{HTTP:Upgrade}} {rewrite_cond} [NC]
+    RewriteCond %{{HTTP:Upgrade}} =websocket [NC]
     RewriteRule /(.*) {ws_protocol}://localhost:{default_port}/$1 [P,L]
-    RewriteCond %{{HTTP:Upgrade}} !={rewrite_cond} [NC]
+    RewriteCond %{{HTTP:Upgrade}} !=websocket [NC]
     RewriteRule /(.*) {http_protocol}://localhost:{default_port}/$1 [P,L]
 
     ProxyPassReverse / {http_protocol}://localhost:{default_port}/
@@ -182,7 +182,6 @@ class WebserverCmd(object):
             admin_email=admin_email,
             short_name=config.short_name,
             log_suffix="_ssl",
-            rewrite_cond="=websocket",
             ws_protocol="wss",
             http_protocol="https",
             default_port=config.default_port,
@@ -196,7 +195,6 @@ class WebserverCmd(object):
             admin_email=admin_email,
             short_name=config.short_name,
             log_suffix="",
-            rewrite_cond="!=websocket",
             ws_protocol="ws",
             http_protocol="http",
             default_port=config.default_port,
