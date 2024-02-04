@@ -191,8 +191,8 @@ class InputWebSolution(WebSolution):
 
         def show():
             with ui.row():
-                ui.checkbox("debug", value=self.debug).bind_value(self.webserver, "debug")
-                ui.checkbox("debug with trace", value=True).bind_value(self.webserver, "do_trace")
+                ui.checkbox("debug", value=self.webserver.debug).bind_value(self.webserver, "debug")
+                ui.checkbox("debug with trace", value=self.webserver.do_trace).bind_value(self.webserver, "do_trace")
                 ui.checkbox("render on load", value=self.render_on_load).bind_value(
                     self, "render_on_load"
                 )
