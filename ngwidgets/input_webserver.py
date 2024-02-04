@@ -69,6 +69,7 @@ class InputWebSolution(WebSolution):
             client (Client): The client interacting with this solution.
         """
         super().__init__(webserver, client)
+        self.debug=webserver.debug
         self.is_local = False
         self.input = ""
 
