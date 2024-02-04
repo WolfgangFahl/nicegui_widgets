@@ -34,7 +34,7 @@ class WebserverConfig:
     version: Optional[Version] = None
     color_schema: ColorSchema = field(default_factory=ColorSchema.indigo)
     detailed_menu: bool = True
-    timeout: Optional[bool] = None
+    timeout: Optional[float] = None
     storage_secret: Optional[str] = None
     storage_path: Optional[str] = None
     config_path: Optional[str] = None
@@ -46,7 +46,7 @@ class WebserverConfig:
         self.config_path = self.base_path
         self.storage_path = self.storage_path or os.path.join(self.base_path, "storage")
         self.storage_secret = self.storage_secret or str(uuid.uuid4())
-        self.timeout = self.timeout or 3.0
+        self.timeout = self.timeout if self.timeout is not None else 3.0
         
     @property
     def yaml_path(self) -> str:
