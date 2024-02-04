@@ -46,6 +46,7 @@ class WebserverConfig:
         self.config_path = self.base_path
         self.storage_path = self.storage_path or os.path.join(self.base_path, "storage")
         self.storage_secret = self.storage_secret or str(uuid.uuid4())
+        self.timeout = self.timeout or 3.0
         
     @property
     def yaml_path(self) -> str:

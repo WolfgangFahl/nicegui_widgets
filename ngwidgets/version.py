@@ -3,17 +3,14 @@ Created on 2023-09-12
 
 @author: wf
 """
-from dataclasses import dataclass
-
+from ngwidgets.yamlable import lod_storable
 import ngwidgets
 
-
-@dataclass
+@lod_storable
 class Version:
     """
     Version handling for nicegui widgets
     """
-
     name = "ngwidgets"
     version = ngwidgets.__version__
     date = "2023-09-10"
@@ -26,7 +23,7 @@ class Version:
     chat_url = "https://github.com/WolfgangFahl/nicegui_widgets/discussions"
     cm_url = "https://github.com/WolfgangFahl/nicegui_widgets"
 
-    license = f"""Copyright 2023 contributors. All rights reserved.
+    license = f"""Copyright 2023-2024 contributors. All rights reserved.
 
   Licensed under the Apache License 2.0
   http://www.apache.org/licenses/LICENSE-2.0
