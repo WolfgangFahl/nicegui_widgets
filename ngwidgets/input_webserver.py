@@ -29,25 +29,37 @@ class InputWebserver(NiceGuiWebserver):
         @ui.page("/")
         async def home_page(client: Client):
             return await self.page(client, InputWebSolution.home)
-    
+
         @ui.page("/settings")
         async def settings_page(client: Client):
             return await self.page(client, InputWebSolution.settings)
-    
+
         @ui.page("/about")
         async def about_page(client: Client):
             return await self.page(client, InputWebSolution.about)
 
-        
+    def configure_run(self):
+        """
+        override the run configuration
+        """
+        NiceGuiWebserver.configure_run(self)
+        args = self.args
+        self.is_local = args.local
+        if hasattr(args, "root_path"):
+            self.root_path = os.path.abspath(args.root_path)
+        else:
+            self.root_path = None
+
+
 class InputWebSolution(WebSolution):
     """
     A WebSolution that is focused on handling a single input.
-    
+
     Attributes:
         is_local (bool): Indicates if the input source is local or remote.
         input (str): The input data or path to be processed.
     """
-    
+
     def __init__(self, webserver: NiceGuiWebserver, client: Client):
         """
         Initializes the InputWebSolution instance with the webserver and client.
@@ -143,7 +155,7 @@ class InputWebSolution(WebSolution):
 
     def setup_about(self):
         """
-        display an About 
+        display an About
         """
         self.about_div = About(self.config.version)
 
@@ -190,7 +202,7 @@ class InputWebSolution(WebSolution):
 
     def configure_settings(self):
         """
-        Configures settings specific to this web solution. 
+        Configures settings specific to this web solution.
         This method is intended to be overridden by subclasses to provide custom settings behavior.
         The base method does nothing and can be extended in subclasses.
         """
@@ -202,17 +214,14 @@ class InputWebSolution(WebSolution):
         The base method does nothing and can be extended in subclasses.
         """
         pass
-    
+
     def prepare_ui(self):
         """
         handle the command line arguments
         """
         WebSolution.prepare_ui(self)
-        args=self.webserver.args
+        args = self.webserver.args
         self.input = args.input
-        self.is_local = args.local
-        if hasattr(args, "root_path"):
-            self.root_path = os.path.abspath(args.root_path)
-        else:
-            self.root_path = None
+        self.root_path = self.webserver.root_path
+        self.is_local = self.webserver.is_local
         self.render_on_load = args.render_on_load

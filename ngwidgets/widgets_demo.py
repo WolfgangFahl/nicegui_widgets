@@ -35,13 +35,14 @@ class Element:
             return f"{self.name} ({self.atomic_number})"
         else:
             return DictEdit.empty
-        
+
+
 class NiceGuiWidgetsDemo(InputWebSolution):
     """
     Demonstration Solution
     """
 
-    def __init__(self, webserver: 'NiceGuiWebserver', client: Client):
+    def __init__(self, webserver: "NiceGuiWebserver", client: Client):
         """
         Initialize the NiceGuiWidgetsDemoContext.
 
@@ -518,7 +519,8 @@ class NiceGuiWidgetsDemo(InputWebSolution):
             ui.html(html_content)
 
         await self.setup_content_div(setup_home)
-        
+
+
 class NiceGuiWidgetsDemoWebserver(InputWebserver):
     """
     webserver to demonstrate ngwidgets capabilities
@@ -528,13 +530,15 @@ class NiceGuiWidgetsDemoWebserver(InputWebserver):
     def get_config(cls) -> WebserverConfig:
         copy_right = "(c)2023-2024 Wolfgang Fahl"
         config = WebserverConfig(
-            solution_class=NiceGuiWidgetsDemo,
+            short_name="ngdemo",
             timeout=6.0,
-            copy_right=copy_right, 
-            version=Version(), 
-            default_port=9856
+            copy_right=copy_right,
+            version=Version(),
+            default_port=9856,
         )
-        return config
+        server_config=WebserverConfig.get(config)
+        server_config.solution_class=NiceGuiWidgetsDemo
+        return server_config
 
     def __init__(self):
         """
@@ -555,43 +559,45 @@ class NiceGuiWidgetsDemoWebserver(InputWebserver):
         @ui.page("/solutions")
         async def show_solutions(client: Client):
             return await self.page(client, NiceGuiWidgetsDemo.show_solutions)
-    
+
         @ui.page("/components/{solution_id}")
         async def show_components(solution_id: str, client: Client):
-            return await self.page(client,  NiceGuiWidgetsDemo.show_components, solution_id)
-    
+            return await self.page(
+                client, NiceGuiWidgetsDemo.show_components, solution_id
+            )
+
         @ui.page("/progress")
         async def show_progress(client: Client):
             return await self.page(client, NiceGuiWidgetsDemo.show_progress)
-    
+
         @ui.page("/langs")
         async def show_langs(client: Client):
             return await self.page(client, NiceGuiWidgetsDemo.show_langs)
-    
+
         @ui.page("/color_schema")
         async def show_color_schema(client: Client):
             return await self.page(client, NiceGuiWidgetsDemo.show_color_schema)
-    
+
         @ui.page("/dictedit")
         async def show_dictedit(client: Client):
             return await self.page(client, NiceGuiWidgetsDemo.show_dictedit)
-    
+
         @ui.page("/grid")
         async def show_grid(client: Client):
             return await self.page(client, NiceGuiWidgetsDemo.show_grid)
-    
+
         @ui.page("/hideshow")
         async def show_hide_show(client: Client):
             return await self.page(client, NiceGuiWidgetsDemo.show_hide_show_demo)
-    
+
         @ui.page("/tristate")
         async def show_tristate_demo(client: Client):
             return await self.page(client, NiceGuiWidgetsDemo.show_tristate_demo)
-    
+
         @ui.page("/pdfviewer")
         async def show_pdf_viewer(client: Client):
             return await self.page(client, NiceGuiWidgetsDemo.show_pdf_viewer)
-    
+
         @ui.page("/issue1786")
         async def show_issue_1786(client: Client):
             return await self.page(client, NiceGuiWidgetsDemo.show_issue_1786)

@@ -3,37 +3,75 @@ Created on 2023-09-10
 
 @author: wf
 """
-from dataclasses import dataclass, field
-
-from nicegui import core, ui, Client
-from pydevd_file_utils import setup_client_server_paths
-
-from ngwidgets.color_schema import ColorSchema
-from ngwidgets.version import Version
 import asyncio
 import os
 import sys
 import traceback
 import urllib.request
+import uuid
+from dataclasses import field
 from typing import Any, Callable, Dict, List, Optional, Union
 
+from nicegui import Client, core, ui
+from pydevd_file_utils import setup_client_server_paths
 
-@dataclass
+from ngwidgets.color_schema import ColorSchema
+from ngwidgets.version import Version
+from ngwidgets.yamlable import lod_storable
+
+
+@lod_storable
 class WebserverConfig:
     """
     configuration of a webserver
     """
-    # the class to be use to instantiate solutions per client
-    solution_class: Optional[type] = None  
+    # the short name to be used e.g. for determining the default storage_path
+    short_name: str
 
     # set your copyright string here
-    copy_right: str = ""
+    copy_right: Optional[str] = ""
     default_port: int = 9860
     version: Optional[Version] = None
     color_schema: ColorSchema = field(default_factory=ColorSchema.indigo)
     detailed_menu: bool = True
     timeout: Optional[bool] = None
- 
+    storage_secret: Optional[str] = None
+    storage_path: Optional[str] = None
+    config_path: Optional[str] = None
+
+    def __post_init__(self):
+        """
+        make sure the necessary fields exist
+        """
+        self.config_path = self.base_path
+        self.storage_path = self.storage_path or os.path.join(self.base_path, "storage")
+        self.storage_secret = self.storage_secret or str(uuid.uuid4())
+        
+    @property
+    def yaml_path(self) -> str:
+        return os.path.join(self.config_path, f"{self.short_name}_config.yaml")
+
+    @property
+    def base_path(self)->str:
+        base_path = self.config_path or os.path.join(os.path.expanduser("~"), ".solutions", self.short_name)
+        return base_path
+
+    @classmethod
+    def get(cls, config: "WebserverConfig") -> "WebserverConfig":
+        if os.path.exists(config.yaml_path):
+            # Load the existing config
+            server_config = cls.load_from_yaml_file(config.yaml_path)
+        else:
+            # Create the directories to make sure they  exist
+            os.makedirs(config.config_path, exist_ok=True)
+            os.makedirs(config.storage_path, exist_ok=True)
+
+            # Use the provided default_config as the initial configuration
+            server_config = config
+            server_config.save_to_yaml_file(config.yaml_path)
+
+        return server_config
+
 
 class NiceGuiWebserver(object):
     """
@@ -51,10 +89,7 @@ class NiceGuiWebserver(object):
         self.config = config
         self.app = core.app
 
-    async def page(self, 
-        client: Client, 
-        wanted_action: Callable,
-        *args, **kwargs):
+    async def page(self, client: Client, wanted_action: Callable, *args, **kwargs):
         """
         Handle a page request for a specific client. This method ensures that a specific type of WebSolution
         (or its subclass) is created for each client and used throughout the client's interaction.
@@ -63,33 +98,38 @@ class NiceGuiWebserver(object):
             client (Client): The client making the request.
             wanted_action(Callable): The function of the solution to perform. Might be overriden so we check the solution_instance
             *args, **kwargs: Additional arguments to pass to the action.
-   
+
         Returns:
             The result of the action performed.
         """
-        solution_class=self.config.solution_class
+        solution_class = self.config.solution_class
         if not solution_class:
             raise TypeError("no solution_class configured")
         solution_instance = solution_class(self, client)
-        
+
         # Check if the solution_instance is an instance of solution_class or its subclass
         if not isinstance(solution_instance, solution_class):
-            raise TypeError(f"solution_instance must be an instance of {solution_class.__name__} or its subclass, not {type(solution_instance).__name__}.")
-               
+            raise TypeError(
+                f"solution_instance must be an instance of {solution_class.__name__} or its subclass, not {type(solution_instance).__name__}."
+            )
+
         # Check if the action_callable is a method of solution_instance
-        if not callable(wanted_action) or not hasattr(solution_instance, wanted_action.__name__):
-            raise AttributeError(f"The provided callable {wanted_action.__qualname__} is not a method of {solution_instance.__class__.__name__}.")  
+        if not callable(wanted_action) or not hasattr(
+            solution_instance, wanted_action.__name__
+        ):
+            raise AttributeError(
+                f"The provided callable {wanted_action.__qualname__} is not a method of {solution_instance.__class__.__name__}."
+            )
         # replace action by the one from the instance for inheritance handling
-        action=getattr(solution_instance,wanted_action.__name__)
-    
+        action = getattr(solution_instance, wanted_action.__name__)
+
         await solution_instance.prepare()
- 
+
         # call any preparation code needed before the actual nicegui.ui calls
         # are done
         solution_instance.prepare_ui()
-        
-        return await action(*args, **kwargs)
 
+        return await action(*args, **kwargs)
 
     @classmethod
     def optionalDebug(self, args):
@@ -143,11 +183,11 @@ class NiceGuiWebserver(object):
             reload=False,
             storage_secret=storage_secret,
         )
-        
+
     def configure_run(self):
         """
         Configures specific before run steps of a web server.
-        This method is intended to be overridden 
+        This method is intended to be overridden
         by subclasses to provide custom run behavior.
         The base method does nothing and can be extended in subclasses.
         """
@@ -157,42 +197,40 @@ class NiceGuiWebserver(object):
         """
         stop the server
         """
-        
+
+
 class WebSolution:
     """
     the user/client specific web context of a solution
     """
 
-    def __init__(self, 
-        webserver: NiceGuiWebserver, 
-        client:Client):
+    def __init__(self, webserver: NiceGuiWebserver, client: Client):
         """
         construct a client specific WebSolution
         """
         self.webserver = webserver
-        self.config=self.webserver.config
-        self.args=self.webserver.args
-        self.client=client
+        self.config = self.webserver.config
+        self.args = self.webserver.args
+        self.client = client
         self.log_view = None
         self.container = None
-        
+
     async def prepare(self):
         """
         make sure this solution context is ready for use
         """
-        timeout=self.config.timeout
+        timeout = self.config.timeout
         if timeout is not None:
             await self.client.connected(timeout=timeout)
-            
+
     def prepare_ui(self):
         """
         call any code necessary before the first nicegui.ui call is
         done e.g. handling command line arguments
-        
+
         The base method does nothing and serves as a placeholder for subclasses to define their own UI preparation logic.
         """
         pass
-
 
     def link_button(self, name: str, target: str, icon_name: str, new_tab: bool = True):
         """
@@ -329,7 +367,7 @@ class WebSolution:
     def setup_menu(self, detailed: bool = None):
         """
         set up the default menu home/settings and about
-        
+
         Args:
             detailed(bool): if True add github,chat and help links
         """
@@ -376,7 +414,7 @@ class WebSolution:
         self.setup_menu()
 
         with ui.element("div").classes("w-full h-full") as self.content_div:
-            self.container=self.content_div
+            self.container = self.content_div
             # Execute setup_content if provided
             if setup_content:
                 try:
@@ -408,4 +446,3 @@ class WebSolution:
         if self.log_view:
             self.log_view.push(self.error_msg)
         print(self.error_msg, file=sys.stderr)
-

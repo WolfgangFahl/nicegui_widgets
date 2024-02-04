@@ -8,7 +8,6 @@ import sys
 from ngwidgets.cmd import WebserverCmd
 from ngwidgets.widgets_demo import NiceGuiWidgetsDemoWebserver
 
-
 class NiceguiWidgetsCmd(WebserverCmd):
     """
     command line handling for ngwidgets
