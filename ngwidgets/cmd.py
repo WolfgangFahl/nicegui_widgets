@@ -171,7 +171,7 @@ class WebserverCmd(object):
     RewriteCond %{{HTTP:Upgrade}} !=websocket [NC]
     RewriteRule /(.*) http://localhost:{default_port}/$1 [P,L]
 
-    ProxyPassReverse / {http_protocol}://localhost:{default_port}/
+    ProxyPassReverse / http://localhost:{default_port}/
 </VirtualHost>
 """
     
