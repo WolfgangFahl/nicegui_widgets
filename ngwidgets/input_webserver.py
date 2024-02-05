@@ -70,8 +70,10 @@ class InputWebSolution(WebSolution):
         """
         super().__init__(webserver, client)
         self.debug = webserver.debug
+        self.root_path=None
         self.is_local = False
         self.input = ""
+        self.render_on_load=False
 
     def input_changed(self, cargs):
         """
