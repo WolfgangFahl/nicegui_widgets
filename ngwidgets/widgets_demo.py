@@ -536,8 +536,8 @@ class NiceGuiWidgetsDemoWebserver(InputWebserver):
             version=Version(),
             default_port=9856,
         )
-        server_config=WebserverConfig.get(config)
-        server_config.solution_class=NiceGuiWidgetsDemo
+        server_config = WebserverConfig.get(config)
+        server_config.solution_class = NiceGuiWidgetsDemo
         return server_config
 
     def __init__(self):

@@ -3,18 +3,20 @@ Created on 2023-09-12
 
 @author: wf
 """
-from ngwidgets.yamlable import lod_storable
 import ngwidgets
+from ngwidgets.yamlable import lod_storable
+
 
 @lod_storable
 class Version:
     """
     Version handling for nicegui widgets
     """
+
     name = "ngwidgets"
     version = ngwidgets.__version__
     date = "2023-09-10"
-    updated = "2024-02-04"
+    updated = "2024-02-05"
     description = "NiceGUI widgets"
 
     authors = "Wolfgang Fahl"

@@ -4,7 +4,7 @@ Created on 2023-10-31
 @author: wf
 """
 from fastapi.responses import RedirectResponse
-from nicegui import Client, app, storage, ui
+from nicegui import app, ui
 
 
 class Login(object):
@@ -38,9 +38,19 @@ class Login(object):
         """
         return app.storage.user.get("username", "?")
 
-    async def login(self, _client: Client):
+    async def login(self, solution):
         """
         login
+        """
+        # this might not work if there as already been HTML output
+        if self.authenticated():
+            return RedirectResponse("/")
+
+        await solution.setup_content_div(self.show_login)
+
+    async def show_login(self):
+        """
+        show the login view
         """
 
         def try_login() -> None:  # local function to avoid passing username and password as arguments
@@ -52,9 +62,6 @@ class Login(object):
             else:
                 ui.notify("Wrong username or password", color="negative")
 
-        if self.authenticated():
-            return RedirectResponse("/")
-        self.webserver.setup_menu()
         with ui.card().classes("absolute-center"):
             username = ui.input("Username").on("keydown.enter", try_login)
             password = ui.input(

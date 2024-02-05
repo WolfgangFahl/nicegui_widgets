@@ -25,6 +25,7 @@ class WebserverConfig:
     """
     configuration of a webserver
     """
+
     # the short name to be used e.g. for determining the default storage_path
     short_name: str
 
@@ -47,32 +48,34 @@ class WebserverConfig:
         self.storage_path = self.storage_path or os.path.join(self.base_path, "storage")
         self.storage_secret = self.storage_secret or str(uuid.uuid4())
         self.timeout = self.timeout if self.timeout is not None else 3.0
-        
+
     @property
     def yaml_path(self) -> str:
         return os.path.join(self.config_path, f"{self.short_name}_config.yaml")
 
     @property
-    def base_path(self)->str:
-        base_path = self.config_path or os.path.join(os.path.expanduser("~"), ".solutions", self.short_name)
+    def base_path(self) -> str:
+        base_path = self.config_path or os.path.join(
+            os.path.expanduser("~"), ".solutions", self.short_name
+        )
         return base_path
 
     @classmethod
     def get(cls, config: "WebserverConfig") -> "WebserverConfig":
         """
-        Retrieves or initializes a WebserverConfig instance based on the provided 'config' parameter. 
+        Retrieves or initializes a WebserverConfig instance based on the provided 'config' parameter.
         This method ensures that essential properties like 'storage_secret', 'config_path', and 'storage_path'
         are set in the 'config' object. If a configuration file already exists at the 'yaml_path', it's loaded,
-        and its values are used to update the provided 'config'. However, certain key properties like 'version', 
+        and its values are used to update the provided 'config'. However, certain key properties like 'version',
         'short_name', and 'default_port' can still be overridden by the provided 'config' if they are set.
-    
-        If the configuration file does not exist, this method will create the necessary directories and save 
+
+        If the configuration file does not exist, this method will create the necessary directories and save
         the provided 'config' as the initial configuration to the 'yaml_path', which is derived from 'config_path'
         and 'short_name' and typically located under the user's home directory in the '.solutions' folder.
-    
+
         Args:
             config (WebserverConfig): The configuration object with preferred or default settings.
-    
+
         Returns:
             WebserverConfig: The configuration loaded from the YAML file, or the provided 'config'
                              if the YAML file does not exist.
@@ -80,16 +83,16 @@ class WebserverConfig:
         if os.path.exists(config.yaml_path):
             # Load the existing config
             server_config = cls.load_from_yaml_file(config.yaml_path)
-            if config.version: 
-                server_config.version=config.version
+            if config.version:
+                server_config.version = config.version
             if config.copy_right:
-                server_config.copy_right=config.copy_right
-            if config.default_port!=9680:
-                server_config.default_port=config.default_port
-            if config.short_name!=server_config.short_name:
-                _msg=(f"config short_name mismatch {config.short_name}!={server_config.short_name}")
+                server_config.copy_right = config.copy_right
+            if config.default_port != 9680:
+                server_config.default_port = config.default_port
+            if config.short_name != server_config.short_name:
+                _msg = f"config short_name mismatch {config.short_name}!={server_config.short_name}"
                 pass
-            server_config.short_name=config.short_name
+            server_config.short_name = config.short_name
         else:
             # Create the directories to make sure they  exist
             os.makedirs(config.config_path, exist_ok=True)
@@ -220,7 +223,7 @@ class NiceGuiWebserver(object):
         The base method does nothing and can be extended in subclasses.
         """
         pass
- 
+
     def stop(self):
         """
         stop the server

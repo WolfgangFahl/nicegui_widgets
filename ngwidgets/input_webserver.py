@@ -69,6 +69,7 @@ class InputWebSolution(WebSolution):
             client (Client): The client interacting with this solution.
         """
         super().__init__(webserver, client)
+        self.debug = webserver.debug
         self.is_local = False
         self.input = ""
 
@@ -191,8 +192,12 @@ class InputWebSolution(WebSolution):
 
         def show():
             with ui.row():
-                ui.checkbox("debug", value=self.webserver.debug).bind_value(self.webserver, "debug")
-                ui.checkbox("debug with trace", value=self.webserver.do_trace).bind_value(self.webserver, "do_trace")
+                ui.checkbox("debug", value=self.webserver.debug).bind_value(
+                    self.webserver, "debug"
+                )
+                ui.checkbox(
+                    "debug with trace", value=self.webserver.do_trace
+                ).bind_value(self.webserver, "do_trace")
                 ui.checkbox("render on load", value=self.render_on_load).bind_value(
                     self, "render_on_load"
                 )

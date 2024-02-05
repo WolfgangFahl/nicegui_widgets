@@ -3,11 +3,11 @@ Created on 2023-09-10
 
 @author: wf
 """
-from datetime import datetime
 import sys
 import traceback
 import webbrowser
 from argparse import ArgumentParser, RawDescriptionHelpFormatter
+from datetime import datetime
 
 from ngwidgets.webserver import WebserverConfig
 
@@ -114,7 +114,7 @@ class WebserverCmd(object):
     def handle_args(self) -> bool:
         handled = False
         if self.args.apache:
-            print(self.to_apache_config(self.config,self.args.apache))
+            print(self.to_apache_config(self.config, self.args.apache))
         if self.args.about:
             print(self.program_version_message)
             print(f"see {self.version.doc_url}")
@@ -130,11 +130,11 @@ class WebserverCmd(object):
             ws.run(self.args)
             handled = True
         return handled
-    
-    def to_apache_config(self, config: WebserverConfig,domain:str) -> str:
+
+    def to_apache_config(self, config: WebserverConfig, domain: str) -> str:
         """
         Generate Apache configuration based on the given WebserverConfig.
-    
+
         Args:
             config (WebserverConfig): The webserver configuration object.
             domain(str): the base domain to use
@@ -142,11 +142,11 @@ class WebserverCmd(object):
             str: The Apache configuration as a string.
         """
         iso_timestamp = datetime.now().isoformat()
-        server_name=f"{config.short_name}.{domain}"
-        admin_email=f"webmaster@{domain}"
-        version_info=""
+        server_name = f"{config.short_name}.{domain}"
+        admin_email = f"webmaster@{domain}"
+        version_info = ""
         if config.version:
-            version_info=f"""{config.version.name} Version {config.version.version} of {config.version.updated} ({config.version.description})"""
+            version_info = f"""{config.version.name} Version {config.version.version} of {config.version.updated} ({config.version.description})"""
 
         header_comment = f"""# Apache Configuration for {server_name}
 # {version_info}
@@ -156,7 +156,7 @@ class WebserverCmd(object):
 # {config.copy_right}
 # timeout: {config.timeout}
 """
-    
+
         template = """<VirtualHost *:{port}>
     ServerName {server_name}
     ServerAdmin {admin_email}
@@ -174,7 +174,7 @@ class WebserverCmd(object):
     ProxyPassReverse / http://localhost:{default_port}/
 </VirtualHost>
 """
-    
+
         # For SSL Configuration
         ssl_config = template.format(
             port=443,
@@ -183,9 +183,9 @@ class WebserverCmd(object):
             short_name=config.short_name,
             log_suffix="_ssl",
             default_port=config.default_port,
-            ssl_config_part="Include ssl.conf"
+            ssl_config_part="Include ssl.conf",
         )
-        
+
         # For Non-SSL Configuration
         http_config = template.format(
             port=80,
@@ -194,10 +194,10 @@ class WebserverCmd(object):
             short_name=config.short_name,
             log_suffix="",
             default_port=config.default_port,
-            ssl_config_part=""
+            ssl_config_part="",
         )
-        
-        apache_config= header_comment + ssl_config + http_config
+
+        apache_config = header_comment + ssl_config + http_config
         return apache_config
 
     def cmd_parse(self, argv: list = None):

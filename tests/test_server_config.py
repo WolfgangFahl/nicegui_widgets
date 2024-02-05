@@ -24,16 +24,16 @@ class TestWebserverConfig(Basetest):
         test the webserver configuration via a YAML file
         """
         test_secret = "test_secret"
-        config_path="/tmp/.solution/test_webserver-config"
-        storage_path=f"{config_path}/storage"
-        short_name="test_config"
+        config_path = "/tmp/.solution/test_webserver-config"
+        storage_path = f"{config_path}/storage"
+        short_name = "test_config"
         yaml_path = f"{config_path}/{short_name}_config.yaml"
-        os.makedirs(config_path,exist_ok=True)
+        os.makedirs(config_path, exist_ok=True)
         # Example configuration data
         config_data = {
             "short_name": short_name,
             "storage_secret": test_secret,
-            "config_path": config_path
+            "config_path": config_path,
         }
         with open(yaml_path, "w") as yaml_file:
             yaml.dump(config_data, yaml_file)
@@ -49,7 +49,6 @@ class TestWebserverConfig(Basetest):
         self.assertEqual(server_config.storage_secret, test_secret)
         self.assertEqual(server_config.config_path, config_path)
         self.assertEqual(server_config.storage_path, storage_path)
-       
 
     def test_webserver_config_default(self):
         """
