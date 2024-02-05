@@ -85,3 +85,4 @@ only-include = ["ngwidgets"]
 [project.scripts]
 ngdemo = "ngwidgets.ngwidgets_cmd:main"
 niceuser = "ngwidgets.users:main"
+aichat = "ngwidgets.ai_chat:run_chat"
