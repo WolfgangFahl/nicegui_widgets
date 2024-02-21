@@ -277,7 +277,7 @@ class ListOfDictsGrid:
         
     def sizeColumnsToFit(self):
         if self.ag_grid:
-            self.ag_grid.call_column_api_method("autoSizeAllColumns")
+            self.ag_grid.run_grid_method("autoSizeAllColumns")
             self.ag_grid.update()
 
     def setDefaultColDef(self):
@@ -349,7 +349,7 @@ class ListOfDictsGrid:
         """
         select all my ag_grid rows
         """
-        self.ag_grid.call_api_method("selectAll")
+        self.ag_grid.run_grid_method("selectAll")
 
     async def delete_selected_rows(self, _args):
         """
