@@ -54,6 +54,7 @@ class NiceGuiWidgetsDemo(InputWebSolution):
             client (Client): The client instance this context is associated with.
         """
         super().__init__(webserver, client)  # Call to the superclass constructor
+        self.projects=self.webserver.projects
 
     async def load_pdf(self):
         self.pdf_viewer.load_pdf(self.pdf_url)
