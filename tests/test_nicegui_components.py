@@ -142,7 +142,7 @@ class TestNiceguiProjects(Basetest):
                     "name": "rosys",
                     "github": "https://github.com/zauberzeug/rosys",
                     "stars": 37,
-                    "github_description": "An all-Python robot system based on web technologies. The purpose is similar to ROS, but it's easier to use for mobile robotics.",
+                    "github_description": "An all-Python robot system based on web technologies. The purpose is similar to ROS, but it's based on NiceGUI and easier to use for mobile robotics.",
                     "github_author": "zauberzeug",
                     "created_at": "2020-07-20 13:29:11+00:00",
                 },
