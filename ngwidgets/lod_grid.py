@@ -273,6 +273,9 @@ class ListOfDictsGrid:
         see https://www.reddit.com/r/nicegui/comments/17cg0o5/aggrid_autosize_columns_to_data_width/
         """
         # await asyncio.sleep(0.2)
+        self.sizeColumnsToFit()
+        
+    def sizeColumnsToFit(self):
         if self.ag_grid:
             self.ag_grid.call_column_api_method("autoSizeAllColumns")
             self.ag_grid.update()
