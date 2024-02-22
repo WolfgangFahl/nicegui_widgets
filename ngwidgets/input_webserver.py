@@ -230,5 +230,5 @@ class InputWebSolution(WebSolution):
         args = self.webserver.args
         self.input = args.input
         self.root_path = self.webserver.root_path
-        self.is_local = args.is_local
+        self.is_local = args.local
         self.render_on_load = args.render_on_load
