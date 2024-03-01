@@ -163,7 +163,7 @@ class LLM:
         start_time = datetime.now()
 
         # Interact with the API
-        chat_completion = openai.chat.compeletions.create(
+        chat_completion = openai.chat.completions.create(
             model=model,
             messages=[{"role": "user", "content": prompt_text}],
             temperature=temperature,  # Include the temperature parameter here
