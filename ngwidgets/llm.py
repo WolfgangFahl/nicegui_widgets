@@ -6,7 +6,7 @@ Created on 2023-06-23
 import json
 import os
 import time
-from dataclasses import dataclass, field
+from dataclasses import field
 from datetime import datetime
 from pathlib import Path
 from typing import List, Optional
@@ -163,7 +163,7 @@ class LLM:
         start_time = datetime.now()
 
         # Interact with the API
-        chat_completion = openai.ChatCompletion.create(
+        chat_completion = openai.chat.compeletions.create(
             model=model,
             messages=[{"role": "user", "content": prompt_text}],
             temperature=temperature,  # Include the temperature parameter here
