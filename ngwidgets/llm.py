@@ -170,7 +170,7 @@ class LLM:
         )
         result = chat_completion.choices[0].message.content
         total_tokens = chat_completion.usage.total_tokens
-        model_details = chat_completion.get("model")
+        model_details = chat_completion.model
 
         # Calculate duration
         duration = (datetime.now() - start_time).total_seconds()
