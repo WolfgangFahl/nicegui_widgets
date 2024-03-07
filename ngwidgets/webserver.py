@@ -373,6 +373,8 @@ class WebSolution:
         with ui.element("div").style("display: flex; align-items: center;"):
             self.round_label(title, background_color)
             s = ui.select(selection, **kwargs)
+            # https://github.com/WolfgangFahl/nicegui_widgets/issues/64
+            s.validation={}
             return s
 
     def do_read_input(self, input_str: str) -> str:
