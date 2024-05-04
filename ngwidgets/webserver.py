@@ -416,14 +416,14 @@ class WebSolution:
             detailed = self.config.detailed_menu
         self.config.color_schema.apply()
         with ui.header() as self.header:
-            self.link_button("home", "/", "home")
-            self.link_button("settings", "/settings", "settings")
+            self.link_button("home", "/", "home", new_tab=False)
+            self.link_button("settings", "/settings", "settings", new_tab=False)
             self.configure_menu()
             if detailed:
                 self.link_button("github", version.cm_url, "bug_report")
                 self.link_button("chat", version.chat_url, "chat")
                 self.link_button("help", version.doc_url, "help")
-            self.link_button("about", "/about", "info")
+            self.link_button("about", "/about", "info", new_tab=False)
 
     async def setup_footer(self):
         """
