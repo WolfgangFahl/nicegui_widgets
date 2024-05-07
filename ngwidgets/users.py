@@ -103,7 +103,7 @@ def main():
     )
     args = parser.parse_args()
 
-    user_manager = Users(f"~/.{args.project}/")
+    user_manager = Users(f"~/.solutions/{args.project}/")
 
     if args.add:
         user_manager.add_user(args.username, args.password)
