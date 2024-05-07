@@ -381,7 +381,7 @@ class WebSolution:
             self.round_label(title, background_color)
             s = ui.select(selection, **kwargs)
             # https://github.com/WolfgangFahl/nicegui_widgets/issues/64
-            s.validation={}
+            # s.validation={}
             return s
 
     def do_read_input(self, input_str: str) -> str:
