@@ -237,14 +237,15 @@ class YamlAble(Generic[T]):
         instance: T = cls.from_json(json_str)
         return instance
 
-    def save_to_json_file(self, filename: str):
+    def save_to_json_file(self, filename: str, **kwargs):
         """
         Saves the current dataclass instance to a JSON file.
-
+    
         Args:
             filename (str): The path where the JSON file will be saved.
+            **kwargs: Additional keyword arguments for the `to_json` method.
         """
-        json_content: str = self.to_json()
+        json_content: str = self.to_json(**kwargs)
         with open(filename, "w") as file:
             file.write(json_content)
 
