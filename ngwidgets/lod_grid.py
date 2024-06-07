@@ -129,6 +129,27 @@ class ListOfDictsGrid:
             if col_def["field"] == col:
                 return col_def
         return None
+    
+    def set_column_def(self, col: str, key: str, value: Any) -> Dict:
+        """
+        Set a value in a column definition dictionary for a specified column.
+    
+        This method updates the column definition dictionary for a given column by
+        setting a specific key to a provided value. If the column definition exists,
+        the key-value pair is updated; if not, no changes are made.
+    
+        Parameters:
+            col (str): The name of the column to update.
+            key (str): The key in the column definition dictionary to set.
+            value (Any): The value to assign to the key in the dictionary.
+    
+        Returns:
+            Dict: The updated column definition dictionary, or None if the column does not exist.
+        """
+        col_def = self.get_column_def(col)  # Assuming get_column_def is defined elsewhere.
+        if col_def:
+            col_def[key] = value
+        return col_def
 
     def set_checkbox_renderer(self, checkbox_col: str):
         """
