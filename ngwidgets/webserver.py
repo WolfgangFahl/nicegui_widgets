@@ -245,8 +245,8 @@ class WebSolution:
         self.client = client
         self.log_view = None
         self.container = None
-        
-    def notify(self,msg:str):
+
+    def notify(self, msg: str):
         """
         call ui.notify with a context
         """

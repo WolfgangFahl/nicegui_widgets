@@ -27,7 +27,7 @@ class WebserverCmd(object):
         self.webserver_cls = webserver_cls
         self.exit_code = 0
 
-    def getArgParser(self, description: str=None, version_msg=None) -> ArgumentParser:
+    def getArgParser(self, description: str = None, version_msg=None) -> ArgumentParser:
         """
         Setup command line argument parser
 
@@ -39,9 +39,9 @@ class WebserverCmd(object):
             ArgumentParser: the argument parser
         """
         if description is None:
-            description=self.version.description
+            description = self.version.description
         if version_msg is None:
-            version_msg=self.program_version_message
+            version_msg = self.program_version_message
         parser = ArgumentParser(
             description=description, formatter_class=RawDescriptionHelpFormatter
         )

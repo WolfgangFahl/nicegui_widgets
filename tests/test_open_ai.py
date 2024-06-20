@@ -6,9 +6,9 @@ Created on 2023-06-21
 import unittest
 
 import openai
-from ngwidgets.llm import LLM
 
 from ngwidgets.basetest import Basetest
+from ngwidgets.llm import LLM
 
 
 class TestOpenAi(Basetest):
@@ -39,5 +39,3 @@ class TestOpenAi(Basetest):
         if debug:
             print(result)
         self.assertTrue("OpenAI" in result)
-
-    

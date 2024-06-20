@@ -3,6 +3,7 @@ Created on 2023-09-13
 
 @author: wf
 """
+import asyncio
 from dataclasses import dataclass
 from datetime import datetime
 
@@ -21,7 +22,7 @@ from ngwidgets.tristate import Tristate
 from ngwidgets.version import Version
 from ngwidgets.webserver import WebserverConfig
 from ngwidgets.widgets import HideShow, Lang
-
+from ngwidgets.debouncer import DebouncerUI
 
 @dataclass
 class Element:
@@ -54,7 +55,7 @@ class NiceGuiWidgetsDemo(InputWebSolution):
             client (Client): The client instance this context is associated with.
         """
         super().__init__(webserver, client)  # Call to the superclass constructor
-        self.projects=self.webserver.projects
+        self.projects = self.webserver.projects
 
     async def load_pdf(self):
         self.pdf_viewer.load_pdf(self.pdf_url)
@@ -428,6 +429,38 @@ class NiceGuiWidgetsDemo(InputWebSolution):
                 self.dict_edit2.expansion.open()
 
         await self.setup_content_div(show)
+      
+    async def show_debounce_demo(self):
+        """
+        Show an input field and a result area where the number of stars corresponding
+        to the number entered will be displayed after a debounced delay.
+        """
+        def show():
+            result_row=ui.row()
+            async def generate_stars(number: int):
+                """Simulate a long-running task that generates stars."""
+                with result_row:
+                    ui.notify(f"generating {number} stars")
+                stars = '*' * number
+                await asyncio.sleep(0.1 * number)  # Simulating delay
+                with result_row:
+                    ui.label(stars)
+                    ui.notify(f"generating {number} stars done")
+                
+            debouncer_ui = DebouncerUI(parent=result_row, delay=0.5)            
+            _input_field = ui.input(
+                label='star #:', 
+                value=20 
+            ).props("size=5")
+            _input_field.on('change',lambda event: 
+                debouncer_ui.debounce(
+                    generate_stars, 
+                    number=int(event.args) # number= is important!
+                )
+            ) 
+
+        await self.setup_content_div(show)  
+    
 
     async def show_hide_show_demo(self):
         """
@@ -501,6 +534,7 @@ class NiceGuiWidgetsDemo(InputWebSolution):
             links = {
                 "nicegui solutions bazaar": "/solutions",
                 "ColorSchema": "/color_schema",
+                "Debounce Demo": "/stars",
                 "DictEdit": "/dictedit",
                 "HideShow Demo": "/hideshow",
                 "Lang": "/langs",
@@ -602,3 +636,7 @@ class NiceGuiWidgetsDemoWebserver(InputWebserver):
         @ui.page("/issue1786")
         async def show_issue_1786(client: Client):
             return await self.page(client, NiceGuiWidgetsDemo.show_issue_1786)
+
+        @ui.page("/stars")
+        async def show_debounce_demo(client: Client):
+            return await self.page(client, NiceGuiWidgetsDemo.show_debounce_demo)
