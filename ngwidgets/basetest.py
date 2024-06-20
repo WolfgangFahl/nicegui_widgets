@@ -3,15 +3,14 @@ Created on 2021-08-19
 
 @author: wf
 """
-
+import unittest
 import getpass
 import os
-from unittest import TestCase
 
 from ngwidgets.profiler import Profiler
 
 
-class Basetest(TestCase):
+class Basetest(unittest.TestCase):
     """
     base test case
     """
@@ -20,14 +19,14 @@ class Basetest(TestCase):
         """
         setUp test environment
         """
-        TestCase.setUp(self)
+        unittest.TestCase.setUp(self)
         self.debug = debug
         self.profile = profile
         msg = f"test {self._testMethodName}, debug={self.debug}"
         self.profiler = Profiler(msg, profile=self.profile)
 
     def tearDown(self):
-        TestCase.tearDown(self)
+        unittest.TestCase.tearDown(self)
         self.profiler.time()
 
     @staticmethod
@@ -43,3 +42,6 @@ class Basetest(TestCase):
     def isUser(name: str):
         """Checks if the system has the given name"""
         return getpass.getuser() == name
+    
+if __name__ == '__main__':
+    unittest.main()
