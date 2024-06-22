@@ -3,7 +3,6 @@ Created on 2023-09-13
 
 @author: wf
 """
-import asyncio
 from dataclasses import dataclass
 from datetime import datetime
 
@@ -21,8 +20,11 @@ from ngwidgets.projects_view import ProjectsView
 from ngwidgets.tristate import Tristate
 from ngwidgets.version import Version
 from ngwidgets.webserver import WebserverConfig
-from ngwidgets.widgets import HideShow, Lang
+from ngwidgets.widgets import HideShow, Lang, Link
 from ngwidgets.debouncer import DebouncerUI
+from ngwidgets.wikipedia import WikipediaSearch
+
+
 
 @dataclass
 class Element:
@@ -432,33 +434,40 @@ class NiceGuiWidgetsDemo(InputWebSolution):
       
     async def show_debounce_demo(self):
         """
-        Show an input field and a result area where the number of stars corresponding
-        to the number entered will be displayed after a debounced delay.
+        Show an input field and search wikipedia
         """
         def show():
-            result_row=ui.row()
-            async def generate_stars(number: int):
-                """Simulate a long-running task that generates stars."""
+            async def perform_search(query: str):
+                """Perform a Wikipedia search and display the results."""
                 with result_row:
-                    ui.notify(f"generating {number} stars")
-                stars = '*' * number
-                await asyncio.sleep(0.1 * number)  # Simulating delay
+                    result_row.clear()
+                    ui.notify(f'Searching... {query}')  # Notify user that search is happening
+                search_instance = WikipediaSearch(country=self.country)  # Create an instance of WikipediaSearch
+                results = search_instance.search(query,limit=int(self.limit))
                 with result_row:
-                    ui.label(stars)
-                    ui.notify(f"generating {number} stars done")
+                    result_row.clear()  # Clear the 'Searching...' label or previous results
+                    if results:
+                        for result in results:
+                            link=Link.create(result['url'],result['title'])
+                            html=f"{link}:{result['summary']}<br>"
+                            ui.html(html)
+                    else:
+                        ui.label("No results found.")
+        
+            async def on_input_change(_event=None):
+                await debouncer_ui.debounce(perform_search, search_input.value)
                 
-            debouncer_ui = DebouncerUI(parent=result_row, delay=0.5)            
-            _input_field = ui.input(
-                label='star #:', 
-                value=20 
-            ).props("size=5")
-            _input_field.on('change',lambda event: 
-                debouncer_ui.debounce(
-                    generate_stars, 
-                    number=int(event.args) # number= is important!
-                )
-            ) 
-
+            self.country="en"
+            self.limit=7
+            wikipedias = ["en", "zh", "es", "de", "fr", "ru", "it", "pt", "hi"]
+            with ui.row():
+                search_input = ui.input('Search Wikipedia:',on_change=on_input_change) 
+                _country_select = ui.select(wikipedias,label="wikipedia", value=self.country,on_change=on_input_change).bind_value_to(self, "country")
+                _limit_input = ui.number(label="limit", value=self.limit,on_change=on_input_change).bind_value_to(self, "limit").props("size=5")
+        
+            result_row = ui.row()  # This will be the container for search results    
+            debouncer_ui = DebouncerUI(parent=result_row)     
+      
         await self.setup_content_div(show)  
     
 
