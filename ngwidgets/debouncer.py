@@ -7,6 +7,7 @@ Created on 2024-06-08
 from nicegui import ui, run, background_tasks
 import asyncio
 from typing import Callable, Optional, Any
+from shutup import jk
 
 class Debouncer:
     """A class to manage debouncing of function calls.
@@ -15,9 +16,11 @@ class Debouncer:
     It includes optional callbacks that execute at the start and completion of the debounced function.
     """
     
-    def __init__(self, delay: float = 0.330, 
+    def __init__(self, 
+                 delay: float = 0.330, 
                  debounce_cpu_bound: bool = False, 
-                 debounce_task_name: str = 'Debounce Task'):
+                 debounce_task_name: str = 'Debounce Task',
+                 debug:bool=False):
         """
         Initialize the Debouncer with a specific delay.
         
@@ -25,11 +28,24 @@ class Debouncer:
             delay (float): The debouncing delay in seconds. Default is 0.330 seconds.
             debounce_cpu_bound (bool): If True, use CPU-bound execution; otherwise use I/O-bound execution.
             debounce_task_name (str): The name to use for the task.
+            debug(bool): if True show debug info
         """
         self.delay = delay
+        self.counter=0
         self.debounce_cpu_bound = debounce_cpu_bound
         self.debounce_task_name = debounce_task_name
+        self.debug=debug
         self.task: Optional[asyncio.Task] = None
+        
+    def log(self,call_type:str,func,*args,**kwargs):
+        """
+        log the call
+        """
+        if self.debug:
+            print(f"calling {call_type} #{self.counter}. time")
+            print("function:", func.__name__)
+            print("args:", args, kwargs)
+
 
     async def debounce(self, 
                        func: Callable,
@@ -48,19 +64,26 @@ class Debouncer:
             *args: Positional arguments passed to the function.
             **kwargs: Keyword arguments passed to the function.
         """
+        self.counter+=1
+        # abort any running task
         if self.task and not self.task.done():
             self.task.cancel()
 
         async def task_func():
             if on_start:
                 on_start()
-            await asyncio.sleep(self.delay)
+            # debounce by waiting
+            if self.counter>1:
+                await asyncio.sleep(self.delay)
             try:
                 if asyncio.iscoroutinefunction(func):
+                    self.log("coroutine",func,*args,**kwargs)
                     await func(*args, **kwargs)
                 elif self.debounce_cpu_bound:
+                    self.log("cpu_bound",func,*args,**kwargs)
                     await run.cpu_bound(func, *args, **kwargs)
                 else:
+                    self.log("io_bound",func,*args,**kwargs)
                     await run.io_bound(func, *args, **kwargs)
             except Exception as e:
                 print(f"Error during task execution: {e}")
@@ -73,9 +96,11 @@ class Debouncer:
 class DebouncerUI:
     """A class to manage UI feedback for debouncing, using a specific UI container."""
     
-    def __init__(self, parent, delay: float = 0.330, 
+    def __init__(self, parent, 
+                 delay: float = 0.330, 
                  debounce_cpu_bound: bool = False, 
-                 debounce_task_name: str = 'Debounce Task'):
+                 debounce_task_name: str = 'Debounce Task',
+                 debug:bool=False):
         """
         Initialize the Debouncer UI within a specified parent container.
 
@@ -84,12 +109,20 @@ class DebouncerUI:
             delay (float): The debouncing delay in seconds.
             debounce_cpu_bound (bool): If True, use CPU-bound execution; otherwise use I/O-bound execution.
             debounce_task_name (str): The name to use for the task.
+            debug(bool): if True show debug info
         """
         self.parent = parent
-        self.debouncer = Debouncer(delay, debounce_cpu_bound, debounce_task_name)
+        self.debouncer = Debouncer(
+            delay=delay, 
+            debounce_cpu_bound=debounce_cpu_bound, 
+            debounce_task_name=debounce_task_name,
+            debug=debug)
         self.spinner = None
 
-    def debounce(self, func: Callable, *args, **kwargs):
+    def debounce(self, func: Callable, *args,  
+                on_start: Optional[Callable[[], Any]] = None, 
+                on_done: Optional[Callable[[], Any]] = None,
+                **kwargs):
         """
         Debounce the given function call, managing UI feedback appropriately.
 
@@ -98,18 +131,22 @@ class DebouncerUI:
             *args: Positional arguments passed to the function.
             **kwargs: Keyword arguments passed to the function.
         """
-        def on_start():
+        def ui_on_start():
             """
             Default on start behavior is to add a spinner.
             """
             with self.parent:
                 if not self.spinner:
                     self.spinner = ui.spinner()
+            if on_start:
+                on_start()
 
-        def on_done():
+        def ui_on_done():
             """
             Default behavior is to remove the spinner.
             """
+            if on_done:
+                on_done()
             if self.spinner:
                 try:
                     self.parent.remove(self.spinner)
@@ -117,9 +154,10 @@ class DebouncerUI:
                     pass
                 self.spinner = None
 
-        debounce_result = self.debouncer.debounce(func, 
-                                                  *args, 
-                                                  on_start=on_start, 
-                                                  on_done=on_done, 
-                                                  **kwargs)
+        debounce_result = self.debouncer.debounce(
+            func, 
+            *args, 
+            on_start=ui_on_start, 
+            on_done=ui_on_done, 
+            **kwargs)
         return debounce_result
