@@ -7,7 +7,6 @@ Created on 2024-06-08
 from nicegui import ui, run, background_tasks
 import asyncio
 from typing import Callable, Optional, Any
-from shutup import jk
 
 class Debouncer:
     """A class to manage debouncing of function calls.
