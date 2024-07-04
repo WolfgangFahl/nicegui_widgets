@@ -37,8 +37,10 @@ class ComboBox:
     def prepare_options(self, options: Union[Iterable[str], Dict[str, str]]):
         if isinstance(options, dict):
             return options  # Use directly as dict supports 'items' which include both keys and values
-        elif isinstance(options, Iterable):
-            return sorted(options) if all(options) else list(options)
+        if not isinstance(options,list):
+            options=list(options)     
+        if all(options):
+            options=sorted(options)
         return options  # Fallback if options is neither iterable nor dict
 
     def setup_ui(self):
