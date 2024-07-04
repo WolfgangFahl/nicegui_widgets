@@ -24,12 +24,12 @@ class ComboBox:
 
     def __init__(self, 
         label: str, 
-        options: Iterable[str] or Dict[str, str],
+        options: Iterable[str],
         width_chars:int=40,
         **kwargs):
         self.label_base = label
         self.width_chars=width_chars
-        self.options = sorted(options) if isinstance(options, list) and all(options) else options
+        self.options=self.prepare_options(options)
         self.select = None
         self.kwargs = kwargs
         self.setup_ui()
