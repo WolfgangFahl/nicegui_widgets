@@ -3,13 +3,16 @@ Created on 2023-09-13
 
 @author: wf
 """
+import random
 from dataclasses import dataclass
 from datetime import datetime
 
 from fastapi.responses import Response
 from nicegui import Client, app, run, ui
 
+from ngwidgets.combobox import ComboBox
 from ngwidgets.components_view import ComponentsView
+from ngwidgets.debouncer import DebouncerUI
 from ngwidgets.dict_edit import DictEdit
 from ngwidgets.input_webserver import InputWebserver, InputWebSolution
 from ngwidgets.lod_grid import GridConfig, ListOfDictsGrid
@@ -21,9 +24,7 @@ from ngwidgets.tristate import Tristate
 from ngwidgets.version import Version
 from ngwidgets.webserver import WebserverConfig
 from ngwidgets.widgets import HideShow, Lang, Link
-from ngwidgets.debouncer import DebouncerUI
 from ngwidgets.wikipedia import WikipediaSearch
-
 
 
 @dataclass
@@ -431,45 +432,60 @@ class NiceGuiWidgetsDemo(InputWebSolution):
                 self.dict_edit2.expansion.open()
 
         await self.setup_content_div(show)
-      
+
     async def show_debounce_demo(self):
         """
         Show an input field and search wikipedia
         """
+
         def show():
             async def perform_search(query: str):
                 """Perform a Wikipedia search and display the results."""
                 with result_row:
                     result_row.clear()
-                    ui.notify(f'Searching... {query}')  # Notify user that search is happening
-                search_instance = WikipediaSearch(country=self.country)  # Create an instance of WikipediaSearch
-                results = search_instance.search(query,limit=int(self.limit))
+                    ui.notify(
+                        f"Searching... {query}"
+                    )  # Notify user that search is happening
+                search_instance = WikipediaSearch(
+                    country=self.country
+                )  # Create an instance of WikipediaSearch
+                results = search_instance.search(query, limit=int(self.limit))
                 with result_row:
                     result_row.clear()  # Clear the 'Searching...' label or previous results
                     if results:
                         for result in results:
-                            link=Link.create(result['url'],result['title'])
-                            html=f"{link}:{result['summary']}<br>"
+                            link = Link.create(result["url"], result["title"])
+                            html = f"{link}:{result['summary']}<br>"
                             ui.html(html)
                     else:
                         ui.label("No results found.")
-        
+
             async def on_input_change(_event=None):
                 await debouncer_ui.debounce(perform_search, search_input.value)
-                
-            self.country="en"
-            self.limit=7
+
+            self.country = "en"
+            self.limit = 7
             wikipedias = ["en", "zh", "es", "de", "fr", "ru", "it", "pt", "hi"]
             with ui.row():
-                search_input = ui.input('Search Wikipedia:',on_change=on_input_change) 
-                _country_select = ui.select(wikipedias,label="wikipedia", value=self.country,on_change=on_input_change).bind_value_to(self, "country")
-                _limit_input = ui.number(label="limit", value=self.limit,on_change=on_input_change).bind_value_to(self, "limit").props("size=5")
-        
-            result_row = ui.row()  # This will be the container for search results    
-            debouncer_ui = DebouncerUI(parent=result_row)     
-      
-        await self.setup_content_div(show)  
-    
+                search_input = ui.input("Search Wikipedia:", on_change=on_input_change)
+                _country_select = ui.select(
+                    wikipedias,
+                    label="wikipedia",
+                    value=self.country,
+                    on_change=on_input_change,
+                ).bind_value_to(self, "country")
+                _limit_input = (
+                    ui.number(
+                        label="limit", value=self.limit, on_change=on_input_change
+                    )
+                    .bind_value_to(self, "limit")
+                    .props("size=5")
+                )
+
+            result_row = ui.row()  # This will be the container for search results
+            debouncer_ui = DebouncerUI(parent=result_row)
+
+        await self.setup_content_div(show)
 
     async def show_hide_show_demo(self):
         """
@@ -533,6 +549,53 @@ class NiceGuiWidgetsDemo(InputWebSolution):
 
         await self.setup_content_div(show)
 
+ 
+    async def show_combobox_demo(self):
+        """
+        Demo to showcase the ComboBox class with both predefined options and user input capability,
+        including a button to dynamically change the options using a list of chemical elements.
+        """
+    
+        def on_combobox_change(event):
+            """Handle changes in the ComboBox selection."""
+            selected_value = event.sender.value  # Fetching the current value from the combobox
+            ui.notify(f"Selected: {selected_value}")
+            if selected_value not in self.elements:
+                self.elements.append(selected_value)  # Persist new elements added by the user
+    
+        def update_combobox_options():
+            """Randomly modifies the list of chemical elements and updates the ComboBox options."""
+            random_size = random.randint(10, len(self.elements))  # Random subset size
+            new_elements = random.sample(self.elements, random_size)
+            self.element_combobox.update_options(new_elements)
+            ui.notify(f"Options have been updated to show {random_size} elements.")
+    
+        def show():
+            with ui.row():
+                # Initial list of chemical elements
+                self.elements = [
+                    "Hydrogen", "Helium", "Lithium", "Beryllium", "Boron",
+                    "Carbon", "Nitrogen", "Oxygen", "Fluorine", "Neon",
+                    "Sodium", "Magnesium", "Aluminum", "Silicon", "Phosphorus",
+                    "Sulfur", "Chlorine", "Argon", "Potassium", "Calcium",
+                    # Extended to cover more elements up to Zinc
+                    "Scandium", "Titanium", "Vanadium", "Chromium", "Manganese",
+                    "Iron", "Cobalt", "Nickel", "Copper", "Zinc"
+                ]
+                self.element_combobox = ComboBox(
+                    label="Select a Chemical Element",
+                    width_chars=35,
+                    options=self.elements,
+                    on_change=on_combobox_change,
+                    new_value_mode="add"  # New values added by the user are included in the options
+                )
+
+                # Button to update the options in the ComboBox
+                ui.button("Update Options", on_click=update_combobox_options)
+    
+        await self.setup_content_div(show)
+
+
     async def home(self):
         """
         provide the main content page
@@ -543,6 +606,7 @@ class NiceGuiWidgetsDemo(InputWebSolution):
             links = {
                 "nicegui solutions bazaar": "/solutions",
                 "ColorSchema": "/color_schema",
+                "ComboBox Demo": "/combobox",
                 "Debounce Demo": "/stars",
                 "DictEdit": "/dictedit",
                 "HideShow Demo": "/hideshow",
@@ -603,6 +667,10 @@ class NiceGuiWidgetsDemoWebserver(InputWebserver):
         @ui.page("/solutions")
         async def show_solutions(client: Client):
             return await self.page(client, NiceGuiWidgetsDemo.show_solutions)
+
+        @ui.page("/combobox")
+        async def show_combobox_demo(client: Client):
+            return await self.page(client, NiceGuiWidgetsDemo.show_combobox_demo)
 
         @ui.page("/components/{solution_id}")
         async def show_components(solution_id: str, client: Client):

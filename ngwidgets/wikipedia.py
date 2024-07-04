@@ -9,21 +9,25 @@ Created on 2024-06-22
 
 import requests
 
+
 class WikipediaSearch:
     """
     A class for performing search queries against Wikipedia. This class leverages the MediaWiki API
     to obtain detailed article information including titles, summaries, and direct URLs.
     """
-    def __init__(self, country='en'):
+
+    def __init__(self, country="en"):
         """
         Initializes the WikipediaSearch class with the base URL for the Wikipedia API tailored to the specified language.
-        
+
         Args:
             country (str): country code to configure the API URL, defaults to 'en' for English.
         """
-        self.country=country
-        self.base_url = f'https://{country}.wikipedia.org/w/api.php'
-        self.session = requests.Session()  # Using a session for connection pooling to enhance performance.
+        self.country = country
+        self.base_url = f"https://{country}.wikipedia.org/w/api.php"
+        self.session = (
+            requests.Session()
+        )  # Using a session for connection pooling to enhance performance.
 
     def search(self, query, limit=10, explain_text=False):
         """
@@ -41,41 +45,41 @@ class WikipediaSearch:
 
         # Setup parameters for the query action to fetch detailed information
         params = {
-            'action': 'query',
-            'list': 'search',
-            'srsearch': query,
-            'format': 'json',
-            'utf8': 1,
-            'prop': 'info|extracts',  # Fetch page info and extracts
-            'inprop': 'url',  # Include the direct URL of each page
-            'exintro': True,  # Only the introduction of each page
-            'explaintext': explain_text,  # Return extracts as plain text
-            'exlimit': 'max',  # Maximum number of extracts
-            'srlimit': limit  # Limit the number of search results
+            "action": "query",
+            "list": "search",
+            "srsearch": query,
+            "format": "json",
+            "utf8": 1,
+            "prop": "info|extracts",  # Fetch page info and extracts
+            "inprop": "url",  # Include the direct URL of each page
+            "exintro": True,  # Only the introduction of each page
+            "explaintext": explain_text,  # Return extracts as plain text
+            "exlimit": "max",  # Maximum number of extracts
+            "srlimit": limit,  # Limit the number of search results
         }
         response = self.session.get(self.base_url, params=params)
-        search_results = response.json().get('query', {}).get('search', [])
+        search_results = response.json().get("query", {}).get("search", [])
 
         # Formulate results including summaries and URLs
         detailed_results = []
         for result in search_results:
             # Fetch page details with the correct use of parameters
-            page_id = result['pageid']
+            page_id = result["pageid"]
             page_params = {
-                'action': 'query',
-                'prop': 'info',
-                'pageids': str(page_id),
-                'inprop': 'url',
-                'format': 'json'
+                "action": "query",
+                "prop": "info",
+                "pageids": str(page_id),
+                "inprop": "url",
+                "format": "json",
             }
             page_response = self.session.get(self.base_url, params=page_params)
-            page_info = page_response.json()['query']['pages'][str(page_id)]
-            url = page_info['fullurl']  # Direct URL from the API
+            page_info = page_response.json()["query"]["pages"][str(page_id)]
+            url = page_info["fullurl"]  # Direct URL from the API
 
             detailed_result = {
-                'title': result['title'],
-                'summary': result.get('snippet', 'No summary available.'),
-                'url': url
+                "title": result["title"],
+                "summary": result.get("snippet", "No summary available."),
+                "url": url,
             }
             detailed_results.append(detailed_result)
 

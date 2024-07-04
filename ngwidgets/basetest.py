@@ -3,9 +3,9 @@ Created on 2021-08-19
 
 @author: wf
 """
-import unittest
 import getpass
 import os
+import unittest
 
 from ngwidgets.profiler import Profiler
 
@@ -42,6 +42,7 @@ class Basetest(unittest.TestCase):
     def isUser(name: str):
         """Checks if the system has the given name"""
         return getpass.getuser() == name
-    
-if __name__ == '__main__':
+
+
+if __name__ == "__main__":
     unittest.main()
