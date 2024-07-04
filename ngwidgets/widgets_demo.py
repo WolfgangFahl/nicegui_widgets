@@ -560,8 +560,6 @@ class NiceGuiWidgetsDemo(InputWebSolution):
             """Handle changes in the ComboBox selection."""
             selected_value = event.sender.value  # Fetching the current value from the combobox
             ui.notify(f"Selected: {selected_value}")
-            if selected_value not in self.elements:
-                self.elements.append(selected_value)  # Persist new elements added by the user
     
         def update_combobox_options():
             """Randomly modifies the list of chemical elements and updates the ComboBox options."""
@@ -586,8 +584,9 @@ class NiceGuiWidgetsDemo(InputWebSolution):
                     label="Select a Chemical Element",
                     width_chars=35,
                     options=self.elements,
+                    clearable=True,
+                    new_value_mode='add-unique',
                     on_change=on_combobox_change,
-                    new_value_mode="add"  # New values added by the user are included in the options
                 )
 
                 # Button to update the options in the ComboBox
