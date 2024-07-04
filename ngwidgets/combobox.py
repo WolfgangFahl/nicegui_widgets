@@ -4,7 +4,7 @@ Created on 2024-07-04
 
 @author: wf
 """
-from typing import Dict, List
+from typing import Dict, Iterable, List, Union
 
 from nicegui import (
     ui,
@@ -18,13 +18,13 @@ class ComboBox:
 
     Attributes:
         label_base (str): The base text for the combobox label.
-        options (List[str] or Dict[str, str]): The current list of options available in the combobox.
+        options (Iterable[str]): The current list of options available in the combobox.
         select (ui.Select): The UI component instance, allowing for both selection and direct input.
     """
 
     def __init__(self, 
         label: str, 
-        options: List[str] or Dict[str, str],
+        options: Iterable[str] or Dict[str, str],
         width_chars:int=40,
         **kwargs):
         self.label_base = label
@@ -33,6 +33,13 @@ class ComboBox:
         self.select = None
         self.kwargs = kwargs
         self.setup_ui()
+        
+    def prepare_options(self, options: Union[Iterable[str], Dict[str, str]]):
+        if isinstance(options, dict):
+            return options  # Use directly as dict supports 'items' which include both keys and values
+        elif isinstance(options, Iterable):
+            return sorted(options) if all(options) else list(options)
+        return options  # Fallback if options is neither iterable nor dict
 
     def setup_ui(self):
         """Initializes the UI component for the combobox with optional text input capability."""
@@ -45,18 +52,16 @@ class ComboBox:
         self.select.style(f'width: {self.width_chars}ch')  # 
 
         
-    def update_options(self, new_options: List[str] or Dict[str, str], limit: int = None, options_count: int = None):
+    def update_options(self, new_options: Iterable[str], limit: int = None, options_count: int = None):
         """Updates the options available in the combobox and refreshes the label, applying a limit to the number of items displayed if specified,
         and showing total available options if different from displayed due to the limit.
     
         Args:
-            new_options (List[str] or Dict[str, str]): The new options to update in the combobox.
+            new_options (Interable[str]): The new options to update in the combobox.
             limit (int, optional): Maximum number of options to display. If None, all options are displayed.
             options_count (int, optional): The total count of available options, relevant only if a limit is set.
         """
-        # Sort new_options if it is a list and all elements are non-None, otherwise use as is
-        if isinstance(new_options, list) and all(new_options):
-            new_options = sorted(new_options)
+        new_options = self.prepare_options(new_options)
     
         # Apply limit if specified
         if limit is not None and isinstance(new_options, list) and len(new_options) > limit:
