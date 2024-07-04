@@ -13,6 +13,14 @@ components:
     ColorSchema enables NiceGUI color customization.
     Includes palettes from https://www.materialpalette.com: RED, PINK, PURPLE,
     DEEP PURPLE, ...
+- name: combobox.py
+  source: /ngwidgets/combobox.py
+  issue: 68
+  demo_url: http://ngdemo.bitplan.com/combobox
+  demo_image_url: https://github.com/WolfgangFahl/nicegui_widgets/assets/1336221/c21bb5ef-a63b-4744-ba2f-31b2d3eeff65
+  description: >
+    ComboBox enhances the select with_input mode by sorting and displaying
+    the number of available items
 - name: dict_edit.py
   source: /ngwidgets/dict_edit.py
   issue: 47
