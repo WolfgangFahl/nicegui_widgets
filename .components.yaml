@@ -4,6 +4,14 @@
 # see http://ngdemo.bitplan.com/solutions
 # WF 2023-12-16
 components:
+- name: ColorMap
+  source: /ngwidgets/color_map.py
+  issue: 69
+  demo_url: http://ngdemo.bitplan.com/color_map
+  demo_image_url: https://private-user-images.githubusercontent.com/1336221/349399424-29be4688-7bd1-4332-87c4-7876439f92cf.png
+  description: >
+    The ColorMap allows to create a color range matrix defined by start and end colors
+    and parameters for minimum and maximum luminance and saturation
 - name: color_schema.py
   source: /ngwidgets/color_schema.py
   issue: 15

@@ -567,8 +567,6 @@ class NiceGuiWidgetsDemo(InputWebSolution):
                         color = color_map.get_color(row, col)
                         with grid:
                             button=ui.button(color.hex_l,color=f"{color.hex_l}")
-#                               background-color: {color};
-#                              color: {'black' if Color(color).luminance > 0.5 else 'white'};
                             button.style(
                                 f"""
                                 width: 50px;
@@ -578,11 +576,11 @@ class NiceGuiWidgetsDemo(InputWebSolution):
                                 """
                             )
         
-        def create_slider(label, min_val, max_val, value, step):
-            with ui.row():
-                ui.label(f"{label}:")
-                slider = ui.slider(min=min_val, max=max_val, value=value, step=step).props('label-always')
-                return slider
+        def create_slider(label, min_val, max_val, value, step, on_change):
+            ui.label(f"{label}:")
+            slider = ui.slider(min=min_val, max=max_val, value=value, step=step).props('label-always')
+            slider.on('update:model-value', on_change)
+            return slider
     
         def show():
             color_map1 = ColorMap()
@@ -593,7 +591,7 @@ class NiceGuiWidgetsDemo(InputWebSolution):
                     end_color=end.value,
                     num_levels=int(levels.value),
                     lum_min=lum_min.value,
-                    lum_f=lum_f.value,
+                    lum_max=lum_max.value,
                     sat_f=sat.value
                 )
                 update_grid(color_map, grid_container)
@@ -602,14 +600,13 @@ class NiceGuiWidgetsDemo(InputWebSolution):
                 with ui.card().classes('w-1/3'):
                     ui.label("ColorMap Demo").classes("text-h4")
                     with ui.row():
-                        start = ui.color_input("Start Color", value=color_map1.start_color.hex)
-                        end = ui.color_input("End Color", value=color_map1.end_color.hex)
-                    
-                    levels = create_slider("Levels", 2, 10, 5, 1)
-                    lum_min = create_slider("Min Luminance", 0, 1, color_map1.lum_min, 0.1)
-                    lum_f = create_slider("Luminance Factor", 0, 1, color_map1.lum_f, 0.1)
-                    sat = create_slider("Saturation", 0, 1, color_map1.sat_f, 0.1)
-                    
+                        start = ui.color_input("Start Color", value=color_map1.start_color.hex_l, on_change=refresh_color_map)
+                        end = ui.color_input("End Color", value=color_map1.end_color.hex_l, on_change=refresh_color_map)                    
+                    with ui.grid(columns=2):  
+                        levels = create_slider("Levels", 2, 10, 5, 1, refresh_color_map)
+                        lum_min = create_slider("Min Luminance", 0, 1, color_map1.lum_min, 0.05, refresh_color_map)
+                        lum_max = create_slider("Max Luminance", 0, 1, color_map1.lum_max, 0.02, refresh_color_map)
+                        sat = create_slider("Saturation", 0, 1, color_map1.sat_f, 0.05, refresh_color_map)
                     ui.button("Refresh", on_click=refresh_color_map)
                 
                 grid_container = ui.card().classes('w-1/3')
