@@ -17,7 +17,7 @@ license= "Apache-2.0"
 dependencies = [
 	# https://nicegui.io/
 	# pin to workaround https://github.com/zauberzeug/nicegui/issues/2641
-    "nicegui>=1.4.23",
+    "nicegui>=1.4.29",
  	# orjson
  	# https://pypi.org/project/orjson/
  	"orjson>=3.9.10",
@@ -46,7 +46,9 @@ dependencies = [
     #https://pypi.org/project/PyYAML/
     "PyYAML>=6.0.1",
     #https://pypi.org/project/openai/
-    "openai>=1.12.0"
+    "openai>=1.12.0",
+    # https://pypi.org/project/colour/
+	"colour>=0.1.5"
 ]
 
 requires-python = ">=3.9"
@@ -58,6 +60,7 @@ classifiers=[
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
     "Operating System :: OS Independent",
     "Topic :: Software Development :: Libraries :: Python Modules",
     "Intended Audience :: Developers",

@@ -10,6 +10,7 @@ from datetime import datetime
 from fastapi.responses import Response
 from nicegui import Client, app, run, ui
 
+from ngwidgets.color_map import ColorMap
 from ngwidgets.combobox import ComboBox
 from ngwidgets.components_view import ComponentsView
 from ngwidgets.debouncer import DebouncerUI
@@ -548,52 +549,144 @@ class NiceGuiWidgetsDemo(InputWebSolution):
             )
 
         await self.setup_content_div(show)
+        
+        
+    async def show_colormap_demo(self):
+        """
+        Display the ColorMap demo interactively 
+        allowing to set grid size, start and end color
+        and luminance and saturation parameters
+        """
+               
+        def update_grid(color_map, grid_container):
+            grid_container.clear()
+            with grid_container:
+                grid = ui.grid(columns=color_map.num_levels)
+                for row in range(color_map.num_levels):
+                    for col in range(color_map.num_levels):
+                        color = color_map.get_color(row, col)
+                        with grid:
+                            button=ui.button(color.hex_l,color=f"{color.hex_l}")
+#                               background-color: {color};
+#                              color: {'black' if Color(color).luminance > 0.5 else 'white'};
+                            button.style(
+                                f"""
+                                width: 50px;
+                                height: 50px;
+                                font-size: 8px;
+                                padding: 2px;
+                                """
+                            )
+        
+        def create_slider(label, min_val, max_val, value, step):
+            with ui.row():
+                ui.label(f"{label}:")
+                slider = ui.slider(min=min_val, max=max_val, value=value, step=step).props('label-always')
+                return slider
+    
+        def show():
+            color_map1 = ColorMap()
+            
+            def refresh_color_map():
+                color_map = ColorMap(
+                    start_color=start.value,
+                    end_color=end.value,
+                    num_levels=int(levels.value),
+                    lum_min=lum_min.value,
+                    lum_f=lum_f.value,
+                    sat_f=sat.value
+                )
+                update_grid(color_map, grid_container)
+            
+            with ui.row():
+                with ui.card().classes('w-1/3'):
+                    ui.label("ColorMap Demo").classes("text-h4")
+                    with ui.row():
+                        start = ui.color_input("Start Color", value=color_map1.start_color.hex)
+                        end = ui.color_input("End Color", value=color_map1.end_color.hex)
+                    
+                    levels = create_slider("Levels", 2, 10, 5, 1)
+                    lum_min = create_slider("Min Luminance", 0, 1, color_map1.lum_min, 0.1)
+                    lum_f = create_slider("Luminance Factor", 0, 1, color_map1.lum_f, 0.1)
+                    sat = create_slider("Saturation", 0, 1, color_map1.sat_f, 0.1)
+                    
+                    ui.button("Refresh", on_click=refresh_color_map)
+                
+                grid_container = ui.card().classes('w-1/3')
+                
+                refresh_color_map()  # Initial display
+    
+        await self.setup_content_div(show)
 
- 
     async def show_combobox_demo(self):
         """
         Demo to showcase the ComboBox class with both predefined options and user input capability,
         including a button to dynamically change the options using a list of chemical elements.
         """
-    
+
         def on_combobox_change(event):
             """Handle changes in the ComboBox selection."""
-            selected_value = event.sender.value  # Fetching the current value from the combobox
+            selected_value = (
+                event.sender.value
+            )  # Fetching the current value from the combobox
             ui.notify(f"Selected: {selected_value}")
-    
+
         def update_combobox_options():
             """Randomly modifies the list of chemical elements and updates the ComboBox options."""
             random_size = random.randint(10, len(self.elements))  # Random subset size
             new_elements = random.sample(self.elements, random_size)
             self.element_combobox.update_options(new_elements)
             ui.notify(f"Options have been updated to show {random_size} elements.")
-    
+
         def show():
             with ui.row():
                 # Initial list of chemical elements
                 self.elements = [
-                    "Hydrogen", "Helium", "Lithium", "Beryllium", "Boron",
-                    "Carbon", "Nitrogen", "Oxygen", "Fluorine", "Neon",
-                    "Sodium", "Magnesium", "Aluminum", "Silicon", "Phosphorus",
-                    "Sulfur", "Chlorine", "Argon", "Potassium", "Calcium",
+                    "Hydrogen",
+                    "Helium",
+                    "Lithium",
+                    "Beryllium",
+                    "Boron",
+                    "Carbon",
+                    "Nitrogen",
+                    "Oxygen",
+                    "Fluorine",
+                    "Neon",
+                    "Sodium",
+                    "Magnesium",
+                    "Aluminum",
+                    "Silicon",
+                    "Phosphorus",
+                    "Sulfur",
+                    "Chlorine",
+                    "Argon",
+                    "Potassium",
+                    "Calcium",
                     # Extended to cover more elements up to Zinc
-                    "Scandium", "Titanium", "Vanadium", "Chromium", "Manganese",
-                    "Iron", "Cobalt", "Nickel", "Copper", "Zinc"
+                    "Scandium",
+                    "Titanium",
+                    "Vanadium",
+                    "Chromium",
+                    "Manganese",
+                    "Iron",
+                    "Cobalt",
+                    "Nickel",
+                    "Copper",
+                    "Zinc",
                 ]
                 self.element_combobox = ComboBox(
                     label="Select a Chemical Element",
                     width_chars=35,
                     options=self.elements,
                     clearable=True,
-                    new_value_mode='add-unique',
+                    new_value_mode="add-unique",
                     on_change=on_combobox_change,
                 )
 
                 # Button to update the options in the ComboBox
                 ui.button("Update Options", on_click=update_combobox_options)
-    
-        await self.setup_content_div(show)
 
+        await self.setup_content_div(show)
 
     async def home(self):
         """
@@ -604,6 +697,7 @@ class NiceGuiWidgetsDemo(InputWebSolution):
             # Define the links and labels in a dictionary
             links = {
                 "nicegui solutions bazaar": "/solutions",
+                "ColorMap Demo": "/colormap",
                 "ColorSchema": "/color_schema",
                 "ComboBox Demo": "/combobox",
                 "Debounce Demo": "/stars",
@@ -666,6 +760,10 @@ class NiceGuiWidgetsDemoWebserver(InputWebserver):
         @ui.page("/solutions")
         async def show_solutions(client: Client):
             return await self.page(client, NiceGuiWidgetsDemo.show_solutions)
+
+        @ui.page("/colormap")
+        async def show_colormap_demo(client: Client):
+            return await self.page(client, NiceGuiWidgetsDemo.show_colormap_demo)
 
         @ui.page("/combobox")
         async def show_combobox_demo(client: Client):
