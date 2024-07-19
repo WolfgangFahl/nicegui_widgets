@@ -8,7 +8,7 @@ components:
   source: /ngwidgets/color_map.py
   issue: 69
   demo_url: http://ngdemo.bitplan.com/colormap
-  demo_image_url: https://private-user-images.githubusercontent.com/1336221/349399424-29be4688-7bd1-4332-87c4-7876439f92cf.png
+  demo_image_url: https://github.com/user-attachments/assets/29be4688-7bd1-4332-87c4-7876439f92cf
   description: >
     The ColorMap allows to create a color range matrix defined by start and end colors
     and parameters for minimum and maximum luminance and saturation
