@@ -13,7 +13,6 @@ from dataclasses import field
 from typing import Any, Callable, Dict, List, Optional, Union
 
 from nicegui import Client, core, ui
-from pydevd_file_utils import setup_client_server_paths
 
 from ngwidgets.color_schema import ColorSchema
 from ngwidgets.version import Version
@@ -173,7 +172,7 @@ class NiceGuiWebserver(object):
         """
         if args.debugServer:
             import pydevd
-
+            from pydevd_file_utils import setup_client_server_paths
             print(
                 f"remotePath: {args.debugRemotePath} localPath:{args.debugLocalPath}",
                 flush=True,
