@@ -7,6 +7,7 @@ nicegui widgets
 [![PyPI Status](https://img.shields.io/pypi/v/ngwidgets.svg)](https://pypi.python.org/pypi/ngwidgets/)
 [![GitHub issues](https://img.shields.io/github/issues/WolfgangFahl/nicegui_widgets.svg)](https://github.com/WolfgangFahl/nicegui_widgets/issues)
 [![GitHub closed issues](https://img.shields.io/github/issues-closed/WolfgangFahl/nicegui_widgets.svg)](https://github.com/WolfgangFahl/nicegui_widgets/issues/?q=is%3Aissue+is%3Aclosed)
+[![API Docs](https://img.shields.io/badge/API-Documentation-blue)](https://WolfgangFahl.github.io/nicegui_widgets/)
 [![License](https://img.shields.io/github/license/WolfgangFahl/nicegui_widgets.svg)](https://www.apache.org/licenses/LICENSE-2.0)
 
 ## Docs and Tutorials

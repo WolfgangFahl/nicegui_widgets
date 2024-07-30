@@ -1,0 +1,88 @@
+#!/bin/bash
+# create docs for a configurable project
+# WF 2024-07-30 - updated
+
+# Extract project name from pyproject.toml
+PROJECT_NAME=$(grep "\[project\]" pyproject.toml -A1 | grep name | cut -d '=' -f2 | tr -d ' "')
+PACKAGE_NAME=$(grep "\[tool.hatch.build.targets.wheel.sources\]" pyproject.toml -A1 | tail -1 | cut -d '=' -f2 | tr -d ' "')
+
+
+# Function to print usage information
+print_usage() {
+    echo "Usage: $0 [OPTIONS]"
+    echo "Options:"
+    echo "  -pr, --project NAME    Set the project name (default: $PROJECT_NAME)"
+    echo "  -pa, --package NAME    Set the package name (default: $PACKAGE_NAME)"
+    echo "  -d, --deploy          Deploy the documentation after building"
+    echo "  -h, --help            Display this help message"
+}
+
+# Parse command line arguments
+DEPLOY=false
+while [[ "$#" -gt 0 ]]; do
+    case $1 in
+        -pr|--project) PROJECT_NAME="$2"; shift ;;
+        -pa|--package) PACKAGE_NAME="$2"; shift ;;
+        -d|--deploy) DEPLOY=true ;;
+        -h|--help) print_usage; exit 0 ;;
+        *) echo "Unknown parameter: $1"; print_usage; exit 1 ;;
+    esac
+    shift
+done
+
+# Ensure we're in the correct directory
+if [[ ! -d "$PACKAGE_NAME" ]]; then
+    echo "Error: $PACKAGE_NAME package directory not found. Are you in the correct directory?"
+    exit 1
+fi
+
+# Check if mkdocs is installed
+if ! command -v mkdocs &> /dev/null; then
+    pip install mkdocs mkdocs-material mkdocstrings[python]
+fi
+
+# Create or update mkdocs.yml
+cat << EOF > mkdocs.yml
+site_name: $PROJECT_NAME API Documentation
+theme:
+  name: material
+plugins:
+  - search
+  - mkdocstrings:
+      handlers:
+        python:
+          setup_commands:
+            - import sys
+            - import os
+            - sys.path.insert(0, os.path.abspath("."))
+          selection:
+            docstring_style: google
+          rendering:
+            show_source: true
+nav:
+  - API: index.md
+EOF
+
+# Create or update index.md
+index_md=docs/index.md
+mkdir -p docs
+cat << EOF > $index_md
+# $PROJECT_NAME API Documentation
+
+::: $PACKAGE_NAME
+    options:
+      show_submodules: true
+EOF
+
+# Ignore DeprecationWarnings during build
+export PYTHONWARNINGS="ignore::DeprecationWarning"
+
+# Build the documentation
+mkdocs build --config-file ./mkdocs.yml
+
+# Deploy if requested
+if [ "$DEPLOY" = true ]; then
+    mkdocs gh-deploy --force --config-file ./mkdocs.yml
+fi
+
+echo "Documentation process completed for $PROJECT_NAME."
