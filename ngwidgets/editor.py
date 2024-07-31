@@ -4,10 +4,9 @@ Created on 2022-11-27
 @author: wf
 """
 
-import os
+import subprocess, os, platform
 import tempfile
 from pathlib import Path
-from sys import platform
 from urllib.request import urlopen
 
 from bs4 import BeautifulSoup
@@ -19,6 +18,15 @@ class Editor:
 
     see https://stackoverflow.com/questions/1442841/lauch-default-editor-like-webbrowser-module
     """
+
+    @classmethod
+    def open_filepath(cls,filepath:str):
+        if platform.system() == 'Darwin':       # macOS
+            subprocess.call(('open', filepath))
+        elif platform.system() == 'Windows':    # Windows
+            os.startfile(filepath,'open')
+        else:                                   # linux variants
+            subprocess.call(('xdg-open', filepath))
 
     @classmethod
     def extract_text(cls, html_text: str) -> str:
@@ -49,7 +57,7 @@ class Editor:
         return text
 
     @classmethod
-    def open(cls, file_source: str, extract_text: bool = True) -> str:
+    def open(cls, file_source: str, extract_text: bool = True,default_editor_cmd:str="/usr/local/bin/atom") -> str:
         """
         open an editor for the given file_source
 
@@ -78,10 +86,12 @@ class Editor:
         editor_env = os.getenv("EDITOR")
         if editor_env:
             editor_cmd = editor_env
-        if platform == "darwin":
+        if platform.system() == "darwin":
             if not editor_env:
                 # https://stackoverflow.com/questions/22390709/how-can-i-open-the-atom-editor-from-the-command-line-in-os-x
-                editor_cmd = "/usr/local/bin/atom"
+                editor_cmd = default_editor_cmd
+        if not editor_cmd:
+            editor_cmd="open"
         os_cmd = f"{editor_cmd} {file_source}"
         os.system(os_cmd)
         return file_source
