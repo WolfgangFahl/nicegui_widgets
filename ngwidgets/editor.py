@@ -93,14 +93,13 @@ class Editor:
         editor_env = os.getenv("EDITOR")
         if editor_env:
             editor_cmd = editor_env
-        if platform.system() == "darwin":
+        if platform.system() == "Darwin":
             if not editor_env:
                 # https://stackoverflow.com/questions/22390709/how-can-i-open-the-atom-editor-from-the-command-line-in-os-x
                 editor_cmd = default_editor_cmd
-        if not editor_cmd:
-            editor_cmd = "open"
-        os_cmd = f"{editor_cmd} {file_source}"
-        os.system(os_cmd)
+        if editor_cmd:
+            os_cmd = f"{editor_cmd} {file_source}"
+            os.system(os_cmd)
         return file_source
 
     @classmethod
