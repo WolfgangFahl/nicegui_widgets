@@ -3,6 +3,7 @@ Created on 2023-09-13
 
 @author: wf
 """
+
 import random
 from dataclasses import dataclass
 from datetime import datetime
@@ -227,9 +228,9 @@ class NiceGuiWidgetsDemo(InputWebSolution):
             new_name = self.names[next_name[0]]
             next_name[0] += 1  # Increment the index
             if next_name[0] >= len(self.names):
-                next_name[
-                    0
-                ] = 0  # Reset the index if it reaches the end of the names list
+                next_name[0] = (
+                    0  # Reset the index if it reaches the end of the names list
+                )
             return new_name
 
         lod = [
@@ -549,15 +550,14 @@ class NiceGuiWidgetsDemo(InputWebSolution):
             )
 
         await self.setup_content_div(show)
-        
-        
+
     async def show_colormap_demo(self):
         """
-        Display the ColorMap demo interactively 
+        Display the ColorMap demo interactively
         allowing to set grid size, start and end color
         and luminance and saturation parameters
         """
-               
+
         def update_grid(color_map, grid_container):
             grid_container.clear()
             with grid_container:
@@ -566,7 +566,7 @@ class NiceGuiWidgetsDemo(InputWebSolution):
                     for col in range(color_map.num_levels):
                         color = color_map.get_color(row, col)
                         with grid:
-                            button=ui.button(color.hex_l,color=f"{color.hex_l}")
+                            button = ui.button(color.hex_l, color=f"{color.hex_l}")
                             button.style(
                                 f"""
                                 width: 50px;
@@ -575,16 +575,18 @@ class NiceGuiWidgetsDemo(InputWebSolution):
                                 padding: 2px;
                                 """
                             )
-        
+
         def create_slider(label, min_val, max_val, value, step, on_change):
             ui.label(f"{label}:")
-            slider = ui.slider(min=min_val, max=max_val, value=value, step=step).props('label-always')
-            slider.on('update:model-value', on_change)
+            slider = ui.slider(min=min_val, max=max_val, value=value, step=step).props(
+                "label-always"
+            )
+            slider.on("update:model-value", on_change)
             return slider
-    
+
         def show():
             color_map1 = ColorMap()
-            
+
             def refresh_color_map():
                 color_map = ColorMap(
                     start_color=start.value,
@@ -592,27 +594,56 @@ class NiceGuiWidgetsDemo(InputWebSolution):
                     num_levels=int(levels.value),
                     lum_min=lum_min.value,
                     lum_max=lum_max.value,
-                    sat_f=sat.value
+                    sat_f=sat.value,
                 )
                 update_grid(color_map, grid_container)
-            
+
             with ui.row():
-                with ui.card().classes('w-1/3'):
+                with ui.card().classes("w-1/3"):
                     ui.label("ColorMap Demo").classes("text-h4")
                     with ui.row():
-                        start = ui.color_input("Start Color", value=color_map1.start_color.hex_l, on_change=refresh_color_map)
-                        end = ui.color_input("End Color", value=color_map1.end_color.hex_l, on_change=refresh_color_map)                    
-                    with ui.grid(columns=2):  
+                        start = ui.color_input(
+                            "Start Color",
+                            value=color_map1.start_color.hex_l,
+                            on_change=refresh_color_map,
+                        )
+                        end = ui.color_input(
+                            "End Color",
+                            value=color_map1.end_color.hex_l,
+                            on_change=refresh_color_map,
+                        )
+                    with ui.grid(columns=2):
                         levels = create_slider("Levels", 2, 10, 5, 1, refresh_color_map)
-                        lum_min = create_slider("Min Luminance", 0, 1, color_map1.lum_min, 0.05, refresh_color_map)
-                        lum_max = create_slider("Max Luminance", 0, 1, color_map1.lum_max, 0.02, refresh_color_map)
-                        sat = create_slider("Saturation", 0, 1, color_map1.sat_f, 0.05, refresh_color_map)
+                        lum_min = create_slider(
+                            "Min Luminance",
+                            0,
+                            1,
+                            color_map1.lum_min,
+                            0.05,
+                            refresh_color_map,
+                        )
+                        lum_max = create_slider(
+                            "Max Luminance",
+                            0,
+                            1,
+                            color_map1.lum_max,
+                            0.02,
+                            refresh_color_map,
+                        )
+                        sat = create_slider(
+                            "Saturation",
+                            0,
+                            1,
+                            color_map1.sat_f,
+                            0.05,
+                            refresh_color_map,
+                        )
                     ui.button("Refresh", on_click=refresh_color_map)
-                
-                grid_container = ui.card().classes('w-1/3')
-                
+
+                grid_container = ui.card().classes("w-1/3")
+
                 refresh_color_map()  # Initial display
-    
+
         await self.setup_content_div(show)
 
     async def show_combobox_demo(self):

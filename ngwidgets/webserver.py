@@ -3,6 +3,7 @@ Created on 2023-09-10
 
 @author: wf
 """
+
 import asyncio
 import os
 import sys
@@ -173,6 +174,7 @@ class NiceGuiWebserver(object):
         if args.debugServer:
             import pydevd
             from pydevd_file_utils import setup_client_server_paths
+
             print(
                 f"remotePath: {args.debugRemotePath} localPath:{args.debugLocalPath}",
                 flush=True,

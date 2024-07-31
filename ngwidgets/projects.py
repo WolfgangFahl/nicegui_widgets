@@ -331,7 +331,7 @@ class Project:
             github_author=repo.owner.login,
             created_at=repo.created_at,
             avatar=avatar_url,
-            components_url=components_url
+            components_url=components_url,
             # Other fields can be filled in as needed
         )
         return project

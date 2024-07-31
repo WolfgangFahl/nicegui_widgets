@@ -4,6 +4,7 @@ Created on 2024-07-04
 
 @author: wf
 """
+
 from typing import Dict, Iterable, List, Union
 
 from nicegui import (

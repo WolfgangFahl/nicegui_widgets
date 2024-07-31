@@ -25,6 +25,7 @@ Prompts for LLM:
 
 Main author: OpenAI's language model (instructed by WF)
 """
+
 import math
 from datetime import datetime, timedelta
 

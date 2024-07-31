@@ -3,6 +3,7 @@ Created on 2023-11-02
 
 @author: wf
 """
+
 from ngwidgets.basetest import Basetest
 from ngwidgets.lod_grid import GridConfig, ListOfDictsGrid
 

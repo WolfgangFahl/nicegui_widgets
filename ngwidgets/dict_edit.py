@@ -3,6 +3,7 @@ Created on 2023-06-22
 
 @author: wf
 """
+
 from dataclasses import asdict, dataclass, field, fields, is_dataclass
 from datetime import date, datetime
 from typing import Any, Callable, Dict, Optional, Union

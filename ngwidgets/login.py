@@ -3,6 +3,7 @@ Created on 2023-10-31
 
 @author: wf
 """
+
 from fastapi.responses import RedirectResponse
 from nicegui import app, ui
 
@@ -53,7 +54,9 @@ class Login(object):
         show the login view
         """
 
-        def try_login() -> None:  # local function to avoid passing username and password as arguments
+        def try_login() -> (
+            None
+        ):  # local function to avoid passing username and password as arguments
             if self.users.check_password(username.value, password.value):
                 app.storage.user.update(
                     {"username": username.value, "authenticated": True}

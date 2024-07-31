@@ -4,7 +4,9 @@ Created on 2022-11-27
 @author: wf
 """
 
-import subprocess, os, platform
+import os
+import platform
+import subprocess
 import tempfile
 from pathlib import Path
 from urllib.request import urlopen
@@ -20,13 +22,13 @@ class Editor:
     """
 
     @classmethod
-    def open_filepath(cls,filepath:str):
-        if platform.system() == 'Darwin':       # macOS
-            subprocess.call(('open', filepath))
-        elif platform.system() == 'Windows':    # Windows
-            os.startfile(filepath,'open')
-        else:                                   # linux variants
-            subprocess.call(('xdg-open', filepath))
+    def open_filepath(cls, filepath: str):
+        if platform.system() == "Darwin":  # macOS
+            subprocess.call(("open", filepath))
+        elif platform.system() == "Windows":  # Windows
+            os.startfile(filepath, "open")
+        else:  # linux variants
+            subprocess.call(("xdg-open", filepath))
 
     @classmethod
     def extract_text(cls, html_text: str) -> str:
@@ -57,7 +59,12 @@ class Editor:
         return text
 
     @classmethod
-    def open(cls, file_source: str, extract_text: bool = True,default_editor_cmd:str="/usr/local/bin/atom") -> str:
+    def open(
+        cls,
+        file_source: str,
+        extract_text: bool = True,
+        default_editor_cmd: str = "/usr/local/bin/atom",
+    ) -> str:
         """
         open an editor for the given file_source
 
@@ -91,7 +98,7 @@ class Editor:
                 # https://stackoverflow.com/questions/22390709/how-can-i-open-the-atom-editor-from-the-command-line-in-os-x
                 editor_cmd = default_editor_cmd
         if not editor_cmd:
-            editor_cmd="open"
+            editor_cmd = "open"
         os_cmd = f"{editor_cmd} {file_source}"
         os.system(os_cmd)
         return file_source

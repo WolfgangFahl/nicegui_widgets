@@ -3,6 +3,7 @@ Created on 2023-12-16
 
 @author: wf
 """
+
 from nicegui import ui
 
 from ngwidgets.components import Component, Components

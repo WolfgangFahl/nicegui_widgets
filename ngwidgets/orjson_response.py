@@ -3,6 +3,7 @@ Created on 2023-11-19
 
 @author: wf
 """
+
 from typing import Any
 
 import orjson

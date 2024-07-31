@@ -3,6 +3,7 @@ Created on 2023-10-3
 
 @author: wf
 """
+
 import datetime
 import sys
 import traceback
@@ -70,9 +71,9 @@ class ListOfDictsGrid:
             if self.config.with_buttons:
                 self.setup_button_row()
             # Update options to include onGridReady event handling
-            self.config.options[
-                ":onGridReady"
-            ] = "(params) => params.columnApi.autoSizeAllColumns()"
+            self.config.options[":onGridReady"] = (
+                "(params) => params.columnApi.autoSizeAllColumns()"
+            )
 
             self.ag_grid = ui.aggrid(
                 options=self.config.options,

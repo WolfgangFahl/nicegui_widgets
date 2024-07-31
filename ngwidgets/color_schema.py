@@ -3,6 +3,7 @@ Created on 2023-09-13
 
 @author: wf
 """
+
 from dataclasses import dataclass
 
 from nicegui import ui

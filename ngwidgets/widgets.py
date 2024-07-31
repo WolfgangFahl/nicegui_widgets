@@ -7,6 +7,7 @@ common nicegui widgets and tools
 
 
 """
+
 import html
 from urllib.parse import quote
 

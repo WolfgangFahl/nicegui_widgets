@@ -3,6 +3,7 @@ Created on 2023-06-21
 
 @author: wf
 """
+
 import unittest
 
 import openai

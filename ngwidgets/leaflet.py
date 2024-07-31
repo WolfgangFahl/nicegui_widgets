@@ -6,6 +6,7 @@ https://github.com/zauberzeug/nicegui/blob/main/examples/map/leaflet.py
 modified 2023-08-16 to handle set_zoom and draw_path
 @author: wf
 """
+
 from typing import List, Tuple
 
 from nicegui import ui

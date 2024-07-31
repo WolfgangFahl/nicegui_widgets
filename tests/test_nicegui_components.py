@@ -5,6 +5,7 @@ Test suite for the nicegui_projects module in the ngwidgets package.
 
 @author: wf
 """
+
 import json
 from dataclasses import asdict
 from datetime import datetime
@@ -146,7 +147,7 @@ class TestNiceguiProjects(Basetest):
                     "github_author": "zauberzeug",
                     "created_at": "2020-07-20 13:29:11+00:00",
                 },
-            )
+            ),
             # Add more test cases here as needed
         ]
         for repo_name, expected_attributes in example_repos:

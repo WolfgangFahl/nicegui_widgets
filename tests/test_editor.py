@@ -5,7 +5,7 @@ Created on 2022-11-27
 """
 
 from ngwidgets.basetest import Basetest
-from yprinciple.editor import Editor
+from ngwidgets.editor import Editor
 
 
 class TestEditor(Basetest):

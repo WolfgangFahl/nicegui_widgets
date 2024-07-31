@@ -5,6 +5,7 @@ based on https://raw.githubusercontent.com/zauberzeug/nicegui/main/examples/chat
 
 @author: wf
 """
+
 from datetime import datetime
 from typing import List, Tuple
 from uuid import uuid4
@@ -41,8 +42,9 @@ async def home(client: Client):
 
     anchor_style = r"a:link, a:visited {color: inherit !important; text-decoration: none; font-weight: 500}"
     ui.add_head_html(f"<style>{anchor_style}</style>")
-    with ui.footer().classes("bg-white"), ui.column().classes(
-        "w-full max-w-3xl mx-auto my-6"
+    with (
+        ui.footer().classes("bg-white"),
+        ui.column().classes("w-full max-w-3xl mx-auto my-6"),
     ):
         with ui.row().classes("w-full no-wrap items-center"):
             with ui.avatar().on("click", lambda: ui.open(home)):

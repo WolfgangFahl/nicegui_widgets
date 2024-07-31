@@ -3,6 +3,7 @@ Created on 2023-11-15
 
 @author: wf
 """
+
 import logging
 
 from nicegui import ui
