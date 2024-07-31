@@ -1075,6 +1075,63 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#ngwidgets.editor" class="md-nav__link">
+    <span class="md-ellipsis">
+      editor
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="editor">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#ngwidgets.editor.Editor" class="md-nav__link">
+    <span class="md-ellipsis">
+      Editor
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Editor">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#ngwidgets.editor.Editor.extract_text" class="md-nav__link">
+    <span class="md-ellipsis">
+      extract_text
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ngwidgets.editor.Editor.open" class="md-nav__link">
+    <span class="md-ellipsis">
+      open
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ngwidgets.editor.Editor.open_tmp_text" class="md-nav__link">
+    <span class="md-ellipsis">
+      open_tmp_text
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#ngwidgets.file_selector" class="md-nav__link">
     <span class="md-ellipsis">
       file_selector
@@ -4495,6 +4552,63 @@
   <a href="#ngwidgets.dict_edit.FormUiDef.from_dict" class="md-nav__link">
     <span class="md-ellipsis">
       from_dict
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#ngwidgets.editor" class="md-nav__link">
+    <span class="md-ellipsis">
+      editor
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="editor">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#ngwidgets.editor.Editor" class="md-nav__link">
+    <span class="md-ellipsis">
+      Editor
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Editor">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#ngwidgets.editor.Editor.extract_text" class="md-nav__link">
+    <span class="md-ellipsis">
+      extract_text
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ngwidgets.editor.Editor.open" class="md-nav__link">
+    <span class="md-ellipsis">
+      open
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ngwidgets.editor.Editor.open_tmp_text" class="md-nav__link">
+    <span class="md-ellipsis">
+      open_tmp_text
     </span>
   </a>
   
@@ -15619,6 +15733,719 @@ that can be customized for each field in a form.</p>
         <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">dictionary</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
     <span class="p">}</span>
     <span class="k">return</span> <span class="n">FormUiDef</span><span class="p">(</span><span class="n">title</span><span class="o">=</span><span class="s2">&quot;Dictionary Form&quot;</span><span class="p">,</span> <span class="n">ui_fields</span><span class="o">=</span><span class="n">ui_fields</span><span class="p">)</span>
+</code></pre></div></td></tr></table></div>
+            </details>
+    </div>
+
+</div>
+
+
+
+  </div>
+
+    </div>
+
+</div>
+
+
+
+
+  </div>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-module">
+
+
+
+<h2 id="ngwidgets.editor" class="doc doc-heading">
+            <code>editor</code>
+
+
+</h2>
+
+    <div class="doc doc-contents ">
+
+      <p>Created on 2022-11-27</p>
+<p>@author: wf</p>
+
+
+
+  <div class="doc doc-children">
+
+
+
+
+
+
+
+
+<div class="doc doc-object doc-class">
+
+
+
+<h3 id="ngwidgets.editor.Editor" class="doc doc-heading">
+            <code>Editor</code>
+
+
+</h3>
+
+
+    <div class="doc doc-contents ">
+
+
+      <p>helper class to open the system defined editor</p>
+<p>see https://stackoverflow.com/questions/1442841/lauch-default-editor-like-webbrowser-module</p>
+
+              <details class="quote">
+                <summary>Source code in <code>ngwidgets/editor.py</code></summary>
+                <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 16</span>
+<span class="normal"> 17</span>
+<span class="normal"> 18</span>
+<span class="normal"> 19</span>
+<span class="normal"> 20</span>
+<span class="normal"> 21</span>
+<span class="normal"> 22</span>
+<span class="normal"> 23</span>
+<span class="normal"> 24</span>
+<span class="normal"> 25</span>
+<span class="normal"> 26</span>
+<span class="normal"> 27</span>
+<span class="normal"> 28</span>
+<span class="normal"> 29</span>
+<span class="normal"> 30</span>
+<span class="normal"> 31</span>
+<span class="normal"> 32</span>
+<span class="normal"> 33</span>
+<span class="normal"> 34</span>
+<span class="normal"> 35</span>
+<span class="normal"> 36</span>
+<span class="normal"> 37</span>
+<span class="normal"> 38</span>
+<span class="normal"> 39</span>
+<span class="normal"> 40</span>
+<span class="normal"> 41</span>
+<span class="normal"> 42</span>
+<span class="normal"> 43</span>
+<span class="normal"> 44</span>
+<span class="normal"> 45</span>
+<span class="normal"> 46</span>
+<span class="normal"> 47</span>
+<span class="normal"> 48</span>
+<span class="normal"> 49</span>
+<span class="normal"> 50</span>
+<span class="normal"> 51</span>
+<span class="normal"> 52</span>
+<span class="normal"> 53</span>
+<span class="normal"> 54</span>
+<span class="normal"> 55</span>
+<span class="normal"> 56</span>
+<span class="normal"> 57</span>
+<span class="normal"> 58</span>
+<span class="normal"> 59</span>
+<span class="normal"> 60</span>
+<span class="normal"> 61</span>
+<span class="normal"> 62</span>
+<span class="normal"> 63</span>
+<span class="normal"> 64</span>
+<span class="normal"> 65</span>
+<span class="normal"> 66</span>
+<span class="normal"> 67</span>
+<span class="normal"> 68</span>
+<span class="normal"> 69</span>
+<span class="normal"> 70</span>
+<span class="normal"> 71</span>
+<span class="normal"> 72</span>
+<span class="normal"> 73</span>
+<span class="normal"> 74</span>
+<span class="normal"> 75</span>
+<span class="normal"> 76</span>
+<span class="normal"> 77</span>
+<span class="normal"> 78</span>
+<span class="normal"> 79</span>
+<span class="normal"> 80</span>
+<span class="normal"> 81</span>
+<span class="normal"> 82</span>
+<span class="normal"> 83</span>
+<span class="normal"> 84</span>
+<span class="normal"> 85</span>
+<span class="normal"> 86</span>
+<span class="normal"> 87</span>
+<span class="normal"> 88</span>
+<span class="normal"> 89</span>
+<span class="normal"> 90</span>
+<span class="normal"> 91</span>
+<span class="normal"> 92</span>
+<span class="normal"> 93</span>
+<span class="normal"> 94</span>
+<span class="normal"> 95</span>
+<span class="normal"> 96</span>
+<span class="normal"> 97</span>
+<span class="normal"> 98</span>
+<span class="normal"> 99</span>
+<span class="normal">100</span>
+<span class="normal">101</span>
+<span class="normal">102</span>
+<span class="normal">103</span>
+<span class="normal">104</span>
+<span class="normal">105</span>
+<span class="normal">106</span>
+<span class="normal">107</span>
+<span class="normal">108</span>
+<span class="normal">109</span>
+<span class="normal">110</span>
+<span class="normal">111</span>
+<span class="normal">112</span>
+<span class="normal">113</span>
+<span class="normal">114</span>
+<span class="normal">115</span>
+<span class="normal">116</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span> <span class="nc">Editor</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    helper class to open the system defined editor</span>
+
+<span class="sd">    see https://stackoverflow.com/questions/1442841/lauch-default-editor-like-webbrowser-module</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">extract_text</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">html_text</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        extract the text from the given html_text</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            html_text(str): the input for the html text</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            str: the plain text</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">soup</span> <span class="o">=</span> <span class="n">BeautifulSoup</span><span class="p">(</span><span class="n">html_text</span><span class="p">,</span> <span class="n">features</span><span class="o">=</span><span class="s2">&quot;html.parser&quot;</span><span class="p">)</span>
+
+        <span class="c1"># kill all script and style elements</span>
+        <span class="k">for</span> <span class="n">script</span> <span class="ow">in</span> <span class="n">soup</span><span class="p">([</span><span class="s2">&quot;script&quot;</span><span class="p">,</span> <span class="s2">&quot;style&quot;</span><span class="p">]):</span>
+            <span class="n">script</span><span class="o">.</span><span class="n">extract</span><span class="p">()</span>  <span class="c1"># rip it out</span>
+
+        <span class="c1"># get text</span>
+        <span class="n">text</span> <span class="o">=</span> <span class="n">soup</span><span class="o">.</span><span class="n">get_text</span><span class="p">()</span>
+
+        <span class="c1"># break into lines and remove leading and trailing space on each</span>
+        <span class="n">lines</span> <span class="o">=</span> <span class="p">(</span><span class="n">line</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span> <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">text</span><span class="o">.</span><span class="n">splitlines</span><span class="p">())</span>
+        <span class="c1"># break multi-headlines into a line each</span>
+        <span class="n">chunks</span> <span class="o">=</span> <span class="p">(</span><span class="n">phrase</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span> <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">lines</span> <span class="k">for</span> <span class="n">phrase</span> <span class="ow">in</span> <span class="n">line</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;  &quot;</span><span class="p">))</span>
+        <span class="c1"># drop blank lines</span>
+        <span class="n">text</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">chunk</span> <span class="k">for</span> <span class="n">chunk</span> <span class="ow">in</span> <span class="n">chunks</span> <span class="k">if</span> <span class="n">chunk</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">text</span>
+
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">open</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">file_source</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">extract_text</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        open an editor for the given file_source</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            file_source(str): the path to the file</span>
+<span class="sd">            extract_text(bool): if True extract the text from html sources</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            str: the path to the file e.g. a temporary file if the file_source points to an url</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># handle urls</span>
+        <span class="c1"># https://stackoverflow.com/a/45886824/1497139</span>
+        <span class="k">if</span> <span class="n">file_source</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;http&quot;</span><span class="p">):</span>
+            <span class="n">url_source</span> <span class="o">=</span> <span class="n">urlopen</span><span class="p">(</span><span class="n">file_source</span><span class="p">)</span>
+            <span class="c1"># https://stackoverflow.com/a/19156107/1497139</span>
+            <span class="n">charset</span> <span class="o">=</span> <span class="n">url_source</span><span class="o">.</span><span class="n">headers</span><span class="o">.</span><span class="n">get_content_charset</span><span class="p">()</span>
+            <span class="c1"># if charset fails here you might want to set it to utf-8 as a default!</span>
+            <span class="n">text</span> <span class="o">=</span> <span class="n">url_source</span><span class="o">.</span><span class="n">read</span><span class="p">()</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="n">charset</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">extract_text</span><span class="p">:</span>
+                <span class="c1"># https://stackoverflow.com/a/24618186/1497139</span>
+                <span class="n">text</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">extract_text</span><span class="p">(</span><span class="n">text</span><span class="p">)</span>
+
+            <span class="k">return</span> <span class="bp">cls</span><span class="o">.</span><span class="n">open_tmp_text</span><span class="p">(</span><span class="n">text</span><span class="p">)</span>
+
+        <span class="n">editor_cmd</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="n">editor_env</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="s2">&quot;EDITOR&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">editor_env</span><span class="p">:</span>
+            <span class="n">editor_cmd</span> <span class="o">=</span> <span class="n">editor_env</span>
+        <span class="k">if</span> <span class="n">platform</span> <span class="o">==</span> <span class="s2">&quot;darwin&quot;</span><span class="p">:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">editor_env</span><span class="p">:</span>
+                <span class="c1"># https://stackoverflow.com/questions/22390709/how-can-i-open-the-atom-editor-from-the-command-line-in-os-x</span>
+                <span class="n">editor_cmd</span> <span class="o">=</span> <span class="s2">&quot;/usr/local/bin/atom&quot;</span>
+        <span class="n">os_cmd</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">editor_cmd</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">file_source</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">system</span><span class="p">(</span><span class="n">os_cmd</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">file_source</span>
+
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">open_tmp_text</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">text</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">file_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        open an editor for the given text in a newly created temporary file</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            text(str): the text to write to a temporary file and then open</span>
+<span class="sd">            file_name(str): the name to use for the file</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            str: the path to the temp file</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># see https://stackoverflow.com/a/8577226/1497139</span>
+        <span class="c1"># https://stackoverflow.com/a/3924253/1497139</span>
+        <span class="k">with</span> <span class="n">tempfile</span><span class="o">.</span><span class="n">NamedTemporaryFile</span><span class="p">(</span><span class="n">delete</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span> <span class="k">as</span> <span class="n">tmp</span><span class="p">:</span>
+            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">tmp</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">tmp_file</span><span class="p">:</span>
+                <span class="n">tmp_file</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">text</span><span class="p">)</span>
+                <span class="n">tmp_file</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+            <span class="k">if</span> <span class="n">file_name</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">file_path</span> <span class="o">=</span> <span class="n">tmp</span><span class="o">.</span><span class="n">name</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="c1"># https://stackoverflow.com/questions/3167154/how-to-split-a-dos-path-into-its-components-in-python</span>
+                <span class="n">path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">tmp</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+                <span class="c1"># https://stackoverflow.com/a/49798311/1497139</span>
+                <span class="n">file_path</span> <span class="o">=</span> <span class="n">path</span><span class="o">.</span><span class="n">parent</span> <span class="o">/</span> <span class="n">file_name</span>
+                <span class="n">os</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="n">tmp</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">file_path</span><span class="p">)</span>
+
+            <span class="k">return</span> <span class="bp">cls</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">file_path</span><span class="p">))</span>
+</code></pre></div></td></tr></table></div>
+              </details>
+
+
+
+  <div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+<div class="doc doc-object doc-function">
+
+
+<h4 id="ngwidgets.editor.Editor.extract_text" class="doc doc-heading">
+            <code class="highlight language-python"><span class="n">extract_text</span><span class="p">(</span><span class="n">html_text</span><span class="p">)</span></code>
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-classmethod"><code>classmethod</code></small>
+  </span>
+
+</h4>
+
+
+    <div class="doc doc-contents ">
+
+      <p>extract the text from the given html_text</p>
+
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code>html_text(str)</code></td>
+            <td>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>the input for the html text</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+    <p><span class="doc-section-title">Returns:</span></p>
+    <table>
+      <thead>
+        <tr>
+<th>Name</th>          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+<td><code>str</code></td>            <td>
+                  <code>str</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>the plain text</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+            <details class="quote">
+              <summary>Source code in <code>ngwidgets/editor.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">23</span>
+<span class="normal">24</span>
+<span class="normal">25</span>
+<span class="normal">26</span>
+<span class="normal">27</span>
+<span class="normal">28</span>
+<span class="normal">29</span>
+<span class="normal">30</span>
+<span class="normal">31</span>
+<span class="normal">32</span>
+<span class="normal">33</span>
+<span class="normal">34</span>
+<span class="normal">35</span>
+<span class="normal">36</span>
+<span class="normal">37</span>
+<span class="normal">38</span>
+<span class="normal">39</span>
+<span class="normal">40</span>
+<span class="normal">41</span>
+<span class="normal">42</span>
+<span class="normal">43</span>
+<span class="normal">44</span>
+<span class="normal">45</span>
+<span class="normal">46</span>
+<span class="normal">47</span>
+<span class="normal">48</span>
+<span class="normal">49</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@classmethod</span>
+<span class="k">def</span> <span class="nf">extract_text</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">html_text</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    extract the text from the given html_text</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        html_text(str): the input for the html text</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        str: the plain text</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">soup</span> <span class="o">=</span> <span class="n">BeautifulSoup</span><span class="p">(</span><span class="n">html_text</span><span class="p">,</span> <span class="n">features</span><span class="o">=</span><span class="s2">&quot;html.parser&quot;</span><span class="p">)</span>
+
+    <span class="c1"># kill all script and style elements</span>
+    <span class="k">for</span> <span class="n">script</span> <span class="ow">in</span> <span class="n">soup</span><span class="p">([</span><span class="s2">&quot;script&quot;</span><span class="p">,</span> <span class="s2">&quot;style&quot;</span><span class="p">]):</span>
+        <span class="n">script</span><span class="o">.</span><span class="n">extract</span><span class="p">()</span>  <span class="c1"># rip it out</span>
+
+    <span class="c1"># get text</span>
+    <span class="n">text</span> <span class="o">=</span> <span class="n">soup</span><span class="o">.</span><span class="n">get_text</span><span class="p">()</span>
+
+    <span class="c1"># break into lines and remove leading and trailing space on each</span>
+    <span class="n">lines</span> <span class="o">=</span> <span class="p">(</span><span class="n">line</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span> <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">text</span><span class="o">.</span><span class="n">splitlines</span><span class="p">())</span>
+    <span class="c1"># break multi-headlines into a line each</span>
+    <span class="n">chunks</span> <span class="o">=</span> <span class="p">(</span><span class="n">phrase</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span> <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">lines</span> <span class="k">for</span> <span class="n">phrase</span> <span class="ow">in</span> <span class="n">line</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;  &quot;</span><span class="p">))</span>
+    <span class="c1"># drop blank lines</span>
+    <span class="n">text</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">chunk</span> <span class="k">for</span> <span class="n">chunk</span> <span class="ow">in</span> <span class="n">chunks</span> <span class="k">if</span> <span class="n">chunk</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">text</span>
+</code></pre></div></td></tr></table></div>
+            </details>
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h4 id="ngwidgets.editor.Editor.open" class="doc doc-heading">
+            <code class="highlight language-python"><span class="nb">open</span><span class="p">(</span><span class="n">file_source</span><span class="p">,</span> <span class="n">extract_text</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span></code>
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-classmethod"><code>classmethod</code></small>
+  </span>
+
+</h4>
+
+
+    <div class="doc doc-contents ">
+
+      <p>open an editor for the given file_source</p>
+
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code>file_source(str)</code></td>
+            <td>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>the path to the file</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>extract_text(bool)</code></td>
+            <td>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>if True extract the text from html sources</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+    <p><span class="doc-section-title">Returns:</span></p>
+    <table>
+      <thead>
+        <tr>
+<th>Name</th>          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+<td><code>str</code></td>            <td>
+                  <code>str</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>the path to the file e.g. a temporary file if the file_source points to an url</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+            <details class="quote">
+              <summary>Source code in <code>ngwidgets/editor.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">51</span>
+<span class="normal">52</span>
+<span class="normal">53</span>
+<span class="normal">54</span>
+<span class="normal">55</span>
+<span class="normal">56</span>
+<span class="normal">57</span>
+<span class="normal">58</span>
+<span class="normal">59</span>
+<span class="normal">60</span>
+<span class="normal">61</span>
+<span class="normal">62</span>
+<span class="normal">63</span>
+<span class="normal">64</span>
+<span class="normal">65</span>
+<span class="normal">66</span>
+<span class="normal">67</span>
+<span class="normal">68</span>
+<span class="normal">69</span>
+<span class="normal">70</span>
+<span class="normal">71</span>
+<span class="normal">72</span>
+<span class="normal">73</span>
+<span class="normal">74</span>
+<span class="normal">75</span>
+<span class="normal">76</span>
+<span class="normal">77</span>
+<span class="normal">78</span>
+<span class="normal">79</span>
+<span class="normal">80</span>
+<span class="normal">81</span>
+<span class="normal">82</span>
+<span class="normal">83</span>
+<span class="normal">84</span>
+<span class="normal">85</span>
+<span class="normal">86</span>
+<span class="normal">87</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@classmethod</span>
+<span class="k">def</span> <span class="nf">open</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">file_source</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">extract_text</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    open an editor for the given file_source</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        file_source(str): the path to the file</span>
+<span class="sd">        extract_text(bool): if True extract the text from html sources</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        str: the path to the file e.g. a temporary file if the file_source points to an url</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># handle urls</span>
+    <span class="c1"># https://stackoverflow.com/a/45886824/1497139</span>
+    <span class="k">if</span> <span class="n">file_source</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;http&quot;</span><span class="p">):</span>
+        <span class="n">url_source</span> <span class="o">=</span> <span class="n">urlopen</span><span class="p">(</span><span class="n">file_source</span><span class="p">)</span>
+        <span class="c1"># https://stackoverflow.com/a/19156107/1497139</span>
+        <span class="n">charset</span> <span class="o">=</span> <span class="n">url_source</span><span class="o">.</span><span class="n">headers</span><span class="o">.</span><span class="n">get_content_charset</span><span class="p">()</span>
+        <span class="c1"># if charset fails here you might want to set it to utf-8 as a default!</span>
+        <span class="n">text</span> <span class="o">=</span> <span class="n">url_source</span><span class="o">.</span><span class="n">read</span><span class="p">()</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="n">charset</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">extract_text</span><span class="p">:</span>
+            <span class="c1"># https://stackoverflow.com/a/24618186/1497139</span>
+            <span class="n">text</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">extract_text</span><span class="p">(</span><span class="n">text</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="bp">cls</span><span class="o">.</span><span class="n">open_tmp_text</span><span class="p">(</span><span class="n">text</span><span class="p">)</span>
+
+    <span class="n">editor_cmd</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">editor_env</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="s2">&quot;EDITOR&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">editor_env</span><span class="p">:</span>
+        <span class="n">editor_cmd</span> <span class="o">=</span> <span class="n">editor_env</span>
+    <span class="k">if</span> <span class="n">platform</span> <span class="o">==</span> <span class="s2">&quot;darwin&quot;</span><span class="p">:</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">editor_env</span><span class="p">:</span>
+            <span class="c1"># https://stackoverflow.com/questions/22390709/how-can-i-open-the-atom-editor-from-the-command-line-in-os-x</span>
+            <span class="n">editor_cmd</span> <span class="o">=</span> <span class="s2">&quot;/usr/local/bin/atom&quot;</span>
+    <span class="n">os_cmd</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">editor_cmd</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">file_source</span><span class="si">}</span><span class="s2">&quot;</span>
+    <span class="n">os</span><span class="o">.</span><span class="n">system</span><span class="p">(</span><span class="n">os_cmd</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">file_source</span>
+</code></pre></div></td></tr></table></div>
+            </details>
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h4 id="ngwidgets.editor.Editor.open_tmp_text" class="doc doc-heading">
+            <code class="highlight language-python"><span class="n">open_tmp_text</span><span class="p">(</span><span class="n">text</span><span class="p">,</span> <span class="n">file_name</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span></code>
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-classmethod"><code>classmethod</code></small>
+  </span>
+
+</h4>
+
+
+    <div class="doc doc-contents ">
+
+      <p>open an editor for the given text in a newly created temporary file</p>
+
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code>text(str)</code></td>
+            <td>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>the text to write to a temporary file and then open</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>file_name(str)</code></td>
+            <td>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>the name to use for the file</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+    <p><span class="doc-section-title">Returns:</span></p>
+    <table>
+      <thead>
+        <tr>
+<th>Name</th>          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+<td><code>str</code></td>            <td>
+                  <code>str</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>the path to the temp file</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+            <details class="quote">
+              <summary>Source code in <code>ngwidgets/editor.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 89</span>
+<span class="normal"> 90</span>
+<span class="normal"> 91</span>
+<span class="normal"> 92</span>
+<span class="normal"> 93</span>
+<span class="normal"> 94</span>
+<span class="normal"> 95</span>
+<span class="normal"> 96</span>
+<span class="normal"> 97</span>
+<span class="normal"> 98</span>
+<span class="normal"> 99</span>
+<span class="normal">100</span>
+<span class="normal">101</span>
+<span class="normal">102</span>
+<span class="normal">103</span>
+<span class="normal">104</span>
+<span class="normal">105</span>
+<span class="normal">106</span>
+<span class="normal">107</span>
+<span class="normal">108</span>
+<span class="normal">109</span>
+<span class="normal">110</span>
+<span class="normal">111</span>
+<span class="normal">112</span>
+<span class="normal">113</span>
+<span class="normal">114</span>
+<span class="normal">115</span>
+<span class="normal">116</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@classmethod</span>
+<span class="k">def</span> <span class="nf">open_tmp_text</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">text</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">file_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    open an editor for the given text in a newly created temporary file</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        text(str): the text to write to a temporary file and then open</span>
+<span class="sd">        file_name(str): the name to use for the file</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        str: the path to the temp file</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># see https://stackoverflow.com/a/8577226/1497139</span>
+    <span class="c1"># https://stackoverflow.com/a/3924253/1497139</span>
+    <span class="k">with</span> <span class="n">tempfile</span><span class="o">.</span><span class="n">NamedTemporaryFile</span><span class="p">(</span><span class="n">delete</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span> <span class="k">as</span> <span class="n">tmp</span><span class="p">:</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">tmp</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">tmp_file</span><span class="p">:</span>
+            <span class="n">tmp_file</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">text</span><span class="p">)</span>
+            <span class="n">tmp_file</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">file_name</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">file_path</span> <span class="o">=</span> <span class="n">tmp</span><span class="o">.</span><span class="n">name</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># https://stackoverflow.com/questions/3167154/how-to-split-a-dos-path-into-its-components-in-python</span>
+            <span class="n">path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">tmp</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+            <span class="c1"># https://stackoverflow.com/a/49798311/1497139</span>
+            <span class="n">file_path</span> <span class="o">=</span> <span class="n">path</span><span class="o">.</span><span class="n">parent</span> <span class="o">/</span> <span class="n">file_name</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="n">tmp</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">file_path</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="bp">cls</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">file_path</span><span class="p">))</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -31609,7 +32436,7 @@ creating a tri-state toggle input that cycles through predefined icon sets.</p>
     <span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;ngwidgets&quot;</span>
     <span class="n">version</span> <span class="o">=</span> <span class="n">ngwidgets</span><span class="o">.</span><span class="n">__version__</span>
     <span class="n">date</span> <span class="o">=</span> <span class="s2">&quot;2023-09-10&quot;</span>
-    <span class="n">updated</span> <span class="o">=</span> <span class="s2">&quot;2024-07-27&quot;</span>
+    <span class="n">updated</span> <span class="o">=</span> <span class="s2">&quot;2024-07-31&quot;</span>
     <span class="n">description</span> <span class="o">=</span> <span class="s2">&quot;NiceGUI widgets&quot;</span>
 
     <span class="n">authors</span> <span class="o">=</span> <span class="s2">&quot;Wolfgang Fahl&quot;</span>
