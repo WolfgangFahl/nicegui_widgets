@@ -1,0 +1,8 @@
+#!/bin/bash
+# WF 2024-07-31
+# prepare a release
+scripts/doc -d
+
+# Commit with a message that includes the current ISO timestamp
+git commit -a -m "release commit"
+git push
