@@ -1,9 +1,132 @@
 #!/bin/bash
-# WF 2020-06-03
-#python3 -m unittest discover
-pip list | egrep "^green " 
-if [ $? -ne 0 ]
-then
-  pip install green
-fi
-green tests -s 1
+# WF 2022-08-20
+# WF 2024-08-03
+
+#ansi colors
+#http://www.csc.uvic.ca/~sae/seng265/fall04/tips/s265s047-tips/bash-using-colors.html
+blue='\033[0;34m'
+red='\033[0;31m'
+green='\033[0;32m' # '\e[1;32m' is too bright for white bg.
+endColor='\033[0m'
+
+#
+# a colored message
+#   params:
+#     1: l_color - the color of the message
+#     2: l_msg - the message to display
+#
+color_msg() {
+  local l_color="$1"
+  local l_msg="$2"
+  echo -e "${l_color}$l_msg${endColor}"
+}
+
+#
+# error
+#
+# show the given error message on stderr and exit
+#
+#   params:
+#     1: l_msg - the error message to display
+#
+error() {
+  local l_msg="$1"
+  # use ansi red for error
+  color_msg $red "Error:" 1>&2
+  color_msg $red "\t$l_msg" 1>&2
+  exit 1
+}
+
+#
+# show a negative message
+#
+negative() {
+  local l_msg="$1"
+  color_msg $red "❌:$l_msg"
+}
+
+#
+# show a positive message
+#
+positive() {
+  local l_msg="$1"
+  color_msg $green "✅:$l_msg"
+}
+
+# show usage
+#
+usage() {
+  echo "$0 [-g|--green|-m|--module|-t|--tox|-h|--help]"
+  echo "-t |--tox: run tests with tox"
+  echo "-g |--green: run tests with green"
+  echo "-m |--module: run modulewise test"
+  echo "-h  |--help:  show this usage"
+  echo "default is running tests with unittest discover"
+  exit 1
+}
+
+#
+# check and optional install the given package
+#
+check_package() {
+  local l_package="$1"
+  pip show $l_package > /dev/null
+  if [ $? -ne 0 ]
+  then
+    negative "$l_package"
+    color_msg $blue "installing $l_package"
+    pip install $l_package
+  else
+    positive "$l_package"
+  fi
+}
+
+#
+# test module by module
+#
+modulewise_test() {
+  foundErrors=0
+  foundTests=0
+  for testmodule in tests/test*.py
+  do
+    echo "testing $testmodule ..."
+    # see https://github.com/CleanCut/green/issues/263
+    #green $testmodule -s1
+    python -m unittest $testmodule
+    exit_code=$?
+    foundErrors=$((foundErrors+exit_code))
+    foundTests=$((foundTests+1))
+  done
+  echo "$foundErrors/$foundTests  module unit tests failed" 1>&2
+  if [[ $foundErrors -gt 0 ]]
+  then
+    exit 1
+  fi
+}
+
+export PYTHON_PATH="."
+while [  "$1" != ""  ]
+do
+  option="$1"
+  case $option in
+    -h|--help)
+      usage
+      exit 0
+      ;;
+    -g|--green)
+      check_package green
+      green tests -s 1
+      exit 0
+      ;;
+    -m|--module)
+      modulewise_test
+      exit 0
+      ;;
+    -t|--tox)
+      check_package tox
+      tox -e py
+      exit 0
+      ;;
+  esac
+done
+python3 -m unittest discover
