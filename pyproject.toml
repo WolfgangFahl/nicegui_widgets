@@ -17,7 +17,7 @@ license= "Apache-2.0"
 dependencies = [
 	# https://nicegui.io/
 	# pin to workaround https://github.com/zauberzeug/nicegui/issues/2641
-    "nicegui>=1.4.29",
+    "nicegui>=1.4.34",
  	# orjson
  	# https://pypi.org/project/orjson/
  	"orjson>=3.9.10",
