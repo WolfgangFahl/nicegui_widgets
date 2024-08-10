@@ -66,4 +66,4 @@ class LogElementHandler(logging.Handler):
         """
         err_msg = f"Error: {str(ex)} | Log Record: {str(record)}"
         print(err_msg, file=sys.stderr)
-        self.solution.handle_exception(err_msg)
+        
