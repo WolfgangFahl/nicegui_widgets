@@ -176,7 +176,7 @@ class InputWebSolution(WebSolution):
         if with_log:
             self.log_view = ui.log(max_lines=max_lines).classes(log_classes)
             if handle_logging:
-                self.log_view_handler = LogElementHandler(self.log_view)
+                self.log_view_handler = LogElementHandler(self,self.log_view)
                 self.webserver.logger.addHandler(self.log_view_handler)
         else:
             self.log_view = None
