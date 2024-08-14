@@ -105,7 +105,7 @@ class UiLogHandler(logging.Handler):
             try:
                 self.ui_log.push(formatted_msg)
             except Exception as ex:
-                self.falllback_handler.handleError(record)
+                self.fallback_handler.handleError(record)
                 self.fallback_handler.emit(f"ui.log failure: {str(ex)} - switching off ui log ...")
                 self.ui_log=None
                 pass
