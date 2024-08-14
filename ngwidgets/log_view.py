@@ -101,12 +101,14 @@ class UiLogHandler(logging.Handler):
         self.fallback_handler.emit(record)
         formatted_msg = self.format(record)
 
-        try:
-            self.ui_log.push(formatted_msg)
-        except Exception as ex:
-            self.fallback_handler.emit(f"ui.log failure: {str(ex)} - switching off ui log ...")
-            self.ui_log=None
-            pass
+        if self.ui_log is not None:
+            try:
+                self.ui_log.push(formatted_msg)
+            except Exception as ex:
+                self.falllback_handler.handleError(record)
+                self.fallback_handler.emit(f"ui.log failure: {str(ex)} - switching off ui log ...")
+                self.ui_log=None
+                pass
 
     def setLevel(self, level):
         """
