@@ -4,6 +4,7 @@ Created on 2023-09-13
 @author: wf
 """
 
+import logging
 import random
 from dataclasses import dataclass
 from datetime import datetime
@@ -18,6 +19,7 @@ from ngwidgets.debouncer import DebouncerUI
 from ngwidgets.dict_edit import DictEdit
 from ngwidgets.input_webserver import InputWebserver, InputWebSolution
 from ngwidgets.lod_grid import GridConfig, ListOfDictsGrid
+from ngwidgets.log_view import UiLogHandler
 from ngwidgets.pdfviewer import pdfviewer
 from ngwidgets.progress import NiceguiProgressbar
 from ngwidgets.projects import Projects
@@ -48,7 +50,7 @@ class NiceGuiWidgetsDemo(InputWebSolution):
     Demonstration Solution
     """
 
-    def __init__(self, webserver: "NiceGuiWebserver", client: Client):
+    def __init__(self, webserver: "NiceGuiWidgetsDemoWebserver", client: Client):
         """
         Initialize the NiceGuiWidgetsDemoContext.
 
@@ -503,6 +505,39 @@ class NiceGuiWidgetsDemo(InputWebSolution):
 
         await self.setup_content_div(show)
 
+    async def show_log_element_handler_demo(self):
+        """
+        demonstrate logging via log_view
+        """
+
+        def on_loglevel_change(value):
+            if self.log_view:
+                self.log_view.setLevel(value)
+
+        def show():
+            with ui.row():
+                ui.select(
+                    {
+                        logging.NOTSET: "All",
+                        logging.DEBUG: f"{UiLogHandler.LOG_LEVEL_ICONS[logging.DEBUG]} Debug",
+                        logging.INFO: f"{UiLogHandler.LOG_LEVEL_ICONS[logging.INFO]} Info",
+                        logging.WARNING: f"{UiLogHandler.LOG_LEVEL_ICONS[logging.WARNING]} Warning",
+                        logging.ERROR: f"{UiLogHandler.LOG_LEVEL_ICONS[logging.ERROR]} Error",
+                        logging.CRITICAL: f"{UiLogHandler.LOG_LEVEL_ICONS[logging.CRITICAL]} Critical",
+                    },
+                    value=logging.NOTSET,
+                    on_change=lambda e: on_loglevel_change(e.value),
+                )
+
+            with ui.row():
+                ui.button("Debug", on_click=lambda: self.logger.debug("DEBUG"))
+                ui.button("Info", on_click=lambda: self.logger.info("INFO"))
+                ui.button("Warning", on_click=lambda: self.logger.warning("WARNING"))
+                ui.button("Error", on_click=lambda: self.logger.error("ERROR"))
+                ui.button("Critical", on_click=lambda: self.logger.critical("CRITICAL"))
+
+        await self.setup_content_div(show)
+
     async def show_tristate_demo(self):
         """
         Demonstrate the Tristate project.
@@ -733,6 +768,7 @@ class NiceGuiWidgetsDemo(InputWebSolution):
                 "HideShow Demo": "/hideshow",
                 "Lang": "/langs",
                 "ListOfDictsGrid": "/grid",
+                "Log Element Handler Demo": "/log_handler",
                 "Tristate Demo": "/tristate",
                 "pdfviewer": "/pdfviewer",
                 "Progressbar": "/progress",
@@ -810,6 +846,12 @@ class NiceGuiWidgetsDemoWebserver(InputWebserver):
         @ui.page("/langs")
         async def show_langs(client: Client):
             return await self.page(client, NiceGuiWidgetsDemo.show_langs)
+
+        @ui.page("/log_handler")
+        async def show_log_handler_demo(client: Client):
+            return await self.page(
+                client, NiceGuiWidgetsDemo.show_log_element_handler_demo
+            )
 
         @ui.page("/color_schema")
         async def show_color_schema(client: Client):

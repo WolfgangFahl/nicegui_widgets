@@ -5,6 +5,7 @@ Created on 2023-09-10
 """
 
 import asyncio
+import logging
 import os
 import sys
 import traceback
@@ -115,6 +116,7 @@ class NiceGuiWebserver(object):
         Constructor
         """
         self.debug = False
+        self.logger = logging.getLogger()
         self.do_trace = True
         if config is None:
             config = WebserverConfig()
@@ -241,6 +243,7 @@ class WebSolution:
         construct a client specific WebSolution
         """
         self.webserver = webserver
+        self.logger = webserver.logger
         self.config = self.webserver.config
         self.args = self.webserver.args
         self.client = client
