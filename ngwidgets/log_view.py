@@ -17,6 +17,13 @@ class LogView:
     """
     Handle logging by delegating to a ui.log
     """
+    LOG_LEVEL_ICONS = {
+        logging.DEBUG: "🐞",
+        logging.INFO: "ℹ️",
+        logging.WARNING: "⚠️",
+        logging.ERROR: "❌",
+        logging.CRITICAL: "🔥",
+    }
 
     def __init__(
         self,
@@ -24,22 +31,71 @@ class LogView:
         classes: str = "w-full",
         level: int = logging.NOTSET,
         log_stream: TextIO = sys.stderr,
-        with_sleep:float=None
+        with_sleep: float=None
     ):
+        self.level=level
+        self.with_sleep=with_sleep
         self.loggers: List[logging.Logger] = []
         self.ui_log = ui.log(max_lines=max_lines).classes(classes)
         self.handler = UiLogHandler(self.ui_log, level, log_stream)
-        self.with_sleep=with_sleep
+        self.fallback_handler = logging.StreamHandler(log_stream)
+        self.fallback_handler.setLevel(logging.DEBUG)
+
+    def on_fail(self,ex:Exception):
+        self.ui_log=None
+        self.handler.ui_log=None
+        self.fallback_handler.emit(f"ui.log failure: {str(ex)} - switching off ui log ...")
+
+    def clear(self):
+        """
+        clear my ui_log
+        """
+        if self.ui_log is not None:
+            try:
+                self.ui_log.clear()
+            except Exception as ex:
+                self.on_fail(ex)
 
     def push(self, msg: str):
-        self.ui_log.push(msg)
+        """
+        Push a message to the UI log.
+
+        Args:
+            msg (str): The message to push to the log.
+        """
+        level_icon = self.LOG_LEVEL_ICONS.get(self.level, "")
+        if not msg.startswith(level_icon):
+            msg = f"{level_icon}:{msg}"
+        if self.ui_log is None:
+            self.fallback_handler.emit(logging.makeLogRecord({'msg': msg, 'levelno': self.level}))
+        else:
+            try:
+                self.ui_log.push(msg)
+                if self.with_sleep:
+                    time.sleep(self.with_sleep)
+            except Exception as ex:
+                self.on_fail(ex)
 
     def setLevel(self, level: int):
+        """
+        Set the logging level for this handler and all associated loggers.
+
+        Args:
+            level (int): The logging level to set.
+        """
+        self.level=level
         self.handler.setLevel(level)
+        self.fallback_handler.setLevel(level)
         for logger in self.loggers:
             logger.setLevel(level)
 
     def addAsHandler(self, logger: logging.Logger):
+        """
+        Add this LogView as a handler to the given logger.
+
+        Args:
+            logger (logging.Logger): The logger to add this handler to.
+        """
         if logger in self.loggers:
             return
         if self.handler not in logger.handlers:
@@ -51,20 +107,10 @@ class UiLogHandler(logging.Handler):
     A logging handler that emits messages to a NiceGUI log element.
     Uses a fallback logger to make sure messages do not get lost when the log element is not available
     """
-
-    LOG_LEVEL_ICONS = {
-        logging.DEBUG: "🐞",
-        logging.INFO: "ℹ️",
-        logging.WARNING: "⚠️",
-        logging.ERROR: "❌",
-        logging.CRITICAL: "🔥",
-    }
-
     def __init__(
         self,
         ui_log: ui.log,
         level: int = logging.NOTSET,
-        log_stream: TextIO = sys.stderr,
     ):
         """
         Constructor
@@ -73,19 +119,20 @@ class UiLogHandler(logging.Handler):
             ui_log (ui.log): The NiceGUI log element to which messages will be emitted.
             level (int): The logging level for this handler. Default is logging.NOTSET.
             log_stream (TextIO): The stream to use for fallback logging. Default is sys.stderr.
+            with_sleep (float): add an additional sleep after each push to work around recursive call / timing issues - 0.001 = 1 msec recommended
         """
         super().__init__(level)
         self.ui_log = ui_log
-        self.fallback_handler = logging.StreamHandler(log_stream)
-        self.fallback_handler.setLevel(logging.DEBUG)
 
-    def addAsHandler(self, logger: logging.Logger):
+    def addAsHandler(self, logger: logging.Logger) -> bool:
         """
-        add me as a handler to the given logger
+        Add this handler to the given logger if it's not already added.
 
         Args:
-            logger (logging.Logger): the source logger
+            logger (logging.Logger): The logger to add this handler to.
 
+        Returns:
+            bool: True if the handler was added, False if it was already present.
         """
         if self not in logger.handlers:
             logger.addHandler(self)
@@ -95,17 +142,6 @@ class UiLogHandler(logging.Handler):
         else:
             return False
 
-    def clear(self):
-        if self.ui_log is not None:
-            try:
-                self.ui_log.clear()
-            except Exception as ex:
-                self.on_fail(ex)
-
-    def on_fail(self,ex:Exception):
-        self.ui_log=None
-        self.fallback_handler.emit(f"ui.log failure: {str(ex)} - switching off ui log ...")
-
     def emit(self, record: logging.LogRecord):
         """
         Emit a record to the NiceGUI log element
@@ -114,22 +150,9 @@ class UiLogHandler(logging.Handler):
         Args:
             record (logging.LogRecord): The log record to be emitted.
         """
-        level_icon = self.LOG_LEVEL_ICONS.get(record.levelno, "")
-        if record.msg:
-            if not record.msg.startswith(level_icon):
-                record.msg = f"{level_icon}:{record.msg}"
-        self.fallback_handler.emit(record)
-        formatted_msg = self.format(record)
-
         if self.ui_log is not None:
-            try:
-                self.ui_log.push(formatted_msg)
-                if self.with_sleep:
-                    time.sleep(self.with_sleep)
-            except Exception as ex:
-                self.fallback_handler.handleError(record)
-                self.on_fail(ex)
-                pass
+            formatted_msg = self.format(record)
+            self.ui_log.push(formatted_msg)
 
     def setLevel(self, level):
         """
