@@ -86,6 +86,19 @@ class UiLogHandler(logging.Handler):
         """
         if self not in logger.handlers:
             logger.addHandler(self)
+            # see https://nicegui.io/documentation/log#attach_to_a_logger
+            ui.context.client.on_disconnect(lambda: logger.removeHandler(self))
+
+    def clear(self):
+        if self.ui_log is not None:
+            try:
+                self.ui_log.clear()
+            except Exception as ex:
+                self.on_fail(ex)
+
+    def on_fail(self,ex:Exception):
+        self.ui_log=None
+        self.fallback_handler.emit(f"ui.log failure: {str(ex)} - switching off ui log ...")
 
     def emit(self, record: logging.LogRecord):
         """
@@ -105,9 +118,8 @@ class UiLogHandler(logging.Handler):
             try:
                 self.ui_log.push(formatted_msg)
             except Exception as ex:
-                self.ui_log=None
                 self.fallback_handler.handleError(record)
-                self.fallback_handler.emit(f"ui.log failure: {str(ex)} - switching off ui log ...")
+                self.on_fail(ex)
                 pass
 
     def setLevel(self, level):
