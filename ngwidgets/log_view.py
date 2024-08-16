@@ -62,14 +62,16 @@ class LogView:
             msg = f"{level_icon}:{msg}"
         return msg
 
-    def push(self, msg: str):
+    def push(self, msg: str, level:int =None):
         """
         Push a message to the UI log.
 
         Args:
             msg (str): The message to push to the log.
         """
-        msg=self.iconize(msg, self.level)
+        if level is None:
+            level=self.level
+        msg=self.iconize(msg, level)
         if self.ui_log is None:
             self.fallback_handler.emit(logging.makeLogRecord({'msg': msg, 'levelno': self.level}))
         else:
@@ -154,7 +156,7 @@ class UiLogHandler(logging.Handler):
         """
         try:
             formatted_msg = self.format(record)
-            self.log_view.push(formatted_msg)
+            self.log_view.push(formatted_msg,record.levelno)
         except Exception as ex:
             self.log_view.on_fail(ex)
 
