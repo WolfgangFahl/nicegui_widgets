@@ -110,7 +110,8 @@ class UiLogHandler(logging.Handler):
         """
         level_icon = self.LOG_LEVEL_ICONS.get(record.levelno, "")
         if record.msg:
-            record.msg = f"{level_icon}:{record.msg}"
+            if not record.msg.startswith(level_icon):
+                record.msg = f"{level_icon}:{record.msg}"
         self.fallback_handler.emit(record)
         formatted_msg = self.format(record)
 
