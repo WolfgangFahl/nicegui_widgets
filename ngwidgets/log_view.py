@@ -9,6 +9,7 @@ a standard logger.
 
 import logging
 import sys
+import time
 from typing import List, TextIO
 from nicegui import ui
 
@@ -23,10 +24,12 @@ class LogView:
         classes: str = "w-full",
         level: int = logging.NOTSET,
         log_stream: TextIO = sys.stderr,
+        with_sleep:float=None
     ):
         self.loggers: List[logging.Logger] = []
         self.ui_log = ui.log(max_lines=max_lines).classes(classes)
         self.handler = UiLogHandler(self.ui_log, level, log_stream)
+        self.with_sleep=with_sleep
 
     def push(self, msg: str):
         self.ui_log.push(msg)
@@ -118,6 +121,8 @@ class UiLogHandler(logging.Handler):
         if self.ui_log is not None:
             try:
                 self.ui_log.push(formatted_msg)
+                if self.with_sleep:
+                    time.sleep(self.with_sleep)
             except Exception as ex:
                 self.fallback_handler.handleError(record)
                 self.on_fail(ex)
