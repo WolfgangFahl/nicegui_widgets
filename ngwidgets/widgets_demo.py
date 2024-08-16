@@ -19,7 +19,7 @@ from ngwidgets.debouncer import DebouncerUI
 from ngwidgets.dict_edit import DictEdit
 from ngwidgets.input_webserver import InputWebserver, InputWebSolution
 from ngwidgets.lod_grid import GridConfig, ListOfDictsGrid
-from ngwidgets.log_view import UiLogHandler
+from ngwidgets.log_view import LogView
 from ngwidgets.pdfviewer import pdfviewer
 from ngwidgets.progress import NiceguiProgressbar
 from ngwidgets.projects import Projects
@@ -519,11 +519,11 @@ class NiceGuiWidgetsDemo(InputWebSolution):
                 ui.select(
                     {
                         logging.NOTSET: "All",
-                        logging.DEBUG: f"{UiLogHandler.LOG_LEVEL_ICONS[logging.DEBUG]} Debug",
-                        logging.INFO: f"{UiLogHandler.LOG_LEVEL_ICONS[logging.INFO]} Info",
-                        logging.WARNING: f"{UiLogHandler.LOG_LEVEL_ICONS[logging.WARNING]} Warning",
-                        logging.ERROR: f"{UiLogHandler.LOG_LEVEL_ICONS[logging.ERROR]} Error",
-                        logging.CRITICAL: f"{UiLogHandler.LOG_LEVEL_ICONS[logging.CRITICAL]} Critical",
+                        logging.DEBUG: f"{LogView.LOG_LEVEL_ICONS[logging.DEBUG]} Debug",
+                        logging.INFO: f"{LogView.LOG_LEVEL_ICONS[logging.INFO]} Info",
+                        logging.WARNING: f"{LogView.LOG_LEVEL_ICONS[logging.WARNING]} Warning",
+                        logging.ERROR: f"{LogView.LOG_LEVEL_ICONS[logging.ERROR]} Error",
+                        logging.CRITICAL: f"{LogView.LOG_LEVEL_ICONS[logging.CRITICAL]} Critical",
                     },
                     value=logging.NOTSET,
                     on_change=lambda e: on_loglevel_change(e.value),
