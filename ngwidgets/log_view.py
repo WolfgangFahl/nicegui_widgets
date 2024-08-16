@@ -42,9 +42,9 @@ class LogView:
     def addAsHandler(self, logger: logging.Logger):
         if logger in self.loggers:
             return
-        self.loggers.append(logger)
         if self.handler not in logger.handlers:
-            self.handler.addAsHandler(logger)
+            if self.handler.addAsHandler(logger):
+                self.loggers.append(logger)
 
 class UiLogHandler(logging.Handler):
     """
@@ -91,6 +91,9 @@ class UiLogHandler(logging.Handler):
             logger.addHandler(self)
             # see https://nicegui.io/documentation/log#attach_to_a_logger
             ui.context.client.on_disconnect(lambda: logger.removeHandler(self))
+            return True
+        else:
+            return False
 
     def clear(self):
         if self.ui_log is not None:
