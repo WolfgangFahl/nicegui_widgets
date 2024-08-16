@@ -37,7 +37,7 @@ class LogView:
         self.with_sleep=with_sleep
         self.loggers: List[logging.Logger] = []
         self.ui_log = ui.log(max_lines=max_lines).classes(classes)
-        self.handler = UiLogHandler(self.ui_log, level)
+        self.handler = UiLogHandler(self, level)
         self.fallback_handler = logging.StreamHandler(log_stream)
         self.fallback_handler.setLevel(logging.DEBUG)
 
@@ -56,6 +56,12 @@ class LogView:
             except Exception as ex:
                 self.on_fail(ex)
 
+    def iconize(self,msg:str,level:int)->str:
+        level_icon = self.LOG_LEVEL_ICONS.get(level, "")
+        if not msg.startswith(level_icon):
+            msg = f"{level_icon}:{msg}"
+        return msg
+
     def push(self, msg: str):
         """
         Push a message to the UI log.
@@ -63,9 +69,7 @@ class LogView:
         Args:
             msg (str): The message to push to the log.
         """
-        level_icon = self.LOG_LEVEL_ICONS.get(self.level, "")
-        if not msg.startswith(level_icon):
-            msg = f"{level_icon}:{msg}"
+        msg=self.iconize(msg, self.level)
         if self.ui_log is None:
             self.fallback_handler.emit(logging.makeLogRecord({'msg': msg, 'levelno': self.level}))
         else:
@@ -109,19 +113,18 @@ class UiLogHandler(logging.Handler):
     """
     def __init__(
         self,
-        ui_log: ui.log,
+        log_view: LogView,
         level: int = logging.NOTSET,
     ):
         """
         Constructor
 
         Args:
-            ui_log (ui.log): The NiceGUI log element to which messages will be emitted.
+            log_view (LogView): the LogView which encapsultes the ui.log in which messages will be emitted.
             level (int): The logging level for this handler. Default is logging.NOTSET.
-            log_stream (TextIO): The stream to use for fallback logging. Default is sys.stderr.
         """
         super().__init__(level)
-        self.ui_log = ui_log
+        self.log_view = log_view
 
     def addAsHandler(self, logger: logging.Logger) -> bool:
         """
@@ -149,9 +152,11 @@ class UiLogHandler(logging.Handler):
         Args:
             record (logging.LogRecord): The log record to be emitted.
         """
-        if self.ui_log is not None:
+        try:
             formatted_msg = self.format(record)
-            self.ui_log.push(formatted_msg)
+            self.log_view.push(formatted_msg)
+        except Exception as ex:
+            self.log_view.on_fail(ex)
 
     def setLevel(self, level):
         """
