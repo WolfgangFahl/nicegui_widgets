@@ -37,7 +37,7 @@ class LogView:
         self.with_sleep=with_sleep
         self.loggers: List[logging.Logger] = []
         self.ui_log = ui.log(max_lines=max_lines).classes(classes)
-        self.handler = UiLogHandler(self.ui_log, level, log_stream)
+        self.handler = UiLogHandler(self.ui_log, level)
         self.fallback_handler = logging.StreamHandler(log_stream)
         self.fallback_handler.setLevel(logging.DEBUG)
 
@@ -119,7 +119,6 @@ class UiLogHandler(logging.Handler):
             ui_log (ui.log): The NiceGUI log element to which messages will be emitted.
             level (int): The logging level for this handler. Default is logging.NOTSET.
             log_stream (TextIO): The stream to use for fallback logging. Default is sys.stderr.
-            with_sleep (float): add an additional sleep after each push to work around recursive call / timing issues - 0.001 = 1 msec recommended
         """
         super().__init__(level)
         self.ui_log = ui_log
