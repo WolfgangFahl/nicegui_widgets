@@ -67,6 +67,7 @@ class ListOfDictsGrid:
         self.lod = lod
         self.config = config or GridConfig()
         self.lod_index = {}
+        self.all_selected = False # track selection state
         try:
             if self.config.with_buttons:
                 self.setup_button_row()
@@ -375,6 +376,37 @@ class ListOfDictsGrid:
         """
         self.ag_grid.run_grid_method("selectAll")
 
+    def deselect_all_rows(self):
+        """
+        deselect all my ag_grid rows
+        see https://stackoverflow.com/a/52199985/1497139
+        """
+        self.ag_grid.run_grid_method("deselectAll")
+
+    def toggle_select_all_rows(self):
+        """
+        Toggle between selecting all rows and deselecting all rows.
+        """
+        if self.all_selected:
+            self.deselect_all_rows()
+        else:
+            self.select_all_rows()
+        self.all_selected=not self.all_selected
+        self.update_select_all_toggle_button()
+
+    def update_select_all_toggle_button(self):
+        """
+        Update the toggle button's label and icon based on selection state.
+        """
+        stb=self.select_toggle_button
+        if self.all_selected:
+            stb.text = "None"
+            stb.icon = "select_off"
+        else:
+            stb.text = "All"
+            stb.icon = "select_all"
+        stb.update()
+
     async def delete_selected_rows(self, _args):
         """
         Delete the currently selected rows based on the key column.
@@ -427,14 +459,14 @@ class ListOfDictsGrid:
         """
         set up a button row
         """
-        with ui.row():
+        with ui.row() as self.button_row:
             # icons per https://fonts.google.com/icons
             if self.config.editable:
                 ui.button("New", icon="add", on_click=self.new_row)
                 ui.button("Delete", icon="delete", on_click=self.delete_selected_rows)
             # ui.button("Fit", icon="arrow_range", on_click=self.onSizeColumnsToFit)
-            ui.button(
+            self.select_toggle_button=ui.button(
                 "All",
                 icon="select_all",
-                on_click=self.select_all_rows,
+                on_click=self.toggle_select_all_rows,
             )
