@@ -397,14 +397,15 @@ class ListOfDictsGrid:
     def update_select_all_toggle_button(self):
         """
         Update the toggle button's label and icon based on selection state.
+        see https://github.com/zauberzeug/nicegui/discussions/3596
         """
         stb=self.select_toggle_button
         if self.all_selected:
             stb.text = "None"
-            stb.icon = "select_off"
+            stb.props('icon=check_box_outline_blank')
         else:
             stb.text = "All"
-            stb.icon = "select_all"
+            stb.props('icon=select_all')
         stb.update()
 
     async def delete_selected_rows(self, _args):
