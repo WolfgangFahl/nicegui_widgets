@@ -70,7 +70,7 @@ class ListOfDictsGrid:
         self.all_selected = False # track selection state
         try:
             if self.config.with_buttons:
-                self.setup_button_row()
+                self.setup_button_row(["new","delete","all"])
             # Update options to include onGridReady event handling
             self.config.options[":onGridReady"] = (
                 "(params) => params.columnApi.autoSizeAllColumns()"
@@ -273,7 +273,6 @@ class ListOfDictsGrid:
         get the complete row data
         """
         row_data = self.ag_grid.options["rowData"]
-        return row_data
 
     def get_rows_by_key(self) -> Dict[Any, Dict[str, Any]]:
         """
@@ -456,18 +455,25 @@ class ListOfDictsGrid:
         except Exception as ex:
             self.handle_exception(ex)
 
-    def setup_button_row(self):
+    def setup_button_row(self,button_names:list):
         """
         set up a button row
+
+        Args:
+            button_names (list): the list of buttons to be setup
         """
         with ui.row() as self.button_row:
             # icons per https://fonts.google.com/icons
             if self.config.editable:
-                ui.button("New", icon="add", on_click=self.new_row)
-                ui.button("Delete", icon="delete", on_click=self.delete_selected_rows)
-            # ui.button("Fit", icon="arrow_range", on_click=self.onSizeColumnsToFit)
-            self.select_toggle_button=ui.button(
-                "All",
-                icon="select_all",
-                on_click=self.toggle_select_all_rows,
-            )
+                if "new" in button_names:
+                    self.new_button=ui.button("New", icon="add", on_click=self.new_row)
+                if "delete" in button_names:
+                    self.delete_button=ui.button("Delete", icon="delete", on_click=self.delete_selected_rows)
+            if "fit" in button_names:
+                self.fit_button=ui.button("Fit", icon="arrow_range", on_click=self.onSizeColumnsToFit)
+            if "all" in button_names:
+                self.select_toggle_button=ui.button(
+                    "All",
+                    icon="select_all",
+                    on_click=self.toggle_select_all_rows,
+                )
