@@ -39,6 +39,7 @@ class GridConfig:
     auto_size_columns: bool = True
     # buttons
     with_buttons: bool = False
+    button_names: List[str] = field(default_factory=lambda: ["new", "delete", "all"])
     prepend_new: bool = True
     html_columns: List[int] = field(default_factory=list)
     keygen_callback: Optional[Callable] = None
@@ -70,7 +71,7 @@ class ListOfDictsGrid:
         self.all_selected = False # track selection state
         try:
             if self.config.with_buttons:
-                self.setup_button_row(["new","delete","all"])
+                self.setup_button_row(self.config.button_names)
             # Update options to include onGridReady event handling
             self.config.options[":onGridReady"] = (
                 "(params) => params.columnApi.autoSizeAllColumns()"
