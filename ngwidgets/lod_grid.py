@@ -274,6 +274,7 @@ class ListOfDictsGrid:
         get the complete row data
         """
         row_data = self.ag_grid.options["rowData"]
+        return row_data
 
     def get_rows_by_key(self) -> Dict[Any, Dict[str, Any]]:
         """
