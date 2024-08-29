@@ -15,14 +15,14 @@ class SceneFrame:
     a frame for a scene with a potentially to be colors stl object
     """
 
-    def __init__(self, solution, stl_color="#57B6A9"):
+    def __init__(self, solution, stl_color:str="#57B6A9"):
         """
         constructor
         """
         self.solution = solution
         self.stl_color = stl_color
         self.scene = None
-        self.stl_object = None
+        self.stl_objects = {}
         self.axes_view = None
 
     def setup_button_row(self):
@@ -63,9 +63,9 @@ class SceneFrame:
             Otherwise, it changes the color of both 'color_picker_button' and 'stl_object'.
         """
         self.color_picker_button.style(f"background-color:{e.color}!important")
-        if self.stl_object:
-            self.stl_color = e.color
-            self.stl_object.material(f"{e.color}")
+        self.stl_color = e.color
+        for stl_object in self.stl_objects.values():
+            stl_object.material(f"{e.color}")
         pass
 
     async def toggle_axes(self):
@@ -97,21 +97,44 @@ class SceneFrame:
             grid = not grid
             # workaround according to https://github.com/zauberzeug/nicegui/discussions/1246
             js_cmd = f'scene_c{self.scene.id}.children.find(c => c.type === "GridHelper").visible = {grid_js}'
-            await ui.run_javascript(js_cmd, respond=False)
+            await ui.run_javascript(js_cmd)
             self.scene._props["grid"] = grid
             self.scene.update()
             # try toggling icon
-            self.toggle_icon(self.grid_button)
+            self.solution.toggle_icon(self.grid_button)
         except Exception as ex:
-            self.solution.handle_exeption(ex)
+            self.solution.handle_exception(ex)
         pass
 
-    def load_stl(self, stl_name: str, url: str, scale: float = 1.0):
+    def load_stl(self,
+            stl_name: str,
+            url: str,
+            scale: float = 1.0,
+            stl_color:str ="#57B6A9") -> object:
         """
-        load an stl object
+        Loads an STL object into the scene, applies transformations, and sets its material.
+
+        This method enables the color picker button, loads an STL file from the specified URL,
+        applies a translation and scaling transformation, sets the object's name and material,
+        and then returns the STL object.
+
+        Args:
+            stl_name (str): The name to assign to the STL object within the scene.
+            url (str): The URL or path from which to load the STL file.
+            scale (float, optional): The scale factor to apply to the STL object. Defaults to 1.0.
+            stl_color (str, optional): the initial color to use for the stl object
+        Returns:
+            object: The loaded and transformed STL object within the scene.
+
+        Raises:
+            ValueError: If the STL file cannot be loaded from the specified URL.
         """
         self.color_picker_button.enable()
         with self.scene:
-            self.stl_object = self.scene.stl(url).move(x=0.0).scale(scale)
-            self.stl_object.name = stl_name
-            self.stl_object.material(self.stl_color)
+            stl_object = self.scene.stl(url).move(x=0.0).scale(scale)
+            stl_object.name = stl_name
+            if stl_color is None:
+                stl_color=self.stl_color
+            stl_object.material(stl_color)
+            self.stl_objects[stl_name]=stl_object
+            return stl_object
