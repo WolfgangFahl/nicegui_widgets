@@ -3,10 +3,12 @@ Created on 2023-09-10
 
 @author: wf
 """
-# avoid ugly deprecation messages see 
+
+# avoid ugly deprecation messages see
 # https://stackoverflow.com/questions/879173/how-to-ignore-deprecation-warnings-in-python
-# and 
+# and
 import shutup
+
 shutup.please()
 import sys
 import traceback

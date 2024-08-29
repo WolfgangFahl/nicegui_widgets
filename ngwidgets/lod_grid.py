@@ -68,7 +68,7 @@ class ListOfDictsGrid:
         self.lod = lod
         self.config = config or GridConfig()
         self.lod_index = {}
-        self.all_selected = False # track selection state
+        self.all_selected = False  # track selection state
         try:
             if self.config.with_buttons:
                 self.setup_button_row(self.config.button_names)
@@ -392,7 +392,7 @@ class ListOfDictsGrid:
             self.deselect_all_rows()
         else:
             self.select_all_rows()
-        self.all_selected=not self.all_selected
+        self.all_selected = not self.all_selected
         self.update_select_all_toggle_button()
 
     def update_select_all_toggle_button(self):
@@ -400,13 +400,13 @@ class ListOfDictsGrid:
         Update the toggle button's label and icon based on selection state.
         see https://github.com/zauberzeug/nicegui/discussions/3596
         """
-        stb=self.select_toggle_button
+        stb = self.select_toggle_button
         if self.all_selected:
             stb.text = "None"
-            stb.props('icon=check_box_outline_blank')
+            stb.props("icon=check_box_outline_blank")
         else:
             stb.text = "All"
-            stb.props('icon=select_all')
+            stb.props("icon=select_all")
         stb.update()
 
     async def delete_selected_rows(self, _args):
@@ -457,7 +457,7 @@ class ListOfDictsGrid:
         except Exception as ex:
             self.handle_exception(ex)
 
-    def setup_button_row(self,button_names:list):
+    def setup_button_row(self, button_names: list):
         """
         set up a button row
 
@@ -468,13 +468,19 @@ class ListOfDictsGrid:
             # icons per https://fonts.google.com/icons
             if self.config.editable:
                 if "new" in button_names:
-                    self.new_button=ui.button("New", icon="add", on_click=self.new_row)
+                    self.new_button = ui.button(
+                        "New", icon="add", on_click=self.new_row
+                    )
                 if "delete" in button_names:
-                    self.delete_button=ui.button("Delete", icon="delete", on_click=self.delete_selected_rows)
+                    self.delete_button = ui.button(
+                        "Delete", icon="delete", on_click=self.delete_selected_rows
+                    )
             if "fit" in button_names:
-                self.fit_button=ui.button("Fit", icon="arrow_range", on_click=self.onSizeColumnsToFit)
+                self.fit_button = ui.button(
+                    "Fit", icon="arrow_range", on_click=self.onSizeColumnsToFit
+                )
             if "all" in button_names:
-                self.select_toggle_button=ui.button(
+                self.select_toggle_button = ui.button(
                     "All",
                     icon="select_all",
                     on_click=self.toggle_select_all_rows,

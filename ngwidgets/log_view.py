@@ -11,12 +11,15 @@ import logging
 import sys
 import time
 from typing import List, TextIO
+
 from nicegui import ui
+
 
 class LogView:
     """
     Handle logging by delegating to a ui.log
     """
+
     LOG_LEVEL_ICONS = {
         logging.DEBUG: "🐞",
         logging.INFO: "ℹ️",
@@ -31,20 +34,22 @@ class LogView:
         classes: str = "w-full",
         level: int = logging.NOTSET,
         log_stream: TextIO = sys.stderr,
-        with_sleep: float=None
+        with_sleep: float = None,
     ):
-        self.level=level
-        self.with_sleep=with_sleep
+        self.level = level
+        self.with_sleep = with_sleep
         self.loggers: List[logging.Logger] = []
         self.ui_log = ui.log(max_lines=max_lines).classes(classes)
         self.handler = UiLogHandler(self, level)
         self.fallback_handler = logging.StreamHandler(log_stream)
         self.fallback_handler.setLevel(logging.DEBUG)
 
-    def on_fail(self,ex:Exception):
-        self.ui_log=None
-        self.handler.ui_log=None
-        self.fallback_handler.emit(f"ui.log failure: {str(ex)} - switching off ui log ...")
+    def on_fail(self, ex: Exception):
+        self.ui_log = None
+        self.handler.ui_log = None
+        self.fallback_handler.emit(
+            f"ui.log failure: {str(ex)} - switching off ui log ..."
+        )
 
     def clear(self):
         """
@@ -56,13 +61,13 @@ class LogView:
             except Exception as ex:
                 self.on_fail(ex)
 
-    def iconize(self,msg:str,level:int)->str:
+    def iconize(self, msg: str, level: int) -> str:
         level_icon = self.LOG_LEVEL_ICONS.get(level, "")
         if not msg.startswith(level_icon):
             msg = f"{level_icon}:{msg}"
         return msg
 
-    def push(self, msg: str, level:int =None):
+    def push(self, msg: str, level: int = None):
         """
         Push a message to the UI log.
 
@@ -70,10 +75,12 @@ class LogView:
             msg (str): The message to push to the log.
         """
         if level is None:
-            level=self.level
-        msg=self.iconize(msg, level)
+            level = self.level
+        msg = self.iconize(msg, level)
         if self.ui_log is None:
-            self.fallback_handler.emit(logging.makeLogRecord({'msg': msg, 'levelno': self.level}))
+            self.fallback_handler.emit(
+                logging.makeLogRecord({"msg": msg, "levelno": self.level})
+            )
         else:
             try:
                 self.ui_log.push(msg)
@@ -89,7 +96,7 @@ class LogView:
         Args:
             level (int): The logging level to set.
         """
-        self.level=level
+        self.level = level
         self.handler.setLevel(level)
         self.fallback_handler.setLevel(level)
         for logger in self.loggers:
@@ -108,11 +115,13 @@ class LogView:
             if self.handler.addAsHandler(logger):
                 self.loggers.append(logger)
 
+
 class UiLogHandler(logging.Handler):
     """
     A logging handler that emits messages to a NiceGUI log element.
     Uses a fallback logger to make sure messages do not get lost when the log element is not available
     """
+
     def __init__(
         self,
         log_view: LogView,
@@ -156,7 +165,7 @@ class UiLogHandler(logging.Handler):
         """
         try:
             formatted_msg = self.format(record)
-            self.log_view.push(formatted_msg,record.levelno)
+            self.log_view.push(formatted_msg, record.levelno)
         except Exception as ex:
             self.log_view.on_fail(ex)
 
