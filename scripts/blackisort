@@ -1,7 +1,7 @@
 #!/bin/bash
 # WF 2024-01-10
-package=ngwidgets
-isort tests/*.py
-black tests/*.py
-isort $package/*.py
-black $package/*.py
+for package in ngwidgets tests pytest_tests
+do
+  isort $package/*.py
+  black $package/*.py
+done

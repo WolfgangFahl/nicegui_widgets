@@ -15,7 +15,7 @@ class SceneFrame:
     a frame for a scene with a potentially to be colors stl object
     """
 
-    def __init__(self, solution, stl_color:str="#57B6A9"):
+    def __init__(self, solution, stl_color: str = "#57B6A9"):
         """
         constructor
         """
@@ -106,11 +106,9 @@ class SceneFrame:
             self.solution.handle_exception(ex)
         pass
 
-    def load_stl(self,
-            stl_name: str,
-            url: str,
-            scale: float = 1.0,
-            stl_color:str ="#57B6A9") -> object:
+    def load_stl(
+        self, stl_name: str, url: str, scale: float = 1.0, stl_color: str = "#57B6A9"
+    ) -> object:
         """
         Loads an STL object into the scene, applies transformations, and sets its material.
 
@@ -134,7 +132,7 @@ class SceneFrame:
             stl_object = self.scene.stl(url).move(x=0.0).scale(scale)
             stl_object.name = stl_name
             if stl_color is None:
-                stl_color=self.stl_color
+                stl_color = self.stl_color
             stl_object.material(stl_color)
-            self.stl_objects[stl_name]=stl_object
+            self.stl_objects[stl_name] = stl_object
             return stl_object

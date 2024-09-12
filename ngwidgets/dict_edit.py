@@ -67,7 +67,6 @@ class FormUiDef:
         }
         return FormUiDef(title="Dictionary Form", ui_fields=ui_fields)
 
-
 class DictEdit:
     """
     NiceGUI based user interface for dictionary or dataclass editing
@@ -152,6 +151,18 @@ class DictEdit:
                     "ui_label",
                     backward=lambda x: f"{self.form_ui_def.title}: {x if x else DictEdit.empty}",
                 )
+
+    def open(self):
+        """
+        show the details of the dict edit
+        """
+        self.expansion.open()
+
+    def close(self):
+        """
+        hide the details of the dict edit
+        """
+        self.expansion.close()
 
     def _create_inputs(self) -> Dict[str, Input]:
         """Creates input elements for the form based on the FormUiDef."""
