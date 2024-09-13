@@ -6,7 +6,7 @@ Created on 2023-12-10
 @author: WF
 @author: OpenAI Assistant (ChatGPT Version 4)
 
-This module provides a Tristate class for use in NiceGUI applications, 
+This module provides a Tristate class for use in NiceGUI applications,
 creating a tri-state toggle input that cycles through predefined icon sets.
 
 The implementation is inspired by examples and discussions from:
@@ -25,8 +25,8 @@ Prompts for Reproducing this Code:
 7. "add proper authorship and iso-date of creation information in the module header"
 8. "add a prompts for reproducing this code in the header comment section that will allow any proper LLM  to reproduce this code"
 9. "Introduce an `update` method invocation within the state change logic to trigger a re-render of the component in NiceGUI.
-10. "add links to https://github.com/zauberzeug/nicegui/tree/main/examples/custom_vue_component, https://jsfiddle.net/wf_bitplan_com/941std72/8/ and https://stackoverflow.com/a/27617418/1497139 for proper reference" 
-11. "Include the following Unicode icon sets in the Tristate component for NiceGUI: 
+10. "add links to https://github.com/zauberzeug/nicegui/tree/main/examples/custom_vue_component, https://jsfiddle.net/wf_bitplan_com/941std72/8/ and https://stackoverflow.com/a/27617418/1497139 for proper reference"
+11. "Include the following Unicode icon sets in the Tristate component for NiceGUI:
 'arrows' with Left Arrow ('←'), Up-Down Arrow ('↕️'), and Right Arrow ('→');
 'ballot' with Ballot Box ('☐'), Ballot Box with Check ('☑️'), and Ballot Box with X ('☒️');
 'check' with Checkbox ('☐'), Question Mark ('❔'), and Checkmark ('✔️');
@@ -103,7 +103,7 @@ class Tristate(Element, component="tristate.js"):
         self.icon_set_name = icon_set_name
         self.icon_set = Tristate.ICON_SETS[icon_set_name]
         self.current_icon_index = 0
-        self.style = style
+        self.style(style)
         self.user_on_change = on_change
         self.on("change", self.on_change)
 

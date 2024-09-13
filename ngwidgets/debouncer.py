@@ -1,5 +1,5 @@
 """
-Debouncing module for managing rapid 
+Debouncing module for managing rapid
 function calls and providing UI feedback.
 Created on 2024-06-08
 """
@@ -163,8 +163,8 @@ class DebouncerUI:
                 on_done()
             if self.spinner:
                 try:
-                    self.parent.remove(self.spinner)
-                except KeyError:
+                    self.spinner.delete()
+                except Exception as _ex:
                     pass
                 self.spinner = None
 

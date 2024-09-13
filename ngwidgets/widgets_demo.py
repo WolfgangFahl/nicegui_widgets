@@ -63,6 +63,9 @@ class NiceGuiWidgetsDemo(InputWebSolution):
         """
         super().__init__(webserver, client)  # Call to the superclass constructor
         self.projects = self.webserver.projects
+        # pdf_url = "https://www.africau.edu/images/default/sample.pdf"
+        self.pdf_url = "https://raw.githubusercontent.com/mozilla/pdf.js/ba2edeae/web/compressed.tracemonkey-pldi-09.pdf"
+
 
     async def load_pdf(self):
         self.pdf_viewer.load_pdf(self.pdf_url)
@@ -810,8 +813,6 @@ class NiceGuiWidgetsDemoWebserver(InputWebserver):
         Constructor
         """
         InputWebserver.__init__(self, config=NiceGuiWidgetsDemoWebserver.get_config())
-        # pdf_url = "https://www.africau.edu/images/default/sample.pdf"
-        self.pdf_url = "https://raw.githubusercontent.com/mozilla/pdf.js/ba2edeae/web/compressed.tracemonkey-pldi-09.pdf"
         self.projects = Projects(topic="nicegui")
         self.projects.load()
         pass

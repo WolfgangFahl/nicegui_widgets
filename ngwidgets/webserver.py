@@ -35,7 +35,7 @@ class WebserverConfig:
     default_port: int = 9860
     version: Optional[Version] = None
     color_schema: ColorSchema = field(default_factory=ColorSchema.indigo)
-    fastapi_docs: bool = True
+    fastapi_docs: Optional[bool] = True
     detailed_menu: bool = True
     timeout: Optional[float] = None
     storage_secret: Optional[str] = None

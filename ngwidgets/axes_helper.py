@@ -29,9 +29,6 @@ class AxesHelper:
     According to nicegui's documentation (https://nicegui.io/documentation/scene), the 'scene.line()' function is used to
     create lines, here is an example:
         scene.line([-4, 0, 0], [-4, 2, 0]).material('#ff0000')
-    To remove elements from the scene, one uses 'scene.remove()' function:
-        scene.remove(element)
-    where element is either the element instance or its ID.
 
     Date: 2023-07-24
     @author: Refactored into Python by OpenAI's ChatGPT
