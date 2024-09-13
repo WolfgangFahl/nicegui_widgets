@@ -61,7 +61,7 @@ class Login(object):
                 app.storage.user.update(
                     {"username": username.value, "authenticated": True}
                 )
-                ui.open("/")
+                ui.navigate.to("/")
             else:
                 ui.notify("Wrong username or password", color="negative")
 

@@ -35,6 +35,7 @@ class WebserverConfig:
     default_port: int = 9860
     version: Optional[Version] = None
     color_schema: ColorSchema = field(default_factory=ColorSchema.indigo)
+    fastapi_docs: bool = True
     detailed_menu: bool = True
     timeout: Optional[float] = None
     storage_secret: Optional[str] = None
@@ -214,6 +215,7 @@ class NiceGuiWebserver(object):
             host=args.host,
             port=args.port,
             show=args.client,
+            fastapi_docs=self.config.fastapi_docs,
             reload=False,
             storage_secret=self.config.storage_secret,
         )

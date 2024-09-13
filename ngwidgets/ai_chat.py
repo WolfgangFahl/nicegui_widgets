@@ -47,7 +47,7 @@ async def home(client: Client):
         ui.column().classes("w-full max-w-3xl mx-auto my-6"),
     ):
         with ui.row().classes("w-full no-wrap items-center"):
-            with ui.avatar().on("click", lambda: ui.open(home)):
+            with ui.avatar().on("click", lambda: ui.navigate.to(home)):
                 ui.image(avatar)
             text = (
                 ui.textarea(placeholder="message")
