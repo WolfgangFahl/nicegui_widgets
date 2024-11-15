@@ -410,6 +410,17 @@ class WebSolution:
             else:
                 raise Exception(f"File does not exist: {input_str}")
 
+    async def toogle_hamburger(self):
+        """
+        toggle the hamburger menu
+        """
+        if not self.header:
+            return
+
+        self.header.toggle()
+        self.footer.toggle()
+        self.hamburger_button1.visible=not self.hamburger_button1.visible
+
     def setup_menu(self, detailed: bool = None):
         """
         set up the default menu home/settings and about
@@ -417,11 +428,17 @@ class WebSolution:
         Args:
             detailed(bool): if True add github,chat and help links
         """
+        self.header=None
         version = self.config.version
         if detailed is None:
             detailed = self.config.detailed_menu
         self.config.color_schema.apply()
+        # parent element for hamburger menu
+        with ui.element("div").classes("top-0 left-0 z-50 bg-transparent") as self.hamburger_container:
+            self.hamburger_button1=ui.button(icon="menu", on_click=self.toogle_hamburger)
+            self.hamburger_button1.visible=False
         with ui.header() as self.header:
+            self.hamburger_button=ui.button(icon="menu", on_click=self.toogle_hamburger)
             self.link_button("home", "/", "home", new_tab=False)
             self.link_button("settings", "/settings", "settings", new_tab=False)
             self.configure_menu()
@@ -429,7 +446,15 @@ class WebSolution:
                 self.link_button("github", version.cm_url, "bug_report")
                 self.link_button("chat", version.chat_url, "chat")
                 self.link_button("help", version.doc_url, "help")
-            self.link_button("about", "/about", "info", new_tab=False)
+                self.link_button("about", "/about", "info", new_tab=False)
+                self.link_button("home", "/", "home", new_tab=False)
+                self.link_button("settings", "/settings", "settings", new_tab=False)
+                self.configure_menu()
+                if detailed:
+                    self.link_button("github", version.cm_url, "bug_report")
+                    self.link_button("chat", version.chat_url, "chat")
+                    self.link_button("help", version.doc_url, "help")
+                self.link_button("about", "/about", "info", new_tab=False)
 
     async def setup_footer(self):
         """
