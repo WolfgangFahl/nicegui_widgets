@@ -29,7 +29,7 @@ from ngwidgets.version import Version
 from ngwidgets.webserver import WebserverConfig
 from ngwidgets.widgets import HideShow, Lang, Link
 from ngwidgets.wikipedia import WikipediaSearch
-
+from ngwidgets.leaflet import leaflet as nleaflet
 
 @dataclass
 class Element:
@@ -768,26 +768,26 @@ class NiceGuiWidgetsDemo(InputWebSolution):
             }
             self.zoom_level = 9
 
-            self.map = ui.leaflet().classes("w-full h-96")
+            first_loc = next(iter(self.locations.keys()))
+            self.map = nleaflet()
+            # Set initial location and zoom after creation
+            self.map.set_location(first_loc, self.zoom_level)
+            self.map.classes("w-full h-96")
+            #await self.map.initialized()
+
             with ui.row():
                 ui.select(
                     self.locations,
                     label="Location",
-                    on_change=lambda e: self.map.center(
-                        e.value, zoom=self.zoom_level
-                    )
+                    on_change=lambda e: self.map.set_location(e.value, zoom_level=self.zoom_level)
                 ).classes("w-40")
                 ui.select(
                     {i: i for i in range(9,18)},
                     label="Zoom",
                     value=self.zoom_level,
-                    on_change=lambda e: self.map.zoom(e.value)
+                    on_change=lambda e: self.map.set_zoom(e.value)
                 ).classes("w-40")
-                ui.button("Draw Path", on_click=lambda: self.map.generic_layer({
-                    'type': 'polyline',
-                    'latLngs': [list(self.locations.keys())[1:3]],
-                    'options': {'color': 'red'}
-                }))
+                ui.button("Draw Path", on_click=lambda: self.map.draw_path(list(self.locations.keys())[1:3]))
 
         await self.setup_content_div(show)
 
