@@ -754,6 +754,43 @@ class NiceGuiWidgetsDemo(InputWebSolution):
 
         await self.setup_content_div(show)
 
+    async def show_leaflet(self):
+        """Show leaflet demo with locations and path drawing"""
+
+        def show():
+            self.locations = {
+                (48.486375, 8.375567): "Baiersbronn",
+                (52.5200, 13.4049): "Berlin",
+                (52.37487, 9.74168): "Hannover",
+                (40.7306, -74.0060): "New York",
+                (39.9042, 116.4074): "Beijing",
+                (35.6895, 139.6917): "Tokyo"
+            }
+            self.zoom_level = 9
+
+            self.map = ui.leaflet().classes("w-full h-96")
+            with ui.row():
+                ui.select(
+                    self.locations,
+                    label="Location",
+                    on_change=lambda e: self.map.center(
+                        e.value, zoom=self.zoom_level
+                    )
+                ).classes("w-40")
+                ui.select(
+                    {i: i for i in range(9,18)},
+                    label="Zoom",
+                    value=self.zoom_level,
+                    on_change=lambda e: self.map.zoom(e.value)
+                ).classes("w-40")
+                ui.button("Draw Path", on_click=lambda: self.map.generic_layer({
+                    'type': 'polyline',
+                    'latLngs': [list(self.locations.keys())[1:3]],
+                    'options': {'color': 'red'}
+                }))
+
+        await self.setup_content_div(show)
+
     async def home(self):
         """
         provide the main content page
@@ -770,6 +807,7 @@ class NiceGuiWidgetsDemo(InputWebSolution):
                 "DictEdit": "/dictedit",
                 "HideShow Demo": "/hideshow",
                 "Lang": "/langs",
+                "Leaflet Map": "/leaflet",
                 "ListOfDictsGrid": "/grid",
                 "Log Element Handler Demo": "/log_handler",
                 "Tristate Demo": "/tristate",
@@ -847,6 +885,10 @@ class NiceGuiWidgetsDemoWebserver(InputWebserver):
         @ui.page("/langs")
         async def show_langs(client: Client):
             return await self.page(client, NiceGuiWidgetsDemo.show_langs)
+
+        @ui.page("/leaflet")
+        async def show_leaflet(client: Client):
+            return await self.page(client, NiceGuiWidgetsDemo.show_leaflet)
 
         @ui.page("/log_handler")
         async def show_log_handler_demo(client: Client):

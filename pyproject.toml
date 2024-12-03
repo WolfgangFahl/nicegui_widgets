@@ -16,7 +16,7 @@ readme = "README.md"
 license= "Apache-2.0"
 dependencies = [
 	# https://nicegui.io/
-    "nicegui>=2.1.0",
+    "nicegui>=2.7.0",
  	# orjson
  	# https://pypi.org/project/orjson/
  	"orjson>=3.9.10",
