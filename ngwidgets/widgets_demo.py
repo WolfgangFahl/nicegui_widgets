@@ -29,7 +29,7 @@ from ngwidgets.version import Version
 from ngwidgets.webserver import WebserverConfig
 from ngwidgets.widgets import HideShow, Lang, Link
 from ngwidgets.wikipedia import WikipediaSearch
-from ngwidgets.leaflet import leaflet as nleaflet
+from ngwidgets.leaflet_map import LeafletMap
 
 @dataclass
 class Element:
@@ -757,37 +757,44 @@ class NiceGuiWidgetsDemo(InputWebSolution):
     async def show_leaflet(self):
         """Show leaflet demo with locations and path drawing"""
 
-        def show():
+        async def show():
+
             self.locations = {
-                (48.486375, 8.375567): "Baiersbronn",
-                (52.5200, 13.4049): "Berlin",
-                (52.37487, 9.74168): "Hannover",
-                (40.7306, -74.0060): "New York",
-                (39.9042, 116.4074): "Beijing",
-                (35.6895, 139.6917): "Tokyo"
+               "London": (51.505, -0.090),
+               "Berlin": (52.5200, 13.4049),
+               "Hannover": (52.37487, 9.74168),
+               "New York": (40.7306, -74.0060),
+               "Beijing": (39.9042, 116.4074),
+               "Tokyo": (35.6895, 139.6917)
             }
             self.zoom_level = 9
+            london=self.locations["London"]
 
-            first_loc = next(iter(self.locations.keys()))
-            self.map = nleaflet()
-            # Set initial location and zoom after creation
-            self.map.set_location(first_loc, self.zoom_level)
-            self.map.classes("w-full h-96")
-            #await self.map.initialized()
+            self.map = LeafletMap(center=london, zoom=self.zoom_level, classes="w-full h-96")
+            await self.map.initialized()
 
-            with ui.row():
+            with ui.row() as self.select_row:
                 ui.select(
-                    self.locations,
-                    label="Location",
-                    on_change=lambda e: self.map.set_location(e.value, zoom_level=self.zoom_level)
+                   options=list(self.locations.keys()),  # Use city names
+                   label="Location",
+                   value="London",
+                   on_change=lambda e: setattr(self.map, 'center', self.locations[e.value])
                 ).classes("w-40")
                 ui.select(
                     {i: i for i in range(9,18)},
                     label="Zoom",
                     value=self.zoom_level,
-                    on_change=lambda e: self.map.set_zoom(e.value)
+                    on_change=lambda e: setattr(self.map, 'zoom', e.value)
                 ).classes("w-40")
-                ui.button("Draw Path", on_click=lambda: self.map.draw_path(list(self.locations.keys())[1:3]))
+                ui.label().bind_text_from(self.map, 'center',lambda center: f'Center: {center[0]:.3f}, {center[1]:.3f}')
+                ui.label().bind_text_from(self.map, 'zoom',lambda zoom: f'Zoom: {zoom}')
+                #ui.label().bind_text(lambda: f'Layers: {len(self.map.layers)}')  # Layer counter
+
+            with ui.grid(columns=2) as self.grid:
+                ui.button(icon='zoom_in', on_click=lambda: setattr(self.map, 'zoom', self.map.zoom + 1))
+                ui.button(icon='zoom_out', on_click=lambda: setattr(self.map, 'zoom', self.map.zoom - 1))
+                #ui.button('Fit world', on_click=lambda: self.map.run_map_method('fitWorld'))
+                #ui.button('Clear layers', on_click=lambda: self.map.layers.clear())
 
         await self.setup_content_div(show)
 
