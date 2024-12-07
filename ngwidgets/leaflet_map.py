@@ -56,11 +56,6 @@ class LeafletMap(ui.leaflet):
         logging.warn(msg)
         ui.notify(msg)
 
-    def clear_layers(self):
-        """Clear all layers and reset layer tracking"""
-        self.run_map_method('clear_layers')
-
-
     def draw_path(self, path: List[Tuple[float, float]], options: Dict = None) -> Any:
         """Draw a polyline path on the map
         Args:
@@ -73,5 +68,4 @@ class LeafletMap(ui.leaflet):
             options = {'color': 'red', 'weight': 3, 'opacity': 0.7}
 
         layer = self.generic_layer(name='polyline', args=[path, options])
-        self.layers[layer.id] = layer
         return layer
