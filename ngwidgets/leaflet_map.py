@@ -10,8 +10,12 @@ from typing import Any, List, Tuple, Dict
 class LeafletMap(ui.leaflet):
     """Enhanced Leaflet map with additional functionality"""
 
-    def __init__(self, center: Tuple[float, float]=(51.505, -0.09), zoom: int=9,
-                 with_draw_control: bool=True, classes: str="h-96"):
+    def __init__(self,
+        center: Tuple[float, float]=(51.505, -0.09),
+        zoom: int=9,
+        with_draw_control: bool=True,
+        classes: str="w-full h-96",
+        debug:bool=False):
         """Initialize enhanced map
 
         Args:
@@ -36,6 +40,7 @@ class LeafletMap(ui.leaflet):
         } if with_draw_control else None
 
         super().__init__(center=center, zoom=zoom, draw_control=draw_control)
+        self.debug=debug
         self.classes(classes)
         self.on('map-click', self._handle_click)
         self.on('draw:created', self._handle_draw)
@@ -53,7 +58,8 @@ class LeafletMap(ui.leaflet):
         coords = e.args['layer'].get('_latlng') or e.args['layer'].get('_latlngs')
         layer_id = e.args['layer'].get('_leaflet_id')
         msg=f'Drawn a {layer_type} with id {layer_id} at {coords}'
-        logging.warn(msg)
+        if self.debug:
+            logging.warn(msg)
         ui.notify(msg)
 
     def draw_path(self, path: List[Tuple[float, float]], options: Dict = None) -> Any:

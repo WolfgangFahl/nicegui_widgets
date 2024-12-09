@@ -794,7 +794,7 @@ class NiceGuiWidgetsDemo(InputWebSolution):
                 ui.button(icon='zoom_in', on_click=lambda: setattr(self.map, 'zoom', self.map.zoom + 1))
                 ui.button(icon='zoom_out', on_click=lambda: setattr(self.map, 'zoom', self.map.zoom - 1))
                 #ui.button('Fit world', on_click=lambda: self.map.run_map_method('fitWorld'))
-                ui.button('Clear layers', on_click=lambda: self.map.layers.clear())
+                ui.button('Clear layers', on_click=lambda: self.map.clear_layers())
 
         await self.setup_content_div(show)
 
