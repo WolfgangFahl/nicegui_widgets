@@ -81,7 +81,7 @@ class Prompts:
         start_save_time = time.time()
 
         # Save the prompts to a file
-        self.prompts.prompts.append(new_prompt)
+        self.prompts.append(new_prompt)
         new_prompt.append_to_file(prompts_filepath)
 
         # After saving
