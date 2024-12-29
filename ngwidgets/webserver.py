@@ -293,7 +293,7 @@ class WebSolution:
         see https://fonts.google.com/icons?icon.set=Material+Icons for potential icon names
         """
         with ui.link(text=" ", target=target, new_tab=new_tab) as link_btn:
-            ui.button(name, icon=icon_name)
+            link_btn.button=ui.button(name, icon=icon_name)
         return link_btn
 
     def tool_button(
