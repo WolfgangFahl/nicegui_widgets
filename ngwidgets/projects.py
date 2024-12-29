@@ -1,13 +1,13 @@
 """
 Created on 2023-12-14
 
-This module, developed as part of the ngwidgets package under the instruction of WF, provides 
-classes and methods for interacting with the Python Package Index (PyPI). It includes the 
-`Project` data class for representing software projects and the `PyPi` class for searching 
-and retrieving package information from PyPI. The code facilitates the creation of tools and 
+This module, developed as part of the ngwidgets package under the instruction of WF, provides
+classes and methods for interacting with the Python Package Index (PyPI). It includes the
+`Project` data class for representing software projects and the `PyPi` class for searching
+and retrieving package information from PyPI. The code facilitates the creation of tools and
 applications that interact with PyPI for information about Python packages.
 
-Prompts for LLM: 
+Prompts for LLM:
 - Create Python classes Project and Projects (holding a list of Project elements) for interacting with PyPI and github, including search functionality.
 - Develop a data class in Python to represent a software project with the attributes.
         name (str): The name of the project.
@@ -28,7 +28,7 @@ Prompts for LLM:
         downloads (int): Number of downloads from PyPI.
         categories (List[str]): Categories associated with the project.
         version (str): The current version of the project on PyPI.
- 
+
 - Implement methods to search PyPI and github for packages/repos that represent projects and retrieve detailed package information on a given topic.
 - allow saving and loading the collected projects
 
@@ -649,108 +649,82 @@ class PyPi:
     def __init__(self, debug: bool = False):
         self.base_url = "https://pypi.org/pypi"
         self.debug = debug
+        self.cache_dir = Path.home() / ".pypi"
+        self.cache_dir.mkdir(exist_ok=True)
+        self.cache_file = self.cache_dir / "pypi-package-list.json"
+        self.cache_ttl = 3600  # 1 hour
 
-    def search_projects(self, term: str, limit: int = None) -> List[Project]:
-        """
-        Search for packages on PyPI and return them as Project instances.
 
-        Args:
-            term (str): The search term.
-            limit (int, optional): Maximum number of results to return.
+    def pypi_request(self, url: str, headers: Optional[Dict] = None) -> Optional[Dict]:
+        """Make pypi request with simple file caching."""
+        data = None
+        if self.cache_file.exists():
+            file_age = time.time() - self.cache_file.stat().st_mtime
+            if file_age < self.cache_ttl:
+                try:
+                    with open(self.cache_file) as f:
+                        data = json.load(f)
+                except json.JSONDecodeError:
+                    pass
 
-        Returns:
-            List[Project]: A list of Project instances representing the search results.
-        """
-        package_dicts = self.search_packages(term, limit)
-        return [Project.from_pypi(pkg) for pkg in package_dicts]
+        if not data:
+            data = self._make_request(url, headers)
+            if data:
+                with open(self.cache_file, "w") as f:
+                    json.dump(data, f)
 
-    def get_package_info(self, package_name: str) -> dict:
-        """
-        Get detailed information about a package from PyPI using urllib.
+        return data
 
-        Args:
-            package_name (str): The name of the package to retrieve information for.
+    def _make_request(self, url: str, headers: Optional[Dict] = None) -> Optional[Dict]:
+        """Make a request to PyPI API and return JSON response."""
+        try:
+            request = urllib.request.Request(url, headers=headers if headers else {})
+            response = urllib.request.urlopen(request)
+            if response.getcode() == 200:
+                json_response = json.loads(response.read())
+                return json_response
+        except (urllib.error.URLError, json.JSONDecodeError) as e:
+            if self.debug:
+                print(f"Error in request to {url}: {e}")
+        return None
 
-        Returns:
-            dict: A dictionary containing package information.
 
-        Raises:
-            urllib.error.URLError: If there is an issue with the URL.
-            ValueError: If the response status code is not 200.
-        """
+    def get_package_info(self, package_name: str) -> Optional[Dict]:
+        """Get detailed info for a specific package."""
         url = f"{self.base_url}/{package_name}/json"
-
-        response = urllib.request.urlopen(url)
-
-        if response.getcode() != 200:
-            raise ValueError(
-                f"Failed to fetch package info for {package_name}. Status code: {response.getcode()}"
-            )
-
-        package_data = json.loads(response.read())
-
+        package_data = self._make_request(url)
+        if package_data:
+            package_data['package_url'] = f"https://pypi.org/project/{package_name}"
         return package_data
 
-    def search_packages(self, term: str, limit: int = None) -> list:
-        """Search a package in the pypi repositories and retrieve detailed package information.
-
-        Args:
-            term (str): The search term.
-            limit (int, optional): Maximum number of results to return.
-
-        Returns:
-            List[Dict]: A list of dictionaries containing detailed package information.
-
-                see https://raw.githubusercontent.com/shubhodeep9/pipsearch/master/pipsearch/api.py
-        """
-        # Constructing a search URL and sending the request
-        url = "https://pypi.org/search/?q=" + term
-        try:
-            response = urllib.request.urlopen(url)
-            text = response.read()
-        except Exception as e:
-            raise e
-
-        soup = BeautifulSoup(text, "html.parser")
-        packagestable = soup.find("ul", {"class": "unstyled"})
-        # Constructing the result list
+    def search_packages(self, term: str, limit: Optional[int] = None) -> List[Dict]:
+        """Search packages using PyPI JSON API."""
+        headers = {"Accept": "application/vnd.pypi.simple.v1+json"}
+        url = "https://pypi.org/simple/"
         packages = []
 
-        # If no package exists then there is no table displayed hence soup.table will be None
-        if packagestable is None:
-            return packages
+        projects = self.pypi_request(url, headers)
+        if projects:
+            matched_projects = [
+                p for p in projects['projects']
+                if term.lower() in p['name'].lower()
+            ]
+            if limit:
+                matched_projects = matched_projects[:limit]
 
-        packagerows: ResultSet[Tag] = packagestable.findAll("li")
+            for project in matched_projects:
+                package_info = self.get_package_info(project['name'])
+                if package_info:
+                    packages.append(package_info)
 
-        if self.debug:
-            print(f"found len{packagerows} package rows")
-        if limit:
-            selected_rows = packagerows[:limit]
-        else:
-            selected_rows = packagerows
-        for package in selected_rows:
-            nameSelector = package.find("span", {"class": "package-snippet__name"})
-            if nameSelector is None:
-                continue
-            name = nameSelector.text
-
-            link = ""
-            if package.a is not None:
-                href = package.a["href"]
-                if isinstance(href, list):
-                    href = href[0]
-                link = "https://pypi.org" + href
-
-            description = (
-                package.find("p", {"class": "package-snippet__description"}) or Tag()
-            ).text
-
-            version = (
-                package.find("span", {"class": "package-snippet__version"}) or Tag()
-            ).text
-            package_info = self.get_package_info(name)
-            package_info["package_url"] = link
-            packages.append(package_info)
-
-        # returning the result list back
         return packages
+
+    def search_projects(self, term: str, limit: Optional[int] = None) -> List[Project]:
+        """Get PyPI package info as Project instances."""
+        package_dicts = self.search_packages(term, limit)
+        projects = []
+        for package in package_dicts:
+            if package:
+                project = Project.from_pypi(package)
+                projects.append(project)
+        return projects
