@@ -47,6 +47,7 @@ class Prompt:
         result:str,
         chat_completion,
         start_time:datetime,
+        model:Optional[str]=None,
         image_path:Optional[str]=None,
         temperature:float=0.7) -> 'Prompt':
         """
@@ -58,7 +59,7 @@ class Prompt:
         prompt = Prompt(
             prompt=prompt_text,
             response=result,
-            model=self.model,
+            model=model,
             model_details=model_details,
             temperature=temperature,
             tokens=total_tokens,
