@@ -49,7 +49,10 @@ dependencies = [
     # https://pypi.org/project/colour/
 	"colour>=0.1.5",
 	# https://pypi.org/project/shutup/
-	"shutup>=0.2.0"
+	"shutup>=0.2.0",
+	# gpxpy
+	# https://github.com/tkrajina/gpxpy
+	"gpypy"
 ]
 
 
