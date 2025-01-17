@@ -52,7 +52,7 @@ dependencies = [
 	"shutup>=0.2.0",
 	# gpxpy
 	# https://github.com/tkrajina/gpxpy
-	"gpypy"
+	"gpxpy>=1.6.2"
 ]
 
 
