@@ -66,7 +66,8 @@ class GPXViewer:
             self.token = args.token
             self.center = args.center
             self.zoom = args.zoom
-            self.load_gpx(self.args.gpx)
+            if self.args.gpx:
+                self.load_gpx(self.args.gpx)
         else:
             self.zoom=GPXViewer.default_zoom
             self.center=GPXViewer.default_center
