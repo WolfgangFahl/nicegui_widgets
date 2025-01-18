@@ -20,9 +20,14 @@ class TestGPXViewer(Basetest):
         """
         test the gpx viewer for all samples
         """
+        sample_keys=list(GPXViewer.samples.keys())
         expected_centers = {
-            list(GPXViewer.samples.keys())[0]: # Mountain bike loop at Middlesex Fells reservation.
-                (42.44903, -71.1139805)
+            sample_keys[0]: # Mountain bike loop at Middlesex Fells reservation.
+                (42.44903, -71.1139805),
+            sample_keys[1]: # Via Verde de Arditurri
+                (43.302147, -1.8539505),
+            sample_keys[2]: # Vía Verde del Fc Vasco Navarro
+                (42.89977, -2.34528)
         }
         for sample_name, gpx_url in GPXViewer.samples.items():
             with self.subTest(sample_name=sample_name):
