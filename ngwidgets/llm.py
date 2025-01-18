@@ -3,6 +3,7 @@ Created on 2023-06-23
 
 @author: wf
 """
+
 import base64
 import json
 import os
@@ -42,16 +43,18 @@ class Prompt:
             file.write(f"\n{yaml_str}")
 
     @classmethod
-    def from_chat(self,
-        prompt_text:str,
-        result:str,
+    def from_chat(
+        self,
+        prompt_text: str,
+        result: str,
         chat_completion,
-        start_time:datetime,
-        model:Optional[str]=None,
-        image_path:Optional[str]=None,
-        temperature:float=0.7) -> 'Prompt':
+        start_time: datetime,
+        model: Optional[str] = None,
+        image_path: Optional[str] = None,
+        temperature: float = 0.7,
+    ) -> "Prompt":
         """
-         Create a prompt instance with timing and usage info
+        Create a prompt instance with timing and usage info
         """
         total_tokens = chat_completion.usage.total_tokens
         model_details = chat_completion.model
@@ -65,9 +68,10 @@ class Prompt:
             tokens=total_tokens,
             timestamp=datetime.now(),
             duration=duration,
-            image_path=image_path
+            image_path=image_path,
         )
         return prompt
+
 
 @lod_storable
 class Prompts:
@@ -77,7 +81,9 @@ class Prompts:
 
     prompts: List[Prompt] = field(default_factory=list)
 
-    def add_to_filepath(self,new_prompt:Prompt,prompts_filepath,debug:bool=False):
+    def add_to_filepath(
+        self, new_prompt: Prompt, prompts_filepath, debug: bool = False
+    ):
         start_save_time = time.time()
 
         # Save the prompts to a file
@@ -211,9 +217,17 @@ class LLM:
             temperature=temperature,  # Include the temperature parameter here
         )
         result = chat_completion.choices[0].message.content
-        new_prompt = Prompt.from_chat(prompt_text, result, chat_completion, start_time, model, temperature=temperature)
+        new_prompt = Prompt.from_chat(
+            prompt_text,
+            result,
+            chat_completion,
+            start_time,
+            model,
+            temperature=temperature,
+        )
         self.prompts.add_to_filepath(new_prompt, self.prompts_filepath)
         return result
+
 
 class VisionLLM(LLM):
     """
@@ -228,11 +242,7 @@ class VisionLLM(LLM):
         """
         super().__init__(api_key=api_key, model=model, force_key=force_key)
 
-
-    def analyze_image(self,
-        image_path: str,
-        auth:dict,
-        prompt_text: str) -> str:
+    def analyze_image(self, image_path: str, auth: dict, prompt_text: str) -> str:
         """
         Analyze an image with a given prompt
 
@@ -251,12 +261,7 @@ class VisionLLM(LLM):
                 image_url = f"{url_parts[0]}://{auth['username']}:{auth['password']}@{url_parts[1]}"
             else:
                 image_url = image_path
-            image_content = {
-                "type": "image_url",
-                "image_url": {
-                    "url": image_url
-                }
-            }
+            image_content = {"type": "image_url", "image_url": {"url": image_url}}
         else:
             # Local file - use base64
             with open(image_path, "rb") as image_file:
@@ -277,9 +282,15 @@ class VisionLLM(LLM):
             model=self.model, messages=messages
         )
 
-        result= chat_completion.choices[0].message.content
-        new_prompt = Prompt.from_chat(prompt_text, result, chat_completion, start_time, self.model, image_path=image_path)
+        result = chat_completion.choices[0].message.content
+        new_prompt = Prompt.from_chat(
+            prompt_text,
+            result,
+            chat_completion,
+            start_time,
+            self.model,
+            image_path=image_path,
+        )
         self.prompts.add_to_filepath(new_prompt, self.prompts_filepath)
 
         return result
-

@@ -101,3 +101,4 @@ only-include = ["ngwidgets"]
 ngdemo = "ngwidgets.ngwidgets_cmd:main"
 niceuser = "ngwidgets.users:main"
 aichat = "ngwidgets.ai_chat:run_chat"
+gpxviewer = "ngwidgets.gpxviewer_server:main"

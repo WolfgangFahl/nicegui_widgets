@@ -109,3 +109,7 @@ components:
     HideShow is a class representing a hideable/showable section in a NiceGUI application.
     As an alternative to ui.expansion() it allows for dynamic toggling of content visibility,
     with customizable labels and initialization settings for user interfaces.
+- name: GPXViewer
+  source: /ngwidgets/gpx.py
+  issue: 77
+  demo_url: http://ngdemo.bitplan.com/gpxviewer

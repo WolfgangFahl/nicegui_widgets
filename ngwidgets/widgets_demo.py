@@ -17,7 +17,9 @@ from ngwidgets.combobox import ComboBox
 from ngwidgets.components_view import ComponentsView
 from ngwidgets.debouncer import DebouncerUI
 from ngwidgets.dict_edit import DictEdit
+from ngwidgets.gpxviewer import GPXViewer
 from ngwidgets.input_webserver import InputWebserver, InputWebSolution
+from ngwidgets.leaflet_map import LeafletMap
 from ngwidgets.lod_grid import GridConfig, ListOfDictsGrid
 from ngwidgets.log_view import LogView
 from ngwidgets.pdfviewer import pdfviewer
@@ -29,7 +31,7 @@ from ngwidgets.version import Version
 from ngwidgets.webserver import WebserverConfig
 from ngwidgets.widgets import HideShow, Lang, Link
 from ngwidgets.wikipedia import WikipediaSearch
-from ngwidgets.leaflet_map import LeafletMap
+
 
 @dataclass
 class Element:
@@ -65,7 +67,6 @@ class NiceGuiWidgetsDemo(InputWebSolution):
         self.projects = self.webserver.projects
         # pdf_url = "https://www.africau.edu/images/default/sample.pdf"
         self.pdf_url = "https://raw.githubusercontent.com/mozilla/pdf.js/ba2edeae/web/compressed.tracemonkey-pldi-09.pdf"
-
 
     async def load_pdf(self):
         self.pdf_viewer.load_pdf(self.pdf_url)
@@ -754,47 +755,85 @@ class NiceGuiWidgetsDemo(InputWebSolution):
 
         await self.setup_content_div(show)
 
+    async def show_gpxviewer(self):
+        """
+        show gpx demo
+        """
+
+        async def load_gpx(url: str):
+            viewer = GPXViewer.from_url(url)
+            viewer.show()
+
+        async def show():
+            """
+            show off GPXViewer with some samples
+            """
+
+            ui.select(
+                options=list(GPXViewer.samples.keys()),
+                label="Select GPX Track",
+                on_change=lambda e: load_gpx(GPXViewer.samples[e.value]),
+            ).classes("w-64")
+
+        await self.setup_content_div(show)
+
     async def show_leaflet(self):
         """Show leaflet demo with locations and path drawing"""
 
         async def show():
 
             self.locations = {
-               "London": (51.505, -0.090),
-               "Berlin": (52.5200, 13.4049),
-               "Hannover": (52.37487, 9.74168),
-               "New York": (40.7306, -74.0060),
-               "Beijing": (39.9042, 116.4074),
-               "Tokyo": (35.6895, 139.6917)
+                "London": (51.505, -0.090),
+                "Berlin": (52.5200, 13.4049),
+                "Hannover": (52.37487, 9.74168),
+                "New York": (40.7306, -74.0060),
+                "Beijing": (39.9042, 116.4074),
+                "Tokyo": (35.6895, 139.6917),
             }
             self.zoom_level = 9
-            london=self.locations["London"]
+            london = self.locations["London"]
 
-            self.map = LeafletMap(center=london, zoom=self.zoom_level, classes="w-full h-96")
+            self.map = LeafletMap(
+                center=london, zoom=self.zoom_level, classes="w-full h-96"
+            )
             await self.map.initialized()
 
             with ui.row() as self.select_row:
                 ui.select(
-                   options=list(self.locations.keys()),  # Use city names
-                   label="Location",
-                   value="London",
-                   on_change=lambda e: setattr(self.map, 'center', self.locations[e.value])
+                    options=list(self.locations.keys()),  # Use city names
+                    label="Location",
+                    value="London",
+                    on_change=lambda e: setattr(
+                        self.map, "center", self.locations[e.value]
+                    ),
                 ).classes("w-40")
                 ui.select(
-                    {i: i for i in range(9,18)},
+                    {i: i for i in range(9, 18)},
                     label="Zoom",
                     value=self.zoom_level,
-                    on_change=lambda e: setattr(self.map, 'zoom', e.value)
+                    on_change=lambda e: setattr(self.map, "zoom", e.value),
                 ).classes("w-40")
-                ui.label().bind_text_from(self.map, 'center',lambda center: f'Center: {center[0]:.3f}, {center[1]:.3f}')
-                ui.label().bind_text_from(self.map, 'zoom',lambda zoom: f'Zoom: {zoom}')
-                #ui.label().bind_text(lambda: f'Layers: {len(self.map.layers)}')  # Layer counter
+                ui.label().bind_text_from(
+                    self.map,
+                    "center",
+                    lambda center: f"Center: {center[0]:.3f}, {center[1]:.3f}",
+                )
+                ui.label().bind_text_from(
+                    self.map, "zoom", lambda zoom: f"Zoom: {zoom}"
+                )
+                # ui.label().bind_text(lambda: f'Layers: {len(self.map.layers)}')  # Layer counter
 
             with ui.grid(columns=2) as self.grid:
-                ui.button(icon='zoom_in', on_click=lambda: setattr(self.map, 'zoom', self.map.zoom + 1))
-                ui.button(icon='zoom_out', on_click=lambda: setattr(self.map, 'zoom', self.map.zoom - 1))
-                #ui.button('Fit world', on_click=lambda: self.map.run_map_method('fitWorld'))
-                ui.button('Clear layers', on_click=lambda: self.map.clear_layers())
+                ui.button(
+                    icon="zoom_in",
+                    on_click=lambda: setattr(self.map, "zoom", self.map.zoom + 1),
+                )
+                ui.button(
+                    icon="zoom_out",
+                    on_click=lambda: setattr(self.map, "zoom", self.map.zoom - 1),
+                )
+                # ui.button('Fit world', on_click=lambda: self.map.run_map_method('fitWorld'))
+                ui.button("Clear layers", on_click=lambda: self.map.clear_layers())
 
         await self.setup_content_div(show)
 
@@ -812,6 +851,7 @@ class NiceGuiWidgetsDemo(InputWebSolution):
                 "ComboBox Demo": "/combobox",
                 "Debounce Demo": "/stars",
                 "DictEdit": "/dictedit",
+                "GPX-Viewer": "/gpxviewer",
                 "HideShow Demo": "/hideshow",
                 "Lang": "/langs",
                 "Leaflet Map": "/leaflet",
@@ -888,6 +928,10 @@ class NiceGuiWidgetsDemoWebserver(InputWebserver):
         @ui.page("/progress")
         async def show_progress(client: Client):
             return await self.page(client, NiceGuiWidgetsDemo.show_progress)
+
+        @ui.page("/gpxviewer")
+        async def show_gpxviewer(client: Client):
+            return await self.page(client, NiceGuiWidgetsDemo.show_gpxviewer)
 
         @ui.page("/langs")
         async def show_langs(client: Client):

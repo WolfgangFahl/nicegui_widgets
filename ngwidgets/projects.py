@@ -654,7 +654,6 @@ class PyPi:
         self.cache_file = self.cache_dir / "pypi-package-list.json"
         self.cache_ttl = 3600  # 1 hour
 
-
     def pypi_request(self, url: str, headers: Optional[Dict] = None) -> Optional[Dict]:
         """Make pypi request with simple file caching."""
         data = None
@@ -688,13 +687,12 @@ class PyPi:
                 print(f"Error in request to {url}: {e}")
         return None
 
-
     def get_package_info(self, package_name: str) -> Optional[Dict]:
         """Get detailed info for a specific package."""
         url = f"{self.base_url}/{package_name}/json"
         package_data = self._make_request(url)
         if package_data:
-            package_data['package_url'] = f"https://pypi.org/project/{package_name}"
+            package_data["package_url"] = f"https://pypi.org/project/{package_name}"
         return package_data
 
     def search_packages(self, term: str, limit: Optional[int] = None) -> List[Dict]:
@@ -706,14 +704,13 @@ class PyPi:
         projects = self.pypi_request(url, headers)
         if projects:
             matched_projects = [
-                p for p in projects['projects']
-                if term.lower() in p['name'].lower()
+                p for p in projects["projects"] if term.lower() in p["name"].lower()
             ]
             if limit:
                 matched_projects = matched_projects[:limit]
 
             for project in matched_projects:
-                package_info = self.get_package_info(project['name'])
+                package_info = self.get_package_info(project["name"])
                 if package_info:
                     packages.append(package_info)
 

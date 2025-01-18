@@ -67,6 +67,7 @@ class FormUiDef:
         }
         return FormUiDef(title="Dictionary Form", ui_fields=ui_fields)
 
+
 class DictEdit:
     """
     NiceGUI based user interface for dictionary or dataclass editing
