@@ -18,6 +18,8 @@ class GPXViewer:
     """
     samples = {
         "Mountain bike loop at Middlesex Fells reservation.": "https://www.topografix.com/fells_loop.gpx",
+        "Via Verde de Arditurri": "https://www.bahntrassenradwege.de/images/Spanien/Baskenland/V-v-de-arditurri/Arditurri2.gpx",
+        "Vía Verde del Fc Vasco Navarro": "https://ebike.bitplan.com/images/ebike/e/ec/VV-del-FC-Vasco-Navarro_fdmi1644.gpx"
     }
     default_center=[51.4934, 0.0098] # greenwich
     default_zoom=11
