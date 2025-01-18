@@ -21,7 +21,7 @@ def initialize_viewer():
     viewer = GPXViewer(args=args)
 
 @ui.page("/")
-def gpx(gpx: str = None, auth_token: str = None):
+def gpx(gpx: str = None, auth_token: str = None, zoom:int=GPXViewer.default_zoom):
     """
     GPX viewer page with optional gpx_url and auth_token.
     """
@@ -37,7 +37,7 @@ def gpx(gpx: str = None, auth_token: str = None):
     gpx_to_use = gpx if gpx else viewer.args.gpx
     if gpx_to_use:
         viewer.load_gpx(gpx_to_use)
-        viewer.show()
+        viewer.show(zoom=zoom)
     else:
         ui.label("Please provide a GPX file via 'gpx' query parameter or the command line.")
 
