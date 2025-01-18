@@ -113,3 +113,8 @@ components:
   source: /ngwidgets/gpx.py
   issue: 77
   demo_url: http://ngdemo.bitplan.com/gpxviewer
+  demo_image_url: https://private-user-images.githubusercontent.com/1336221/404520387-9155feb3-ee15-4a6e-86d2-cd472f89a2a2.png
+  description: >
+    GPXViewer is a component for visualizing GPX (GPS Exchange Format) files using OpenStreetMap and Leaflet.
+    It can display GPS tracks, routes and waypoints from URLs, with configurable zoom levels
+    and map centering. 
