@@ -13,7 +13,7 @@ class TestGPXViewer(Basetest):
     test GPXViewer
     """
 
-    def setUp(self, debug=False, profile=True):
+    def setUp(self, debug=True, profile=True):
         Basetest.setUp(self, debug=debug, profile=profile)
 
     def test_gpx_viewer(self):
@@ -22,7 +22,7 @@ class TestGPXViewer(Basetest):
         """
         expected_centers = {
             list(GPXViewer.samples.keys())[0]: # Mountain bike loop at Middlesex Fells reservation.
-                (42.434853, -71.114787)
+                (42.44903, -71.1139805)
         }
         for sample_name, gpx_url in GPXViewer.samples.items():
             with self.subTest(sample_name=sample_name):

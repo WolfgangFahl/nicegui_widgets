@@ -78,17 +78,22 @@ class GPXViewer:
         self.get_points(self.gpx)
         return self.gpx
 
-    def get_points(self,gpx):
+    def get_points(self,gpx,way_points_fallback:bool=False):
         """
         get the points for the given gpx track
         """
         self.points = []
+        # routes
+        for route in gpx.routes:
+            for point in route.points:
+                self.points.append((point.latitude, point.longitude))
+        # tracks
         for track in gpx.tracks:
             for segment in track.segments:
                 for point in segment.points:
                     self.points.append((point.latitude, point.longitude))
-        # Handle waypoints if no track points were found
-        if not self.points and gpx.waypoints:
+        # Handle waypoints if no points were found and fallback is active
+        if not self.points and gpx.waypoints and way_points_fallback:
             for waypoint in gpx.waypoints:
                 self.points.append((waypoint.latitude, waypoint.longitude))
 
