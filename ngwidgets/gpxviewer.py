@@ -5,7 +5,7 @@ Created on 2025-01-17
 """
 
 import argparse
-
+import re
 import gpxpy
 import requests
 
@@ -106,6 +106,52 @@ class GPXViewer:
             self.bounding_box = (min(lats), max(lats), min(lons), max(lons))
             self.center = ((min(lats) + max(lats)) / 2, (min(lons) + max(lons)) / 2)
 
+    def parse_lines(self, lines: str):
+        """
+        Parse the 'lines' parameter into route segments.
+
+        Args:
+            lines (str): The input string containing routes in the format:
+                "By bike: 51.243931° N, 6.520022° E, 51.269222° N, 6.625467° E:"
+
+        Returns:
+            list of list of tuples: Parsed routes as lists of (lat, lon) tuples.
+
+        Raises:
+            ValueError: If the input format is invalid.
+        """
+        # Match segments like "51.243931° N, 6.520022° E"
+        coordinate_pattern = r"(\d+\.\d+)° ([NS]), (\d+\.\d+)° ([EW])"
+
+        # Extract individual routes
+        route_segments = lines.split(":")
+        routes = []
+
+        for segment in route_segments:
+            points = re.findall(coordinate_pattern, segment)
+            if points:
+                route = [
+                    (
+                        float(lat) * (-1 if ns == "S" else 1),
+                        float(lon) * (-1 if ew == "W" else 1)
+                    )
+                    for lat, ns, lon, ew in points
+                ]
+                routes.append(route)
+
+        if not routes:
+            raise ValueError("No valid routes found in the input lines.")
+
+        return routes
+
+
+    def parse_lines_and_show(self, lines: str, zoom: int = None):
+        """
+        Parse lines and display them on the map.
+        """
+        routes = self.parse_lines(lines)
+        self.points = [point for route in routes for point in route]
+        self.show(zoom=zoom)
     def show(self,zoom:int=None,center=None):
         """
         show my points
