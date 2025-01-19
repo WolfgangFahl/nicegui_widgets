@@ -103,7 +103,7 @@ class LegStyles:
             "bike": LegStyle(
                 leg_type="bike",
                 point_type="knooppunt",
-                color="#00FF00",
+                color="#FF0000",  # bike - red (avoid green due to map background)
                 utf8_icon="🚲",
                 weight=3,
                 dashArray=None,
@@ -112,7 +112,7 @@ class LegStyles:
             "train": LegStyle(
                 leg_type="train",
                 point_type="train_station",
-                color="#000000",
+                color="#555555",  # train - dark gray (improves contrast over black)
                 utf8_icon="🚂",
                 weight=3,
                 dashArray="10,10",
@@ -121,7 +121,7 @@ class LegStyles:
             "car": LegStyle(
                 leg_type="car",
                 point_type="parking",
-                color="#808080",
+                color="#404040",  # car - medium gray
                 utf8_icon="🚗",
                 weight=3,
                 dashArray=None,
@@ -130,7 +130,7 @@ class LegStyles:
             "ferry": LegStyle(
                 leg_type="ferry",
                 point_type="ferry_terminal",
-                color="#0000FF",
+                color="#1E90FF",  # ferry - dodger blue for visibility
                 utf8_icon="⛴️",
                 weight=3,
                 dashArray="15,10",
@@ -139,7 +139,7 @@ class LegStyles:
             "bus": LegStyle(
                 leg_type="bus",
                 point_type="bus_stop",
-                color="#FFA500",
+                color="#FF4500",  # bus - orange-red for distinctiveness
                 utf8_icon="🚌",
                 weight=3,
                 dashArray=None,
@@ -148,7 +148,7 @@ class LegStyles:
             "plane": LegStyle(
                 leg_type="plane",
                 point_type="airport",
-                color="#800080",
+                color="#4B0082",  # plane - indigo for uniqueness
                 utf8_icon="✈️",
                 weight=3,
                 dashArray="20,10,5,10",
