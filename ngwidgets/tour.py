@@ -19,8 +19,9 @@ class Loc:
     id: str
     coordinates: Tuple[float, float]  # latlon
     name: str
+    loc_type: Optional[str]
+    url: Optional[str]
     notes: Optional[str] = None
-    category: Optional[str] = None
 
 @lod_storable
 class Leg:
