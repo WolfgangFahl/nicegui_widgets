@@ -8,7 +8,7 @@ import logging
 from typing import Any, Dict, List, Tuple
 
 from nicegui import events, ui
-
+from ngwidgets.tour import Tour, LegStyles
 
 class LeafletMap(ui.leaflet):
     """Enhanced Leaflet map with additional functionality"""
@@ -83,3 +83,29 @@ class LeafletMap(ui.leaflet):
 
         layer = self.generic_layer(name="polyline", args=[path, options])
         return layer
+
+    def draw_tour(self, tour: Tour, leg_styles: LegStyles) -> List[Any]:
+        """
+        Draw a complete tour on the map with styled legs
+
+        Args:
+            tour: Tour to draw
+            leg_styles: Style configuration for different leg types
+
+        Returns:
+            List of created layer objects
+        """
+        layers = []
+        for leg in tour.legs:
+            style = leg_styles.get_style(leg.leg_type)
+            path = [leg.start.coordinates, leg.end.coordinates]
+            options = {
+                "color": style.color,
+                "weight": style.weight,
+                "opacity": style.opacity
+            }
+            if style.dashArray:
+                options["dashArray"] = style.dashArray
+            layer = self.draw_path(path, options)
+            layers.append(layer)
+        return layers

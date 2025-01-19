@@ -8,9 +8,9 @@ import argparse
 import re
 import gpxpy
 import requests
-
+from typing import Optional
 from ngwidgets.leaflet_map import LeafletMap
-
+from ngwidgets.tour import Loc, Leg, Tour, LegStyle, LegStyles
 
 class GPXViewer:
     """
@@ -42,7 +42,6 @@ class GPXViewer:
         )
         parser.add_argument("--zoom", type=int, default=GPXViewer.default_zoom, help="zoom level (default: 11)")
         parser.add_argument("--center", nargs=2, type=float, default=GPXViewer.default_center, help="center lat,lon - default: Greenwich")
-
         parser.add_argument("--debug", action="store_true", help="Show debug output")
         return parser
 
@@ -60,7 +59,8 @@ class GPXViewer:
             args(argparse.Namespace): command line arguments
         """
         self.args = args
-        self.points = []
+        self.tour = None
+        self.leg_styles = LegStyles.default()
         self.set_center()
         if args:
             self.debug = args.debug
@@ -84,10 +84,17 @@ class GPXViewer:
 
     def set_center(self):
         """
-        Calculate and set the center and bounding box based on self.points.
+        Calculate and set the center and bounding box based on tour legs
         """
-        if self.points:
-            lats, lons = zip(*self.points)
+
+        if self.tour and self.tour.legs:
+            points = []
+            for leg in self.tour.legs:
+                points.append(leg.start.coordinates)
+                points.append(leg.end.coordinates)
+            # Wrong order: lats, lons need to be extracted after zipping
+            lats = [p[0] for p in points]
+            lons = [p[1] for p in points]
             self.bounding_box = (min(lats), max(lats), min(lons), max(lons))
             self.center = ((min(lats) + max(lats)) / 2, (min(lons) + max(lons)) / 2)
         else:
@@ -95,24 +102,91 @@ class GPXViewer:
             self.bounding_box = None
         return self.center
 
-    def get_points(self,gpx,way_points_fallback:bool=False):
+    def add_leg(self, start_point, end_point, leg_type: str, add_end_point: bool = False, url: Optional[str] = None):
         """
-        get the points for the given gpx track
+        Add a leg to the tour
+
+        Args:
+            start_point: GPX point for start of leg
+            end_point: GPX point for end of leg
+            leg_type: Type of leg (e.g., "bike", "train", "car")
+            add_end_point: Whether to add the end point (True for last leg)
+            url: Optional URL associated with the leg
         """
-        self.points = []
-        # routes
+        if self.tour is None:
+            self.tour = Tour(name="GPX Tour")
+
+        # Create locations
+        start_loc = Loc(
+            id=str(len(self.tour.legs)),
+            name=start_point.name if hasattr(start_point, 'name') else None,
+            coordinates=(start_point.latitude, start_point.longitude)
+        )
+        end_loc = Loc(
+            id=str(len(self.tour.legs) + 1),
+            name=end_point.name if hasattr(end_point, 'name') else None,
+            coordinates=(end_point.latitude, end_point.longitude)
+        )
+
+        # Create and add leg
+        leg = Leg(
+            leg_type=leg_type,
+            start=start_loc,
+            end=end_loc,
+            url=url
+        )
+        self.tour.legs.append(leg)
+
+    def get_points(self, gpx, way_points_fallback: bool = False):
+        """
+        Extract waypoints and legs from the GPX object and create a tour
+        """
+        self.tour = Tour(name="GPX Tour")
+
+        # Process routes
         for route in gpx.routes:
-            for point in route.points:
-                self.points.append((point.latitude, point.longitude))
-        # tracks
+            for i in range(len(route.points) - 1):
+                url = route.link.href if route.link else None
+                is_last = i == len(route.points) - 2
+                self.add_leg(
+                    route.points[i],
+                    route.points[i + 1],
+                    "bike",  # Default to bike for routes
+                    add_end_point=is_last,
+                    url=url
+                )
+
+        # Process tracks
         for track in gpx.tracks:
             for segment in track.segments:
-                for point in segment.points:
-                    self.points.append((point.latitude, point.longitude))
-        # Handle waypoints if no points were found and fallback is active
-        if not self.points and gpx.waypoints and way_points_fallback:
-            for waypoint in gpx.waypoints:
-                self.points.append((waypoint.latitude, waypoint.longitude))
+                for i in range(len(segment.points) - 1):
+                    is_last = i == len(segment.points) - 2
+                    self.add_leg(
+                        segment.points[i],
+                        segment.points[i + 1],
+                        "bike",  # Default to bike for tracks
+                        add_end_point=is_last
+                    )
+
+        prev_loc=None
+        # Handle waypoints if no legs were created and fallback is active
+        if not self.tour.legs and gpx.waypoints and way_points_fallback:
+            for i, waypoint in enumerate(gpx.waypoints):
+                loc = Loc(
+                    id=str(i),
+                    name=waypoint.name,
+                    coordinates=(waypoint.latitude, waypoint.longitude),
+                    notes=waypoint.description
+                )
+                if i > 0:
+                    leg = Leg(
+                        leg_type="bike",
+                        start=prev_loc,
+                        end=loc,
+                        url=waypoint.link.href if waypoint.link else None
+                    )
+                    self.tour.legs.append(leg)
+                prev_loc = loc
 
     def parse_lines(self, lines: str):
         """
@@ -123,52 +197,66 @@ class GPXViewer:
                 "By bike: 51.243931° N, 6.520022° E, 51.269222° N, 6.625467° E:"
 
         Returns:
-            list of list of tuples: Parsed routes as lists of (lat, lon) tuples.
-
-        Raises:
-            ValueError: If the input format is invalid.
+            Tour: Created tour from the parsed coordinates
         """
-        # Match segments like "51.243931° N, 6.520022° E"
         coordinate_pattern = r"(\d+\.\d+)° ([NS]), (\d+\.\d+)° ([EW])"
-
-        # Extract individual routes
         route_segments = lines.split(":")
-        routes = []
+        self.tour = Tour(name="Parsed Tour")
 
         for segment in route_segments:
+            segment = segment.strip()
+
+            # Extract leg type (e.g., "bike", "train")
+            leg_type_match = re.match(r"By (\w+)→", segment)
+            if leg_type_match:
+                leg_type = leg_type_match.group(1).lower()
+                pass
+            else:
+                leg_type="bike"
+
             points = re.findall(coordinate_pattern, segment)
             if points:
-                route = [
-                    (
-                        float(lat) * (-1 if ns == "S" else 1),
-                        float(lon) * (-1 if ew == "W" else 1)
-                    )
-                    for lat, ns, lon, ew in points
-                ]
-                routes.append(route)
+                prev_loc = None
+                for i, (lat, ns, lon, ew) in enumerate(points):
+                    lat_val = float(lat) * (-1 if ns == "S" else 1)
+                    lon_val = float(lon) * (-1 if ew == "W" else 1)
 
-        if not routes:
+                    loc = Loc(
+                        id=str(len(self.tour.legs) + i),
+                        name=None,
+                        coordinates=(lat_val, lon_val)
+                    )
+
+                    if prev_loc:
+                        leg = Leg(
+                            leg_type=leg_type,
+                            start=prev_loc,
+                            end=loc
+                        )
+                        self.tour.legs.append(leg)
+                    prev_loc = loc
+
+        if not self.tour.legs:
             raise ValueError("No valid routes found in the input lines.")
 
-        return routes
-
+        return self.tour
 
     def parse_lines_and_show(self, lines: str, zoom: int = None):
         """
-        Parse lines and display them on the map.
+        Parse lines and display them on the map
         """
-        routes = self.parse_lines(lines)
-        self.points = [point for route in routes for point in route]
+        self.parse_lines(lines)
         self.show(zoom=zoom)
 
-    def show(self,zoom:int=None,center=None):
+    def show(self, zoom: int = None, center=None):
         """
-        show my points
+        Show tour with styled paths
         """
         if zoom is None:
-            zoom=self.zoom
+            zoom = self.zoom
         if center is None:
-            # Set center and bounding box
-            center=self.set_center()
+            center = self.set_center()
+
         self.map = LeafletMap(center=center, zoom=zoom)
-        self.map.draw_path(self.points)
+        if self.tour:
+            self.map.draw_tour(self.tour, self.leg_styles)
