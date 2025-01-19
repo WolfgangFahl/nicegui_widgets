@@ -61,6 +61,7 @@ class GPXViewer:
         """
         self.args = args
         self.points = []
+        self.set_center()
         if args:
             self.debug = args.debug
             self.token = args.token
@@ -81,6 +82,19 @@ class GPXViewer:
         self.get_points(self.gpx)
         return self.gpx
 
+    def set_center(self):
+        """
+        Calculate and set the center and bounding box based on self.points.
+        """
+        if self.points:
+            lats, lons = zip(*self.points)
+            self.bounding_box = (min(lats), max(lats), min(lons), max(lons))
+            self.center = ((min(lats) + max(lats)) / 2, (min(lons) + max(lons)) / 2)
+        else:
+            self.center = self.default_center
+            self.bounding_box = None
+        return self.center
+
     def get_points(self,gpx,way_points_fallback:bool=False):
         """
         get the points for the given gpx track
@@ -99,12 +113,6 @@ class GPXViewer:
         if not self.points and gpx.waypoints and way_points_fallback:
             for waypoint in gpx.waypoints:
                 self.points.append((waypoint.latitude, waypoint.longitude))
-
-                # create map centered on first point
-        if self.points:
-            lats, lons = zip(*self.points)
-            self.bounding_box = (min(lats), max(lats), min(lons), max(lons))
-            self.center = ((min(lats) + max(lats)) / 2, (min(lons) + max(lons)) / 2)
 
     def parse_lines(self, lines: str):
         """
@@ -152,6 +160,7 @@ class GPXViewer:
         routes = self.parse_lines(lines)
         self.points = [point for route in routes for point in route]
         self.show(zoom=zoom)
+
     def show(self,zoom:int=None,center=None):
         """
         show my points
@@ -159,6 +168,7 @@ class GPXViewer:
         if zoom is None:
             zoom=self.zoom
         if center is None:
-            center=self.center
+            # Set center and bounding box
+            center=self.set_center()
         self.map = LeafletMap(center=center, zoom=zoom)
         self.map.draw_path(self.points)
