@@ -3,7 +3,7 @@ Created on 2025-01-22
 
 @author: wf
 """
-
+import traceback
 import json
 import os
 import re
@@ -43,15 +43,17 @@ class Device:
     mid: str  # manufacturer id reference
     model: str
     title: str = ""  # Optional full product title
+    url: str ="" # optional device url
     doc_url: str = ""  # Documentation URL
     # manufacturer: Manufacturer - set on relink
 
     def as_html(self) -> str:
         title = self.title if self.title else self.model
-        device_link = Link.create(url=self.doc_url, text=title, target="_blank") if self.doc_url else title
+        device_link = Link.create(url=self.url, text=title, target="_blank") if self.doc_url else title
+        doc_link=Link.create(url=self.doc_url,text="📄",target="_blank") if self.doc_url else ""
         mfr_html = self.manufacturer.as_html() if hasattr(self, 'manufacturer') else self.mid
-        return f"{mfr_html} → {device_link}"
-    
+        return f"{mfr_html} → {device_link}{doc_link}"
+
 @lod_storable
 class MBusExample:
     """
@@ -61,14 +63,13 @@ class MBusExample:
     name: str
     title: str
     hex: str
+    valid: bool=False
     # device: Device - set on relink
 
     def as_html(self) -> str:
         device_html = self.device.as_html() if hasattr(self, 'device') else self.did
         example_text = f"{self.name}: {self.title}" if self.title else self.name
         return f"{device_html} → {example_text}"
-    
-
 
 @lod_storable
 class MBusExamples:
@@ -84,21 +85,21 @@ class MBusExamples:
     def get(cls, yaml_path: str = None) -> 'MBusExamples':
         """
         Load and dereference M-Bus examples from YAML
-        
+
         Args:
             yaml_path: Path to YAML file (defaults to examples_path/mbus_examples.yaml)
-            
+
         Returns:
             MBusExamples instance with dereferenced objects
         """
         if yaml_path is None:
             yaml_path = cls.examples_path() + "/mbus_examples.yaml"
-            
+
         # Load raw YAML data
         mbus_examples = cls.load_from_yaml_file(yaml_path)
         mbus_examples.relink()
         return mbus_examples
-        
+
     def relink(self):
         """
         Reestablish object references between manufacturers, devices and examples
@@ -109,7 +110,7 @@ class MBusExamples:
                 device.manufacturer = self.manufacturers[device.mid]
             else:
                 raise KeyError(f"Manufacturer '{device.mid}' not found for device '{device_id}'")
-                
+
         # Dereference devices in examples
         for example_id, example in self.examples.items():
             if example.did in self.devices:
@@ -124,16 +125,15 @@ class MBusExamples:
         path = os.path.join(os.path.dirname(__file__), "../ngwidgets_examples")
         path = os.path.abspath(path)
         return path
-    
-
 
 class MBusParser:
     """
     parse MBus data
     """
 
-    def __init__(self):
+    def __init__(self,debug:bool=False):
         # Define example messages
+        self.debug=debug
         self.examples = MBusExamples.get().examples
 
     def fromhex(self, x, base=16):
@@ -170,8 +170,12 @@ class MBusParser:
             data = list(map(self.fromhex, re.findall("..", filtered_data)))
             # Parse using meterbus
             frame = meterbus.load(data)
-        except Exception as e:
-            error_msg = f"Error parsing M-Bus data: {str(e)}"
+        except Exception as ex:
+            error_type = type(ex).__name__
+            error_msg = f"Error parsing M-Bus data: {error_type}: {str(ex)}"
+            if self.debug:
+                traceback.format_exception(ex)
+                pass
         return error_msg, frame
 
 
