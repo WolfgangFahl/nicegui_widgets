@@ -15,7 +15,6 @@ from nicegui import ui
 
 from ngwidgets.widgets import Link
 from ngwidgets.yamlable import lod_storable
-from reportlab.lib.textsplit import dumbSplit
 
 
 @lod_storable
