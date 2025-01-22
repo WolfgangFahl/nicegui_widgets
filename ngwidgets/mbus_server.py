@@ -11,6 +11,9 @@ import re
 import json
 
 class MBusParser:
+    """
+    Meterbus message parser
+    """
     def __init__(self):
         self.hex_input = None
         self.result_area = None
@@ -42,13 +45,12 @@ class MBusParser:
         except Exception as e:
             return False, f"Error parsing M-Bus data: {str(e)}"
 
-    def createTextArea(self, label, readonly=False, placeholder=None):
+    def createTextArea(self, label,placeholder=None,classes:str="h-64"):
         """Create a standardized textarea with common styling"""
         textarea = ui.textarea(
             label=label,
             placeholder=placeholder
-        ).classes("w-full").props('input-class=h-64').props('clearable')
-        textarea.enabled=not readonly
+        ).classes("w-full").props(f'input-class={classes}').props('clearable')
         return textarea
 
     def on_parse(self):
@@ -64,24 +66,25 @@ class MBusParser:
         # Create text areas using the common function
         self.hex_input = self.createTextArea(
             label="Enter M-Bus hex message",
-            placeholder="e.g. 684d4d680800722654832277..."
+            placeholder="e.g. 68 4d 4d 68 08 00 72 26 54 83 22 77...",
+            classes="h-32"
         )
 
         self.result_area = self.createTextArea(
             label="Parsed Result",
-            readonly=True
+            classes="h-96"
         )
+        with ui.row() as self.button_row:
+            # Add a parse button
+            ui.button("Parse Message", on_click=self.on_parse).classes("q-mt-md")
 
-        # Add a parse button
-        ui.button("Parse Message", on_click=self.on_parse).classes("q-mt-md")
-
-        # Add example message
-        ui.button(
-            "Load Example",
-            on_click=lambda: self.hex_input.set_value(
-                "684d4d680800722654832277040904360000000c78265483220406493500000c14490508000b2d0000000b3b0000000a5a18060a5e89020b61883200046d0d0c2c310227c80309fd0e2209fd0f470f00008d16"
-            )
-        ).classes("q-mt-md q-ml-sm")
+            # Add example message
+            ui.button(
+                "Load Example",
+                on_click=lambda: self.hex_input.set_value(
+                    "684d4d680800722654832277040904360000000c78265483220406493500000c14490508000b2d0000000b3b0000000a5a18060a5e89020b61883200046d0d0c2c310227c80309fd0e2209fd0f470f00008d16"
+                )
+            ).classes("q-mt-md q-ml-sm")
 
 def main():
     """Entry point for M-Bus Parser"""
