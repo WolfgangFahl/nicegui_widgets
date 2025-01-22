@@ -6,34 +6,30 @@ manufacturers:
     name: Allmess
     url: https://www.allmess.de
     country: Germany
-
 devices:
   cf_echo_ii:
-    manufacturer: allmess
+    mid: allmess
     model: CF Echo II
+    title: ''
     doc_url: https://www.allmess.de/fileadmin/multimedia/alle_Dateien/MA/MA_BA_12088-AC%20CF%20Echo%20II%20D%20TS1021_KL.pdf
-
   ultramaxx:
-    manufacturer: allmess
+    mid: allmess
     model: UltraMaXX
     title: Integral-MK UltraMaXX
     doc_url: https://www.allmess.de/fileadmin/multimedia/alle_Dateien/DB/DB_P0012%20UltraMaXX_TS0219.pdf
-
 examples:
-  cf_echo_ii_basic:
-    device: cf_echo_ii
+  cf_echo_basic:
+    did: cf_echo_ii
     name: Basic Reading
     title: Standard M-Bus reading
     hex: 684d4d680800722654832277040904360000000c78265483220406493500000c14490508000b2d0000000b3b0000000a5a18060a5e89020b61883200046d0d0c2c310227c80309fd0e2209fd0f470f00008d16
-
-  cf_echo_ii_init:
-    device: cf_echo_ii
+  cf_echo_init:
+    did: cf_echo_ii
     name: CF Echo II init write
     title: CF Echo II init
     hex: 6803036873fea61716
-
   ultramaxx_init:
-    device: ultramaxx
+    did: ultramaxx
     name: CFUM init
     title: CFUM init
     hex: 6803036853fea6f716

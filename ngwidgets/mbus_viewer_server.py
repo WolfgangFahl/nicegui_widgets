@@ -3,12 +3,15 @@ Created on 22.01.2025
 
 @author: wf
 """
+
 import os
+
 from nicegui import Client
+
 import ngwidgets
-from ngwidgets.input_webserver import InputWebserver, WebserverConfig, InputWebSolution
+from ngwidgets.input_webserver import InputWebserver, InputWebSolution, WebserverConfig
+from ngwidgets.mbus_viewer import MBusExamples, MBusViewer
 from ngwidgets.yamlable import lod_storable
-from ngwidgets.mbus_viewer import MBusViewer, MBusExamples
 
 
 @lod_storable
@@ -16,6 +19,7 @@ class Version:
     """
     Version handling for nicegui widgets
     """
+
     name = "mbus-viewer"
     version = ngwidgets.__version__
     date = "2025-01-22"
@@ -40,6 +44,7 @@ class Version:
 {description}
 
   Created by {authors} on {date} last updated {updated}"""
+
 
 class NiceMBusWebserver(InputWebserver):
     """
@@ -69,9 +74,7 @@ class NiceMBusWebserver(InputWebserver):
 
     def configure_run(self):
         root_path = (
-            self.args.root_path
-            if self.args.root_path
-            else MBusExamples.examples_path()
+            self.args.root_path if self.args.root_path else MBusExamples.examples_path()
         )
         self.root_path = os.path.abspath(root_path)
         self.allowed_urls = [
@@ -82,9 +85,7 @@ class NiceMBusWebserver(InputWebserver):
 
 
 class NiceMBus(InputWebSolution):
-    """
-
-    """
+    """ """
 
     def __init__(self, webserver: "NiceMBusWebserver", client: Client):
         super().__init__(webserver, client)
@@ -95,9 +96,7 @@ class NiceMBus(InputWebSolution):
         """
 
         def setup_home():
-            viewer=MBusViewer(solution=self)
+            viewer = MBusViewer(solution=self)
             viewer.setup_ui()
 
-
         await self.setup_content_div(setup_home)
-
