@@ -5,11 +5,14 @@ Created on 2025-01-18
 @author: wf
 """
 import re
+
 from nicegui import ui
+
 from ngwidgets.gpxviewer import GPXViewer
 
 # Global viewer instance
 viewer = None
+
 
 def initialize_viewer():
     """
@@ -19,6 +22,7 @@ def initialize_viewer():
     parser = GPXViewer.get_parser()
     args = parser.parse_args()
     viewer = GPXViewer(args=args)
+
 
 def clean_smw_artifacts(input_str: str) -> str:
     """
@@ -33,8 +37,11 @@ def clean_smw_artifacts(input_str: str) -> str:
     # Regex to match and remove SMW markers
     return re.sub(r"\[\[SMW::(on|off)\]\]", "", input_str)
 
+
 @ui.page("/lines")
-def lines_page(lines: str = None, auth_token: str = None, zoom: int = GPXViewer.default_zoom):
+def lines_page(
+    lines: str = None, auth_token: str = None, zoom: int = GPXViewer.default_zoom
+):
     """
     Endpoint to display routes based on 'lines' parameter.
     """
@@ -60,8 +67,9 @@ def lines_page(lines: str = None, auth_token: str = None, zoom: int = GPXViewer.
     except ValueError as e:
         ui.label(f"Error processing lines: {e}")
 
+
 @ui.page("/")
-def gpx(gpx: str = None, auth_token: str = None, zoom:int=GPXViewer.default_zoom):
+def gpx(gpx: str = None, auth_token: str = None, zoom: int = GPXViewer.default_zoom):
     """
     GPX viewer page with optional gpx_url and auth_token.
     """
@@ -79,7 +87,10 @@ def gpx(gpx: str = None, auth_token: str = None, zoom:int=GPXViewer.default_zoom
         viewer.load_gpx(gpx_to_use)
         viewer.show(zoom=zoom)
     else:
-        ui.label("Please provide a GPX file via 'gpx' query parameter or the command line.")
+        ui.label(
+            "Please provide a GPX file via 'gpx' query parameter or the command line."
+        )
+
 
 def main():
     """
@@ -87,6 +98,7 @@ def main():
     """
     initialize_viewer()
     ui.run(port=viewer.args.port, title="GPX Viewer")
+
 
 # Call main directly without a guard
 main()

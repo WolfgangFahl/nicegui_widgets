@@ -23,12 +23,12 @@ class TestGPXViewer(Basetest):
         """
         sample_keys = list(GPXViewer.samples.keys())
         expected_centers = {
-            sample_keys[0]: # Mountain bike loop at Middlesex Fells reservation.
-                (42.44903, -71.1139805),
-            sample_keys[1]: # Via Verde de Arditurri
-                (43.302147, -1.8539505),
-            sample_keys[2]: # Vía Verde del Fc Vasco Navarro
-                (42.89977, -2.34528)
+            sample_keys[0]: (  # Mountain bike loop at Middlesex Fells reservation.
+                42.44903,
+                -71.1139805,
+            ),
+            sample_keys[1]: (43.302147, -1.8539505),  # Via Verde de Arditurri
+            sample_keys[2]: (42.89977, -2.34528),  # Vía Verde del Fc Vasco Navarro
         }
 
         for sample_name, gpx_url in GPXViewer.samples.items():
@@ -47,8 +47,9 @@ class TestGPXViewer(Basetest):
 
                 # Test that tour and legs were created
                 self.assertIsNotNone(viewer.tour)
-                self.assertGreater(len(viewer.tour.legs), 0,
-                    f"No legs found in {sample_name}")
+                self.assertGreater(
+                    len(viewer.tour.legs), 0, f"No legs found in {sample_name}"
+                )
 
                 # Test map properties
                 self.assertEqual(viewer.zoom, GPXViewer.default_zoom)
@@ -61,23 +62,24 @@ class TestGPXViewer(Basetest):
                     act_lat,
                     exp_lat,
                     places=5,
-                    msg=f"Latitude mismatch for {sample_name}"
+                    msg=f"Latitude mismatch for {sample_name}",
                 )
                 self.assertAlmostEqual(
                     act_lon,
                     exp_lon,
                     places=5,
-                    msg=f"Longitude mismatch for {sample_name}"
+                    msg=f"Longitude mismatch for {sample_name}",
                 )
 
                 # Test bounding box calculation
-                self.assertIsNotNone(viewer.bounding_box,
-                    f"Bounding box not calculated for {sample_name}")
+                self.assertIsNotNone(
+                    viewer.bounding_box,
+                    f"Bounding box not calculated for {sample_name}",
+                )
 
                 # Test map creation with leg styles
                 viewer.show()
-                self.assertIsNotNone(viewer.map,
-                    f"Map not created for {sample_name}")
+                self.assertIsNotNone(viewer.map, f"Map not created for {sample_name}")
 
     def test_lines_parsing(self):
         """
@@ -120,8 +122,9 @@ class TestGPXViewer(Basetest):
         self.assertEqual(len(tour.legs), len(expected_legs))
 
         # Verify parsed legs
-        for leg, (expected_type, expected_start, expected_end) in zip(tour.legs, expected_legs):
+        for leg, (expected_type, expected_start, expected_end) in zip(
+            tour.legs, expected_legs
+        ):
             self.assertEqual(leg.leg_type, expected_type)
             self.assertEqual(leg.start.coordinates, expected_start)
             self.assertEqual(leg.end.coordinates, expected_end)
-

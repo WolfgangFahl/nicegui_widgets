@@ -8,7 +8,9 @@ import logging
 from typing import Any, Dict, List, Tuple
 
 from nicegui import events, ui
-from ngwidgets.tour import Tour, LegStyles
+
+from ngwidgets.tour import LegStyles, Tour
+
 
 class LeafletMap(ui.leaflet):
     """Enhanced Leaflet map with additional functionality"""
@@ -102,7 +104,7 @@ class LeafletMap(ui.leaflet):
             options = {
                 "color": style.color,
                 "weight": style.weight,
-                "opacity": style.opacity
+                "opacity": style.opacity,
             }
             if style.dashArray:
                 options["dashArray"] = style.dashArray

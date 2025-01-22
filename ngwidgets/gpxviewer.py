@@ -6,23 +6,27 @@ Created on 2025-01-17
 
 import argparse
 import re
+from typing import Optional
+
 import gpxpy
 import requests
-from typing import Optional
+
 from ngwidgets.leaflet_map import LeafletMap
-from ngwidgets.tour import Loc, Leg, Tour, LegStyle, LegStyles
+from ngwidgets.tour import Leg, LegStyle, LegStyles, Loc, Tour
+
 
 class GPXViewer:
     """
     display a given gpx file
     """
+
     samples = {
         "Mountain bike loop at Middlesex Fells reservation.": "https://www.topografix.com/fells_loop.gpx",
         "Via Verde de Arditurri": "https://www.bahntrassenradwege.de/images/Spanien/Baskenland/V-v-de-arditurri/Arditurri2.gpx",
-        "Vía Verde del Fc Vasco Navarro": "https://ebike.bitplan.com/images/ebike/e/ec/VV-del-FC-Vasco-Navarro_fdmi1644.gpx"
+        "Vía Verde del Fc Vasco Navarro": "https://ebike.bitplan.com/images/ebike/e/ec/VV-del-FC-Vasco-Navarro_fdmi1644.gpx",
     }
-    default_center=[51.4934, 0.0098] # greenwich
-    default_zoom=11
+    default_center = [51.4934, 0.0098]  # greenwich
+    default_zoom = 11
 
     @classmethod
     def get_parser(cls):
@@ -40,8 +44,19 @@ class GPXViewer:
             default=8080,
             help="Port to run server on (default: 8080)",
         )
-        parser.add_argument("--zoom", type=int, default=GPXViewer.default_zoom, help="zoom level (default: 11)")
-        parser.add_argument("--center", nargs=2, type=float, default=GPXViewer.default_center, help="center lat,lon - default: Greenwich")
+        parser.add_argument(
+            "--zoom",
+            type=int,
+            default=GPXViewer.default_zoom,
+            help="zoom level (default: 11)",
+        )
+        parser.add_argument(
+            "--center",
+            nargs=2,
+            type=float,
+            default=GPXViewer.default_center,
+            help="center lat,lon - default: Greenwich",
+        )
         parser.add_argument("--debug", action="store_true", help="Show debug output")
         return parser
 
@@ -70,8 +85,8 @@ class GPXViewer:
             if self.args.gpx:
                 self.load_gpx(self.args.gpx)
         else:
-            self.zoom=GPXViewer.default_zoom
-            self.center=GPXViewer.default_center
+            self.zoom = GPXViewer.default_zoom
+            self.center = GPXViewer.default_center
 
     def load_gpx(self, gpx_url: str):
         """
@@ -102,7 +117,14 @@ class GPXViewer:
             self.bounding_box = None
         return self.center
 
-    def add_leg(self, start_point, end_point, leg_type: str, add_end_point: bool = False, url: Optional[str] = None):
+    def add_leg(
+        self,
+        start_point,
+        end_point,
+        leg_type: str,
+        add_end_point: bool = False,
+        url: Optional[str] = None,
+    ):
         """
         Add a leg to the tour
 
@@ -119,22 +141,17 @@ class GPXViewer:
         # Create locations
         start_loc = Loc(
             id=str(len(self.tour.legs)),
-            name=start_point.name if hasattr(start_point, 'name') else None,
-            coordinates=(start_point.latitude, start_point.longitude)
+            name=start_point.name if hasattr(start_point, "name") else None,
+            coordinates=(start_point.latitude, start_point.longitude),
         )
         end_loc = Loc(
             id=str(len(self.tour.legs) + 1),
-            name=end_point.name if hasattr(end_point, 'name') else None,
-            coordinates=(end_point.latitude, end_point.longitude)
+            name=end_point.name if hasattr(end_point, "name") else None,
+            coordinates=(end_point.latitude, end_point.longitude),
         )
 
         # Create and add leg
-        leg = Leg(
-            leg_type=leg_type,
-            start=start_loc,
-            end=end_loc,
-            url=url
-        )
+        leg = Leg(leg_type=leg_type, start=start_loc, end=end_loc, url=url)
         self.tour.legs.append(leg)
 
     def get_points(self, gpx, way_points_fallback: bool = False):
@@ -153,7 +170,7 @@ class GPXViewer:
                     route.points[i + 1],
                     "bike",  # Default to bike for routes
                     add_end_point=is_last,
-                    url=url
+                    url=url,
                 )
 
         # Process tracks
@@ -165,10 +182,10 @@ class GPXViewer:
                         segment.points[i],
                         segment.points[i + 1],
                         "bike",  # Default to bike for tracks
-                        add_end_point=is_last
+                        add_end_point=is_last,
                     )
 
-        prev_loc=None
+        prev_loc = None
         # Handle waypoints if no legs were created and fallback is active
         if not self.tour.legs and gpx.waypoints and way_points_fallback:
             for i, waypoint in enumerate(gpx.waypoints):
@@ -176,14 +193,14 @@ class GPXViewer:
                     id=str(i),
                     name=waypoint.name,
                     coordinates=(waypoint.latitude, waypoint.longitude),
-                    notes=waypoint.description
+                    notes=waypoint.description,
                 )
                 if i > 0:
                     leg = Leg(
                         leg_type="bike",
                         start=prev_loc,
                         end=loc,
-                        url=waypoint.link.href if waypoint.link else None
+                        url=waypoint.link.href if waypoint.link else None,
                     )
                     self.tour.legs.append(leg)
                 prev_loc = loc
@@ -212,7 +229,7 @@ class GPXViewer:
                 leg_type = leg_type_match.group(1).lower()
                 pass
             else:
-                leg_type="bike"
+                leg_type = "bike"
 
             points = re.findall(coordinate_pattern, segment)
             if points:
@@ -224,15 +241,11 @@ class GPXViewer:
                     loc = Loc(
                         id=str(len(self.tour.legs) + i),
                         name=None,
-                        coordinates=(lat_val, lon_val)
+                        coordinates=(lat_val, lon_val),
                     )
 
                     if prev_loc:
-                        leg = Leg(
-                            leg_type=leg_type,
-                            start=prev_loc,
-                            end=loc
-                        )
+                        leg = Leg(leg_type=leg_type, start=prev_loc, end=loc)
                         self.tour.legs.append(leg)
                     prev_loc = loc
 
