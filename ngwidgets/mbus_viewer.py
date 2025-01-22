@@ -3,10 +3,72 @@ Created on 2025-01-22
 
 @author: wf
 """
+import os
 import re
 import json
 import meterbus
+from dataclasses import field
 from nicegui import ui
+from ngwidgets.widgets import Link
+from ngwidgets.yamlable import lod_storable
+from typing import Dict
+
+@lod_storable
+class Manufacturer:
+    """
+    A manufacturer of M-Bus devices
+    """
+    name: str
+    url: str
+    country: str = "Germany"  # Most M-Bus manufacturers are German
+
+    def as_html(self) -> str:
+        return Link.create(url=self.url, text=self.name, target="_blank") if self.url else self.name
+
+@lod_storable
+class Device:
+    """
+    A device class for M-Bus devices
+    """
+    manufacturer: Manufacturer
+    model: str
+    title: str = ""  # Optional full product title
+    doc_url: str = ""  # Documentation URL
+
+    def as_html(self) -> str:
+        title = self.title if self.title else self.model
+        return Link.create(url=self.doc_url, text=title, target="_blank") if self.doc_url else title
+
+@lod_storable
+class MBusExample:
+    device: Device
+    name: str
+    title: str
+    hex: str
+
+    def as_html(self) -> str:
+        return self.device.as_html()
+
+@lod_storable
+class MBusExamples:
+    """
+    Manages M-Bus devices and their examples
+    """
+    examples: Dict[str, MBusExample] = field(default_factory=dict)
+
+    @classmethod
+    def get(cls, yaml_path:str=None) -> Dict[str, MBusExample]:
+        if yaml_path is None:
+            yaml_path=cls.examples_path()+"/mbus_examples.yaml"
+        mbus_examples=cls.load_from_yaml_file(yaml_path)
+        return mbus_examples
+
+    @classmethod
+    def examples_path(cls) -> str:
+        # the root directory (default: examples)
+        path = os.path.join(os.path.dirname(__file__), "../ngwidgets_examples")
+        path = os.path.abspath(path)
+        return path
 
 class MBusParser:
     """
@@ -14,10 +76,7 @@ class MBusParser:
     """
     def __init__(self):
         # Define example messages
-        self.examples = {
-            "Basic Reading": "684d4d680800722654832277040904360000000c78265483220406493500000c14490508000b2d0000000b3b0000000a5a18060a5e89020b61883200046d0d0c2c310227c80309fd0e2209fd0f470f00008d16",
-            "CF Echo II": "68 03 03 68  73 fe a6 17  16"
-        }
+        self.examples = MBusExamples.get().examples
 
     def fromhex(self, x, base=16):
         """Convert hex string to integer"""
@@ -41,12 +100,12 @@ class MBusParser:
         }
         return json.dumps(data)
 
-    def parse_mbus_data(self, hex_data):
+    def parse_mbus_frame(self, hex_data):
         """
-        Parse M-Bus hex data and return JSON result
-        Returns tuple of (error_msg, json_str)
+        Parse M-Bus hex data and return mbus frame
+        Returns tuple of (error_msg, mbus_frame)
         """
-        json_str = None
+        frame = None
         error_msg = None
         try:
             # Allow flexible whitespace in input
@@ -55,10 +114,9 @@ class MBusParser:
             data = list(map(self.fromhex, re.findall("..", filtered_data)))
             # Parse using meterbus
             frame = meterbus.load(data)
-            json_str = self.get_frame_json(frame)
         except Exception as e:
             error_msg = f"Error parsing M-Bus data: {str(e)}"
-        return error_msg, json_str
+        return error_msg, frame
 
 class MBusViewer(MBusParser):
     """
@@ -70,7 +128,7 @@ class MBusViewer(MBusParser):
         self.hex_input = None
         self.json_code = None
         self.example_select = None
-        self.error_label = None
+        self.error_html = None
 
     def createTextArea(self, label, placeholder=None, classes: str = "h-64"):
         """Create a standardized textarea with common styling"""
@@ -85,33 +143,46 @@ class MBusViewer(MBusParser):
     def on_parse(self):
         """Handle parse button click"""
         try:
-            error_msg, json_str = self.parse_mbus_data(self.hex_input.value)
-            if error_msg:
-                self.error_label.text = error_msg
-                self.error_label.classes("text-red-500")
-            else:
-                self.json_code.content=json_str
+            with self.result_row:
+                self.json_code.content=""
+                self.error_view.content=""
+                mbus_hex_str=self.hex_input.value
+                error_msg, frame = self.parse_mbus_frame(mbus_hex_str)
+                if error_msg:
+                    self.error_view.content = f"{error_msg}"
+                else:
+                    json_str=self.get_frame_json(frame)
+                    self.json_code.content=json_str
         except Exception as ex:
             self.solution.handle_exception(ex)
 
     def on_example_change(self):
         """Handle example selection change"""
+
         selected = self.example_select.value
         if selected in self.examples:
-            self.hex_input.value = self.examples[selected]
+            example = self.examples[selected]
+            self.hex_input.value = example.hex
+            markup = Link.create(
+                url=example.url,
+                text=example.device,
+                tooltip=example.title,
+                target="_blank") if example.url else example.device
+            self.example_details.content = markup
+            self.example_details.content=markup
             self.on_parse()
 
     def setup_ui(self):
         """Create the NiceGUI user interface"""
         ui.label("M-Bus Message Parser").classes("text-h4 q-mb-md")
 
-        self.error_label = ui.label().classes("text-red-500 hidden")
-
         self.example_select = ui.select(
             label="Select Example",
             options=list(self.examples.keys()),
             on_change=self.on_example_change,
         ).classes("w-full q-mb-md")
+
+        self.example_details = ui.html().classes("w-full mb-4")
 
         self.hex_input = self.createTextArea(
             label="Enter M-Bus hex message",
@@ -121,5 +192,6 @@ class MBusViewer(MBusParser):
 
         with ui.row() as self.button_row:
             ui.button("Parse Message", on_click=self.on_parse).classes("q-mt-md")
-
-        self.json_code = ui.code(language='json').classes("w-full h-96 q-mt-md")
+        with ui.row() as self.result_row:
+            self.error_view = ui.html()
+            self.json_code = ui.code(language='json').classes("w-full h-96 q-mt-md")

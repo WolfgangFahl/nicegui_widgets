@@ -3,11 +3,13 @@ Created on 22.01.2025
 
 @author: wf
 """
+import os
 from nicegui import Client
 import ngwidgets
 from ngwidgets.input_webserver import InputWebserver, WebserverConfig, InputWebSolution
 from ngwidgets.yamlable import lod_storable
-from ngwidgets.mbus_viewer import MBusViewer
+from ngwidgets.mbus_viewer import MBusViewer, MBusExamples
+
 
 @lod_storable
 class Version:
@@ -64,6 +66,20 @@ class NiceMBusWebserver(InputWebserver):
         """
         InputWebserver.__init__(self, config=NiceMBusWebserver.get_config())
         pass
+
+    def configure_run(self):
+        root_path = (
+            self.args.root_path
+            if self.args.root_path
+            else MBusExamples.examples_path()
+        )
+        self.root_path = os.path.abspath(root_path)
+        self.allowed_urls = [
+            "https://raw.githubusercontent.com/WolfgangFahl/nicescad/main/examples/",
+            "https://raw.githubusercontent.com/openscad/openscad/master/examples/",
+            self.root_path,
+        ]
+
 
 class NiceMBus(InputWebSolution):
     """
