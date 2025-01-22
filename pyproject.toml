@@ -96,7 +96,7 @@ mbus = [
 
 
 [tool.hatch.build.targets.wheel]
-only-include = ["ngwidgets"]
+only-include = ["ngwidgets","ngwidgets_examples"]
 
 [tool.hatch.build.targets.wheel.sources]
 "ngwidgets" = "ngwidgets"
