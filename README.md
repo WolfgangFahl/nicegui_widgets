@@ -19,3 +19,4 @@ nicegui widgets
 * [nicetrack](http://nicetrack.bitplan.com)
 * [nicescad](http://nicescad.bitplan.com)
 * [diagrams](http://diagrams2.bitplan.com)
+* [mbus][https://mbus.bitplan.com)
