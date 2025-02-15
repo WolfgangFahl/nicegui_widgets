@@ -127,7 +127,7 @@ class LLM:
             model(str): the model to use
             prompt_filepath(str): the filepath for the prompt logging
         """
-        self.client=None
+        self.client = None
         self.model = model
         self.token_size_limit = LLM.MODEL_SIZE_LIMITS.get(
             model, 4096
@@ -155,7 +155,7 @@ class LLM:
             else:
                 return
         # set the client using the  api key
-        self.client=OpenAI(api_key=openai_api_key)
+        self.client = OpenAI(api_key=openai_api_key)
         # If prompts_filepath is None, use default path in the user's home directory with the current date
         if prompts_filepath is None:
             # Format: Year-Month-Day
@@ -214,12 +214,7 @@ class LLM:
         # Interact with the API
         chat_completion = self.client.chat.completions.create(
             model=model,
-            messages=[
-                {
-                    "role": "user",
-                    "content": prompt_text
-                }
-            ],
+            messages=[{"role": "user", "content": prompt_text}],
             temperature=temperature,  # Include the temperature parameter here
         )
         result = chat_completion.choices[0].message.content

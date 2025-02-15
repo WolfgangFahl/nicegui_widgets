@@ -7,6 +7,7 @@ Created on 2023-06-21
 import unittest
 
 from openai import OpenAI
+
 from ngwidgets.basetest import Basetest
 from ngwidgets.llm import LLM
 
