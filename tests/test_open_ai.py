@@ -6,8 +6,7 @@ Created on 2023-06-21
 
 import unittest
 
-import openai
-
+from openai import OpenAI
 from ngwidgets.basetest import Basetest
 from ngwidgets.llm import LLM
 
@@ -24,7 +23,7 @@ class TestOpenAi(Basetest):
     @unittest.skipIf(Basetest.inPublicCI(), "chatgpt")
     def testOpenAI(self):
         # list models
-        models = openai.Model.list()
+        models = self.llm.client.models.list()
         for model in models.data:
             if self.debug:
                 print(model)
@@ -35,8 +34,8 @@ class TestOpenAi(Basetest):
         """
         test the chatgpt interface
         """
-        result = self.llm.ask("What's your model version?")
+        result = self.llm.ask("Who was the first man on the moon?")
         debug = True
         if debug:
             print(result)
-        self.assertTrue("OpenAI" in result)
+        self.assertTrue("Armstrong" in result)

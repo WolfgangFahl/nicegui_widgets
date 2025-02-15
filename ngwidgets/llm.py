@@ -13,7 +13,7 @@ from datetime import datetime
 from pathlib import Path
 from typing import List, Optional
 
-import openai
+from openai import OpenAI
 
 from ngwidgets.yamlable import lod_storable
 
@@ -127,6 +127,7 @@ class LLM:
             model(str): the model to use
             prompt_filepath(str): the filepath for the prompt logging
         """
+        self.client=None
         self.model = model
         self.token_size_limit = LLM.MODEL_SIZE_LIMITS.get(
             model, 4096
@@ -135,7 +136,7 @@ class LLM:
         openai_api_key = None
         if api_key:
             # If an API key is provided during object creation, set it.
-            openai.api_key = api_key
+            openai_api_key = api_key
         else:
             # Load the API key from the environment or a JSON file
             openai_api_key = os.getenv("OPENAI_API_KEY")
@@ -153,8 +154,8 @@ class LLM:
                 )
             else:
                 return
-        # set the global api key
-        openai.api_key = openai_api_key
+        # set the client using the  api key
+        self.client=OpenAI(api_key=openai_api_key)
         # If prompts_filepath is None, use default path in the user's home directory with the current date
         if prompts_filepath is None:
             # Format: Year-Month-Day
@@ -187,7 +188,7 @@ class LLM:
         Returns:
             bool: True if the Large Language Model is available
         """
-        return openai.api_key is not None
+        return self.client is not None
 
     def ask(self, prompt_text: str, model: str = None, temperature: float = 0.7) -> str:
         """
@@ -211,9 +212,14 @@ class LLM:
         start_time = datetime.now()
 
         # Interact with the API
-        chat_completion = openai.chat.completions.create(
+        chat_completion = self.client.chat.completions.create(
             model=model,
-            messages=[{"role": "user", "content": prompt_text}],
+            messages=[
+                {
+                    "role": "user",
+                    "content": prompt_text
+                }
+            ],
             temperature=temperature,  # Include the temperature parameter here
         )
         result = chat_completion.choices[0].message.content
@@ -278,7 +284,7 @@ class VisionLLM(LLM):
             }
         ]
 
-        chat_completion = openai.chat.completions.create(
+        chat_completion = self.client.chat.completions.create(
             model=self.model, messages=messages
         )
 
