@@ -303,7 +303,7 @@ class ListOfDictsGrid:
 
     def sizeColumnsToFit(self):
         if self.ag_grid:
-            self.ag_grid.run_column_method("autoSizeAllColumns")
+            self.ag_grid.run_grid_method("autoSizeAllColumns")
             self.ag_grid.update()
 
     def setDefaultColDef(self):
