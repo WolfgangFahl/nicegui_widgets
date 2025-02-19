@@ -140,6 +140,27 @@ class NiceGuiWebserver(object):
         solution_class = self.config.solution_class
         if not solution_class:
             raise TypeError("no solution_class configured")
+
+        action_result=await self.execute_action(client,
+            solution_class,
+            wanted_action,
+            *args,
+            **kwargs)
+        return action_result
+
+    async def execute_action(self, client: Client, solution_class, wanted_action: Callable, *args, **kwargs):
+        """
+        Execute the specified action on the solution instance.
+
+        Args:
+            client (Client): The client making the request.
+            solution_class: The solution class to create an instance for to execute the action on.
+            wanted_action(Callable): The function to perform.
+            args, *kwargs: Additional arguments to pass to the action.
+
+        Returns:
+            The result of the action performed.
+        """
         solution_instance = solution_class(self, client)
 
         # Check if the solution_instance is an instance of solution_class or its subclass
@@ -164,7 +185,8 @@ class NiceGuiWebserver(object):
         # are done
         solution_instance.prepare_ui()
 
-        return await action(*args, **kwargs)
+        action_result= await action(*args, **kwargs)
+        return action_result
 
     @classmethod
     def optionalDebug(self, args):
