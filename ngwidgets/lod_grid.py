@@ -207,24 +207,38 @@ class ListOfDictsGrid:
                 type="error",
             )
 
+    def get_index(self, lenient: bool = False,lod=None,key_col:str=None):
+        """
+        get and index (dict of dicts) of the given list of
+        dicts based on the given key column - if no key_col is given
+        index by row number starting from 1
+        """
+        lod_index = {}
+        if lod is None:
+            lod=self.lod
+        if lod:
+            for row_index, row in enumerate(lod):
+                if key_col is None:
+                    lod_index[row_index+1] = row
+                else:
+                    if self.config.key_col in row:
+                        key_value = row[key_col]
+                        lod_index[key_value] = row
+                    else:
+                        msg = f"missing key column {self.config.key_col} in row {row_index}"
+                        if not lenient:
+                            raise Exception(msg)
+                        else:
+                            print(msg, file=sys.stderr)
+                        # missing key
+                        pass
+        return lod_index
+
     def update_index(self, lenient: bool = False):
         """
-        update the index based on the given key column
+        update my index (with view records)
         """
-        self.lod_index = {}
-        if self.lod:
-            for row_index, row in enumerate(self.lod):
-                if self.config.key_col in row:
-                    key_value = row[self.config.key_col]
-                    self.lod_index[key_value] = row
-                else:
-                    msg = f"missing key column {self.config.key_col} in row {row_index}"
-                    if not lenient:
-                        raise Exception(msg)
-                    else:
-                        print(msg, file=sys.stderr)
-                    # missing key
-                    pass
+        self.lod_index=self.get_index(lenient=lenient,lod=self.lod,key_col=self.config.key_col)
 
     def get_row_for_key(self, key_value: str):
         """
@@ -370,6 +384,21 @@ class ListOfDictsGrid:
         """
         selected_rows = await self.ag_grid.get_selected_rows()
         return selected_rows
+
+    async def get_selected_lod(self,lod_index=None):
+        """
+        selected rows are in view (e.g. potentially  html) format
+        get back the original list of dict rows
+        """
+        selected_lod = []
+        selected_rows = await self.get_selected_rows()
+        if lod_index is None:
+            lod_index=self.get_index(lenient=self.config.lenient,lod=self.lod)
+        for row in selected_rows:
+            key_value = row[self.config.key_col]
+            record = lod_index[key_value]
+            selected_lod.append(record)
+        return selected_lod
 
     def select_all_rows(self):
         """
