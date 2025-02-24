@@ -39,7 +39,7 @@ class GridConfig:
     auto_size_columns: bool = True
     # buttons
     with_buttons: bool = False
-    button_names: List[str] = field(default_factory=lambda: ["new", "delete", "all"])
+    button_names: List[str] = field(default_factory=lambda: ["new", "delete", "all", "fit"])
     prepend_new: bool = True
     html_columns: List[int] = field(default_factory=list)
     keygen_callback: Optional[Callable] = None
@@ -477,7 +477,7 @@ class ListOfDictsGrid:
                     )
             if "fit" in button_names:
                 self.fit_button = ui.button(
-                    "Fit", icon="arrow_range", on_click=self.onSizeColumnsToFit
+                    "Fit", icon="fit_screen", on_click=self.onSizeColumnsToFit
                 )
             if "all" in button_names:
                 self.select_toggle_button = ui.button(
