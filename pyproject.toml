@@ -65,6 +65,7 @@ classifiers=[
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13"
     "Operating System :: OS Independent",
     "Topic :: Software Development :: Libraries :: Python Modules",
     "Intended Audience :: Developers",
@@ -92,6 +93,10 @@ test = [
 mbus = [
   # https://pypi.org/project/pyMeterBus/
   'pyMeterBus>=0.8.4',
+]
+sso = [
+  # https://pypi.org/project/py-3rdparty-mediawiki/
+  "py-3rdparty-mediawiki>=0.14.6",
 ]
 
 
