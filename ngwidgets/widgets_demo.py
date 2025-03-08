@@ -31,6 +31,7 @@ from ngwidgets.version import Version
 from ngwidgets.webserver import WebserverConfig
 from ngwidgets.widgets import HideShow, Lang, Link
 from ngwidgets.wikipedia import WikipediaSearch
+from ngwidgets.sso_users_solution import SsoSolution
 
 
 @dataclass
@@ -837,6 +838,14 @@ class NiceGuiWidgetsDemo(InputWebSolution):
 
         await self.setup_content_div(show)
 
+    def configure_menu(self):
+        """
+        configure my menu
+        """
+        InputWebSolution.configure_menu(self)
+        self.sso_solution = SsoSolution(webserver=self.webserver)
+        self.sso_solution.configure_menu()
+
     async def home(self):
         """
         provide the main content page
@@ -881,7 +890,7 @@ class NiceGuiWidgetsDemoWebserver(InputWebserver):
 
     @classmethod
     def get_config(cls) -> WebserverConfig:
-        copy_right = "(c)2023-2024 Wolfgang Fahl"
+        copy_right = "(c)2023-2025 Wolfgang Fahl"
         config = WebserverConfig(
             short_name="ngdemo",
             timeout=6.0,
