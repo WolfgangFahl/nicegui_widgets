@@ -39,7 +39,9 @@ class GridConfig:
     auto_size_columns: bool = True
     # buttons
     with_buttons: bool = False
-    button_names: List[str] = field(default_factory=lambda: ["new", "delete", "all", "fit"])
+    button_names: List[str] = field(
+        default_factory=lambda: ["new", "delete", "all", "fit"]
+    )
     prepend_new: bool = True
     html_columns: List[int] = field(default_factory=list)
     keygen_callback: Optional[Callable] = None
@@ -207,7 +209,7 @@ class ListOfDictsGrid:
                 type="error",
             )
 
-    def get_index(self, lenient: bool = False,lod=None,key_col:str=None):
+    def get_index(self, lenient: bool = False, lod=None, key_col: str = None):
         """
         get and index (dict of dicts) of the given list of
         dicts based on the given key column - if no key_col is given
@@ -215,11 +217,11 @@ class ListOfDictsGrid:
         """
         lod_index = {}
         if lod is None:
-            lod=self.lod
+            lod = self.lod
         if lod:
             for row_index, row in enumerate(lod):
                 if key_col is None:
-                    lod_index[row_index+1] = row
+                    lod_index[row_index + 1] = row
                 else:
                     if self.config.key_col in row:
                         key_value = row[key_col]
@@ -238,7 +240,9 @@ class ListOfDictsGrid:
         """
         update my index (with view records)
         """
-        self.lod_index=self.get_index(lenient=lenient,lod=self.lod,key_col=self.config.key_col)
+        self.lod_index = self.get_index(
+            lenient=lenient, lod=self.lod, key_col=self.config.key_col
+        )
 
     def get_row_for_key(self, key_value: str):
         """
@@ -385,7 +389,7 @@ class ListOfDictsGrid:
         selected_rows = await self.ag_grid.get_selected_rows()
         return selected_rows
 
-    async def get_selected_lod(self,lod_index=None):
+    async def get_selected_lod(self, lod_index=None):
         """
         selected rows are in view (e.g. potentially  html) format
         get back the original list of dict rows
@@ -393,7 +397,7 @@ class ListOfDictsGrid:
         selected_lod = []
         selected_rows = await self.get_selected_rows()
         if lod_index is None:
-            lod_index=self.get_index(lenient=self.config.lenient,lod=self.lod)
+            lod_index = self.get_index(lenient=self.config.lenient, lod=self.lod)
         for row in selected_rows:
             key_value = row[self.config.key_col]
             record = lod_index[key_value]

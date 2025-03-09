@@ -5,17 +5,22 @@ Created on 2025-02-15
 """
 
 from fastapi.responses import RedirectResponse
-from ngwidgets.login import Login
-from ngwidgets.webserver import WebSolution, NiceGuiWebserver
 from nicegui import Client, ui
 from wikibot3rd.sso import User
 from wikibot3rd.sso_users import Sso_Users
+
+from ngwidgets.login import Login
+from ngwidgets.webserver import NiceGuiWebserver, WebSolution
+
 
 class SsoSolution(WebSolution):
     """
     Encapsulates SSO authentication setup and user handling
     """
-    def __init__(self, webserver: NiceGuiWebserver, client: Client = None, credentials_path=None):
+
+    def __init__(
+        self, webserver: NiceGuiWebserver, client: Client = None, credentials_path=None
+    ):
         """
         Initialize SSO authentication
 
@@ -24,8 +29,12 @@ class SsoSolution(WebSolution):
             client: The client instance (can be None for non-client specific solutions)
             credentials_path: Optional path to the SSO credentials file
         """
-        super().__init__(webserver, client)  # Call parent constructor with both required parameters
-        self.users = Sso_Users(webserver.config.short_name, credentials_path=credentials_path)
+        super().__init__(
+            webserver, client
+        )  # Call parent constructor with both required parameters
+        self.users = Sso_Users(
+            webserver.config.short_name, credentials_path=credentials_path
+        )
 
         self.login = Login(webserver, self.users)
 
@@ -88,12 +97,13 @@ class SsoSolution(WebSolution):
 
     async def show_user_details(self):
         """Show the user details page"""
+
         def show():
             self.logout_button = ui.button(
-                "logout", icon="logout",
-                on_click=self.logout
+                "logout", icon="logout", on_click=self.logout
             )
             ui.html(self.as_html())
+
         await self.setup_content_div(show)
 
     def configure_menu(self):
@@ -105,20 +115,19 @@ class SsoSolution(WebSolution):
 
     def register_pages(self):
         """Register the SSO-related pages"""
+
         @ui.page("/user")
         async def show_user(client: Client):
-            if not  self.login.authenticated():
+            if not self.login.authenticated():
                 return RedirectResponse("/login")
             return await self.webserver.execute_action(
                 client,
                 solution_class=SsoSolution,
-                wanted_action=SsoSolution.show_user_details
+                wanted_action=SsoSolution.show_user_details,
             )
 
         @ui.page("/login")
         async def login(client: Client):
             return await self.webserver.execute_action(
-                client,
-                solution_class=SsoSolution,
-                wanted_action=SsoSolution.show_login
+                client, solution_class=SsoSolution, wanted_action=SsoSolution.show_login
             )

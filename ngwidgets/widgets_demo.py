@@ -26,12 +26,12 @@ from ngwidgets.pdfviewer import pdfviewer
 from ngwidgets.progress import NiceguiProgressbar
 from ngwidgets.projects import Projects
 from ngwidgets.projects_view import ProjectsView
+from ngwidgets.sso_users_solution import SsoSolution
 from ngwidgets.tristate import Tristate
 from ngwidgets.version import Version
 from ngwidgets.webserver import WebserverConfig
 from ngwidgets.widgets import HideShow, Lang, Link
 from ngwidgets.wikipedia import WikipediaSearch
-from ngwidgets.sso_users_solution import SsoSolution
 
 
 @dataclass

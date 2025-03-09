@@ -3,22 +3,26 @@ Created on 15.02.2025
 
 @author: wf
 """
+
 import logging
 import os
 import shutil
 import tempfile
+from unittest.mock import Mock, patch
+
 import yaml
-from ngwidgets.basetest import Basetest
 from wikibot3rd.sso import SSO, User
 from wikibot3rd.sso_users import Sso_Users
+
+from ngwidgets.basetest import Basetest
 from ngwidgets.sso_users_solution import SsoSolution
-from unittest.mock import Mock, patch
 
 
 class TestSsoAuth(Basetest):
     """
     test SSO Authentication
     """
+
     def setUp(self, debug=True, profile=True):
         """
         setup the test
@@ -36,20 +40,22 @@ class TestSsoAuth(Basetest):
         self.mock_credentials()
         Basetest.tearDown(self)
 
-    def mock_credentials(self,webserver=None):
+    def mock_credentials(self, webserver=None):
         """
         when called with webserver setup else tear down
         """
+
         def mocked_SSO_constructor(
-               i_self,  # inner self for the patched SSO constructor
-               host: str,
-               database: str,
-               sql_port: int = 3306,
-               db_username: str = None,
-               db_password: str = None,
-               with_pool: bool = True,
-               timeout: float = 3,
-               debug: bool = False):
+            i_self,  # inner self for the patched SSO constructor
+            host: str,
+            database: str,
+            sql_port: int = 3306,
+            db_username: str = None,
+            db_password: str = None,
+            with_pool: bool = True,
+            timeout: float = 3,
+            debug: bool = False,
+        ):
             # set properties
             i_self.host = host
             i_self.database = database
@@ -65,11 +71,12 @@ class TestSsoAuth(Basetest):
             i_self.check_credentials = lambda: True
             i_self.verify_password = lambda: True
             i_self.fetch_user_data_from_database = lambda: None
-            msg=f"providing mocked SSO {i_self.__dict__} with check_port, get_user, ... returning default values"
+            msg = f"providing mocked SSO {i_self.__dict__} with check_port, get_user, ... returning default values"
             if self.debug:
                 logging.warn(msg)
             else:
                 logging.info(msg)
+
         if not webserver:
             if os.path.exists(self.test_dir):
                 shutil.rmtree(self.test_dir)
@@ -85,9 +92,9 @@ class TestSsoAuth(Basetest):
                 "username": "test-user",
                 "password": "test-password",
                 "secret": "test-secret",
-                "wiki_id": "test-wiki"
+                "wiki_id": "test-wiki",
             }
-            self.credentials_path=os.path.join(solutions_path, "sso_credentials.yaml")
+            self.credentials_path = os.path.join(solutions_path, "sso_credentials.yaml")
             with open(self.credentials_path, "w") as f:
                 yaml.dump(creds, f)
 
@@ -107,8 +114,14 @@ class TestSsoAuth(Basetest):
             # (which we absolutely must avoid in the test environment!
             self.mock_sso = Mock(spec=SSO)
             with patch.object(SSO, "__init__", mocked_SSO_constructor):
-                self.sso_auth = SsoSolution(webserver, credentials_path=self.credentials_path)
-                self.sso_auth.users = Sso_Users(solution_name="test", debug=self.debug, credentials_path=self.credentials_path)
+                self.sso_auth = SsoSolution(
+                    webserver, credentials_path=self.credentials_path
+                )
+                self.sso_auth.users = Sso_Users(
+                    solution_name="test",
+                    debug=self.debug,
+                    credentials_path=self.credentials_path,
+                )
 
     def test_get_user_display_name(self):
         """
@@ -125,8 +138,11 @@ class TestSsoAuth(Basetest):
             with self.subTest(msg=msg):
 
                 # Verify SSO availability
-                self.assertEqual(self.sso_auth.users.is_available, is_available,
-                                 f"Expected is_available={is_available}, but got {self.sso_auth.users.is_available}")
+                self.assertEqual(
+                    self.sso_auth.users.is_available,
+                    is_available,
+                    f"Expected is_available={is_available}, but got {self.sso_auth.users.is_available}",
+                )
 
                 # Setup login mock
                 mock_login = Mock()
