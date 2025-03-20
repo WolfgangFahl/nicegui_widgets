@@ -50,7 +50,7 @@ components:
 - name: lod_grid.py
   source: /ngwidgets/lod_grid.py
   issue: 28
-  demo_url: http://nicescad.bitplan.com/grid
+  demo_url: http://ngdemo.bitplan.com/grid
   demo_image_url: https://github.com/WolfgangFahl/nicegui_widgets/assets/1336221/55e850ba-bc92-4879-a943-183501280afe
   description: >
     ListOfDictsGrid offers a configurable interactive ui.ag_grid for list of
@@ -117,4 +117,4 @@ components:
   description: >
     GPXViewer is a component for visualizing GPX (GPS Exchange Format) files using OpenStreetMap and Leaflet.
     It can display GPS tracks, routes and waypoints from URLs, with configurable zoom levels
-    and map centering. 
+    and map centering.
