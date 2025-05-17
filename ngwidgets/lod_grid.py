@@ -389,6 +389,19 @@ class ListOfDictsGrid:
         selected_rows = await self.ag_grid.get_selected_rows()
         return selected_rows
 
+    def select_rows_by_keys(self, key_values: List[Any]) -> None:
+        """
+        Select rows in the grid based on a list of key values.
+
+        Args:
+            key_values (List[Any]): List of key values to be selected.
+        """
+        row_data = self.get_row_data()
+        for row_index, row in enumerate(row_data):
+            key_value=row.get(self.config.key_col)
+            if key_value in key_values:
+                self.ag_grid.run_row_method(row_index, "setSelected", True)
+
     async def get_selected_lod(self, lod_index=None):
         """
         selected rows are in view (e.g. potentially  html) format
