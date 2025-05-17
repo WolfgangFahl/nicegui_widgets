@@ -5,6 +5,7 @@ Created on 2024-06-22
 """
 
 import json
+import unittest
 
 from ngwidgets.basetest import Basetest
 from ngwidgets.wikipedia import WikipediaSearch
@@ -19,6 +20,7 @@ class TestWikipediaSearch(Basetest):
         Basetest.setUp(self, debug=debug, profile=profile)
         self.wikipedia_search = WikipediaSearch()
 
+    @unittest.skipIf(Basetest.inPublicCI(), "Wikipedia API might not work")
     def test_wikipedia_search(self):
         """
         Test the Wikipedia search function by querying a known term and checking the response.
