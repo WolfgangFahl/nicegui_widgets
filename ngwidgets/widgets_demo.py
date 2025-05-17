@@ -115,9 +115,9 @@ class NiceGuiWidgetsDemo(InputWebSolution):
 
             # Buttons for controlling the progress bar
             with ui.row():
-                ui.button("--", on_click=lambda: update_progress(-1))
-                ui.button("++", on_click=lambda: update_progress(1))
-                ui.button("Auto", on_click=toggle_auto)
+                ui.button("--", on_=lambda: update_progress(-1))
+                ui.button("++", on_=lambda: update_progress(1))
+                ui.button("Auto", on_=toggle_auto)
 
         await self.setup_content_div(show)
 
@@ -134,24 +134,24 @@ class NiceGuiWidgetsDemo(InputWebSolution):
         """
 
         def foreground_no_slot(event):
-            ui.notify(f"{event.sender.text} clicked")
+            ui.notify(f"{event.sender.text} ed")
 
         async def background_no_slot(event):
             await run.io_bound(foreground_no_slot, event)
 
         def foreground_with_slot(event):
             with self.button_row:
-                ui.notify(f"{event.sender.text} clicked")
+                ui.notify(f"{event.sender.text} ed")
 
         async def background_with_slot(event):
             await run.io_bound(foreground_with_slot, event)
 
         def show():
             with ui.row() as self.button_row:
-                ui.button("foreground no slot", on_click=foreground_no_slot)
-                ui.button("background no slot", on_click=background_no_slot)
-                ui.button("foreground with slot", on_click=foreground_with_slot)
-                ui.button("background with slot", on_click=background_with_slot)
+                ui.button("foreground no slot", on_=foreground_no_slot)
+                ui.button("background no slot", on_=background_no_slot)
+                ui.button("foreground with slot", on_=foreground_with_slot)
+                ui.button("background with slot", on_=background_with_slot)
 
         await self.setup_content_div(show)
 
@@ -363,7 +363,7 @@ class NiceGuiWidgetsDemo(InputWebSolution):
 
                 # setup some grid event listeners
                 # https://www.ag-grid.com/javascript-data-grid/grid-events/
-                self.lod_grid.ag_grid.on("cellClicked", self.on_cell_clicked)
+                self.lod_grid.ag_grid.on("celled", self.on_cell_clicked)
                 self.lod_grid.ag_grid.on(
                     "cellDoubleClicked", self.on_cell_double_clicked
                 )
