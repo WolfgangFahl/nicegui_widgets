@@ -40,7 +40,7 @@ class Log:
 
     def color_msg(self, color, msg):
         """Display a colored message"""
-        print(f"{color}{msg}{Log.END_COLOR}")
+        print(f"{color}{msg}{END_COLOR}")
 
     def __post_init__(self):
         """
