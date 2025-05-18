@@ -398,7 +398,7 @@ class ListOfDictsGrid:
         """
         row_data = self.get_row_data()
         for row_index, row in enumerate(row_data):
-            key_value=row.get(self.config.key_col)
+            key_value = row.get(self.config.key_col)
             if key_value in key_values:
                 self.ag_grid.run_row_method(row_index, "setSelected", True)
 

@@ -12,10 +12,11 @@ from argparse import Namespace
 from typing import Any, Optional
 
 from fastapi.testclient import TestClient
-from nicegui import ui,app
+from nicegui import app, ui
 from starlette.responses import Response
 
 from ngwidgets.basetest import Basetest
+
 
 class ThreadedServerRunner:
     """
@@ -48,7 +49,7 @@ class ThreadedServerRunner:
     def _run_server(self) -> None:
         """Internal method to run the server."""
         # prevent middleware error if app already started
-        if hasattr(app, '_already_running'):
+        if hasattr(app, "_already_running"):
             self.ws.run = lambda _args: None  # avoid double run
         else:
             app._already_running = True  # mark NiceGUI as started

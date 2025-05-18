@@ -563,6 +563,7 @@ class NiceGuiWidgetsDemo(InputWebSolution):
         # run the selected command and display output
         def run_cmd(cmd_select):
             from ngwidgets.shell import Shell
+
             shell = Shell()
             cmd = commands[cmd_select.value]
             result = shell.run(cmd, tee=True)
@@ -573,13 +574,12 @@ class NiceGuiWidgetsDemo(InputWebSolution):
 
         # setup the shell demo UI
         async def show():
-            cmd_select = ui.select(list(commands.keys()),
-                label="Choose command",
-                value="Combined").classes("w-full")
+            cmd_select = ui.select(
+                list(commands.keys()), label="Choose command", value="Combined"
+            ).classes("w-full")
             ui.button("Run", on_click=lambda: run_cmd(cmd_select))
 
         await self.setup_content_div(show)
-
 
     async def show_tristate_demo(self):
         """
@@ -907,7 +907,7 @@ class NiceGuiWidgetsDemo(InputWebSolution):
                 "Tristate Demo": "/tristate",
                 "pdfviewer": "/pdfviewer",
                 "Progressbar": "/progress",
-                "Shell Demo": "/shell"
+                "Shell Demo": "/shell",
             }
 
             # Generate the HTML using the dictionary

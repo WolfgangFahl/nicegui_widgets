@@ -12,6 +12,7 @@ import threading
 from pathlib import Path
 from typing import Dict, List
 
+
 class StreamTee:
     """
     Tees a single input stream to both a mirror and a capture buffer.
@@ -204,7 +205,12 @@ class Shell:
 
         return process
 
-    def proc_stats(self, title: str, procs: Dict[Path, subprocess.CompletedProcess], ignores: List[str] = []):
+    def proc_stats(
+        self,
+        title: str,
+        procs: Dict[Path, subprocess.CompletedProcess],
+        ignores: List[str] = [],
+    ):
         """
         Show process statistics with checkmark/crossmark and success/failure summary.
 
@@ -228,5 +234,6 @@ class Shell:
                 symbol = "✅"
             print(f"{symbol} {idx}/{total}: {path.name}")
         percent_ok = ((total - failures) / total) * 100 if total > 0 else 0
-        print(f"\n✅ {total - failures}/{total} ({percent_ok:.1f}%), ❌ {failures}/{total} ({100 - percent_ok:.1f}%)")
-
+        print(
+            f"\n✅ {total - failures}/{total} ({percent_ok:.1f}%), ❌ {failures}/{total} ({100 - percent_ok:.1f}%)"
+        )

@@ -1,10 +1,12 @@
-'''
+"""
 Created on 2024-10-04
 
 @author: wf
-'''
+"""
+
 from ngwidgets.basetest import Basetest
-from lodstorage.persistent_log import Log
+from ngwidgets.persistent_log import Log
+
 
 class TestPersistentLog(Basetest):
     """
@@ -15,8 +17,8 @@ class TestPersistentLog(Basetest):
         Basetest.setUp(self, debug=debug, profile=profile)
         self.log = Log()
         if debug:
-            self.log.do_log=False
-            self.log.do_print=True
+            self.log.do_log = False
+            self.log.do_print = True
 
     def test_positive_logging(self):
         """Test normal logging and level summary."""
@@ -43,11 +45,11 @@ class TestPersistentLog(Basetest):
         self.assertEqual(count, 1)
         self.assertIn("process", summary)
 
-        yaml_file="/tmp/persistent_log_test.yaml"
+        yaml_file = "/tmp/persistent_log_test.yaml"
         self.log.save_to_yaml_file(yaml_file)
         # Later or in another session
         loaded_log = Log.load_from_yaml_file(yaml_file)
-        self.assertEqual(self.log,loaded_log)
+        self.assertEqual(self.log, loaded_log)
 
     def test_robustness(self):
         """Test clearing logs and handling unsupported icons."""

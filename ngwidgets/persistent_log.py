@@ -3,12 +3,14 @@ Created on 2024-10-04
 
 @author: wf
 """
-from lodstorage.yamlable import lod_storable
+
 import logging
 from collections import Counter
 from dataclasses import field
-from typing import List, Optional, Tuple
 from datetime import datetime
+from typing import List, Optional, Tuple
+
+from lodstorage.yamlable import lod_storable
 
 # ANSI colors
 BLUE = "\033[0;34m"
@@ -22,20 +24,23 @@ class LogEntry:
     """
     Represents a log entry with a message, kind, and log level name.
     """
+
     msg: str
     kind: str
     level_name: str
-    timestamp: Optional[str]=None
+    timestamp: Optional[str] = None
 
     def __post_init__(self):
         if self.timestamp is None:
             self.timestamp = datetime.now().isoformat()
+
 
 @lod_storable
 class Log:
     """
     Wrapper for persistent logging.
     """
+
     entries: List[LogEntry] = field(default_factory=list)
 
     def color_msg(self, color, msg):
@@ -48,11 +53,7 @@ class Log:
         """
         self.do_log = True
         self.do_print = False
-        self.levels = {
-            "❌": logging.ERROR,
-            "⚠️": logging.WARNING,
-            "✅": logging.INFO
-        }
+        self.levels = {"❌": logging.ERROR, "⚠️": logging.WARNING, "✅": logging.INFO}
         self.level_names = {
             logging.ERROR: "error",
             logging.WARNING: "warn",
@@ -97,11 +98,12 @@ class Log:
         counter = self.get_counter(level)
         if counter:
             count = sum(counter.values())
-            most_common_entries = dict(counter.most_common(limit))  # Get the top 'limit' entries
+            most_common_entries = dict(
+                counter.most_common(limit)
+            )  # Get the top 'limit' entries
             summary_msg = f"{level.capitalize()} entries: {most_common_entries}"
             return count, summary_msg
         return 0, f"No entries found for level: {level}"
-
 
     def log(self, icon: str, kind: str, msg: str):
         """

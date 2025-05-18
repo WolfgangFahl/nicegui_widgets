@@ -6,10 +6,9 @@ Created on 2023-06-21
 
 import unittest
 
-
 from ngwidgets.basetest import Basetest
-from ngwidgets.llm import LLM
 from ngwidgets.claude_llm import ClaudeLLM
+from ngwidgets.llm import LLM
 
 
 class TestLLM(Basetest):
@@ -19,16 +18,13 @@ class TestLLM(Basetest):
 
     def setUp(self, debug=True, profile=True):
         Basetest.setUp(self, debug=debug, profile=profile)
-        self.llms = {
-            "openai": LLM(),
-            "claude": ClaudeLLM()
-        }
+        self.llms = {"openai": LLM(), "claude": ClaudeLLM()}
 
     @unittest.skipIf(Basetest.inPublicCI(), "LLM tests with API cost")
     def testModelList(self):
         # list models
-        for name,llm in self.llms.items():
-            if name=="openai":
+        for name, llm in self.llms.items():
+            if name == "openai":
                 models = llm.client.models.list()
                 for model in models.data:
                     if self.debug:
@@ -40,7 +36,7 @@ class TestLLM(Basetest):
         """
         test the LLM interface
         """
-        for name,llm in self.llms.items():
+        for name, llm in self.llms.items():
             if not llm.available():
                 if self.debug:
                     print(f"{name} LLM not available - skipping")

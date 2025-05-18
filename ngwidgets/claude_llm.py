@@ -12,14 +12,13 @@ from pathlib import Path
 
 import anthropic
 
-from ngwidgets.base_llm import BaseLLM
-from ngwidgets.base_llm import Prompt, Prompts
+from ngwidgets.base_llm import BaseLLM, Prompt, Prompts
 
 
 class ClaudeLLM(BaseLLM):
     """
     Claude Large Language Model access wrapper
-    
+
     to get a key visit
     https://console.anthropic.com/
     """
@@ -42,7 +41,7 @@ class ClaudeLLM(BaseLLM):
         model=DEFAULT_MODEL,
         force_key=False,
         prompts_filepath=None,
-        max_tokens=4000
+        max_tokens=4000,
     ):
         """
         constructor
@@ -133,9 +132,7 @@ class ClaudeLLM(BaseLLM):
             "model": model,
             "max_tokens": self.max_tokens,
             "temperature": temperature,
-            "messages": [
-                {"role": "user", "content": prompt_text}
-            ]
+            "messages": [{"role": "user", "content": prompt_text}],
         }
 
         # Add system prompt if provided
@@ -167,12 +164,7 @@ class ClaudeVisionLLM(ClaudeLLM):
     Extension of ClaudeLLM class to handle image analysis
     """
 
-    def __init__(
-        self,
-        api_key=None,
-        model="claude-3-opus-20240229",
-        force_key=False
-    ):
+    def __init__(self, api_key=None, model="claude-3-opus-20240229", force_key=False):
         """
         Initialize with vision-capable model as default
 
@@ -205,10 +197,7 @@ class ClaudeVisionLLM(ClaudeLLM):
         if image_path.startswith("http"):
             media_content = {
                 "type": "image",
-                "source": {
-                    "type": "url",
-                    "url": image_path
-                }
+                "source": {"type": "url", "url": image_path},
             }
         else:
             # Handle local file
@@ -219,18 +208,15 @@ class ClaudeVisionLLM(ClaudeLLM):
                     "source": {
                         "type": "base64",
                         "media_type": self._get_media_type(image_path),
-                        "data": base64.b64encode(image_data).decode("utf-8")
-                    }
+                        "data": base64.b64encode(image_data).decode("utf-8"),
+                    },
                 }
 
         # Construct message with text and image content
         messages = [
             {
                 "role": "user",
-                "content": [
-                    {"type": "text", "text": prompt_text},
-                    media_content
-                ]
+                "content": [{"type": "text", "text": prompt_text}, media_content],
             }
         ]
 
@@ -238,7 +224,7 @@ class ClaudeVisionLLM(ClaudeLLM):
         message_kwargs = {
             "model": self.model,
             "max_tokens": self.max_tokens,
-            "messages": messages
+            "messages": messages,
         }
 
         # Add system prompt if provided
@@ -274,16 +260,16 @@ class ClaudeVisionLLM(ClaudeLLM):
         Returns:
             str: MIME type of the image
         """
-        extension = image_path.lower().split('.')[-1]
+        extension = image_path.lower().split(".")[-1]
 
         mime_types = {
-            'jpg': 'image/jpeg',
-            'jpeg': 'image/jpeg',
-            'png': 'image/png',
-            'gif': 'image/gif',
-            'webp': 'image/webp',
-            'svg': 'image/svg+xml',
-            'heic': 'image/heic'
+            "jpg": "image/jpeg",
+            "jpeg": "image/jpeg",
+            "png": "image/png",
+            "gif": "image/gif",
+            "webp": "image/webp",
+            "svg": "image/svg+xml",
+            "heic": "image/heic",
         }
 
-        return mime_types.get(extension, 'application/octet-stream')
+        return mime_types.get(extension, "application/octet-stream")
