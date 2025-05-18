@@ -543,6 +543,44 @@ class NiceGuiWidgetsDemo(InputWebSolution):
 
         await self.setup_content_div(show)
 
+    async def show_shell_demo(self):
+        """
+        Demonstrate Shell execution with tee and capture using safe predefined commands.
+        """
+        # predefined safe shell commands
+        commands = {
+            "Echo greeting": "echo Hello from shell",
+            "List files": "ls -l | head -5",
+            "Trigger error": "ls non_existent_file",
+            "Combined": "echo Hello from shell && ls -l | head -5 && ls non_existent_file",
+        }
+
+        # display a labeled preformatted text block
+        def labeled_pre(label: str, value: str, color: str = "black"):
+            ui.label(f"{label}:").style("font-weight: bold")
+            ui.html(f"<pre>{value}</pre>").style(f"color: {color}")
+
+        # run the selected command and display output
+        def run_cmd(cmd_select):
+            from ngwidgets.shell import Shell
+            shell = Shell()
+            cmd = commands[cmd_select.value]
+            result = shell.run(cmd, tee=True)
+            labeled_pre("CMD", cmd)
+            labeled_pre("STDOUT", result.stdout)
+            if result.stderr.strip():
+                labeled_pre("STDERR", result.stderr, color="red")
+
+        # setup the shell demo UI
+        async def show():
+            cmd_select = ui.select(list(commands.keys()),
+                label="Choose command",
+                value="Combined").classes("w-full")
+            ui.button("Run", on_click=lambda: run_cmd(cmd_select))
+
+        await self.setup_content_div(show)
+
+
     async def show_tristate_demo(self):
         """
         Demonstrate the Tristate project.
@@ -869,6 +907,7 @@ class NiceGuiWidgetsDemo(InputWebSolution):
                 "Tristate Demo": "/tristate",
                 "pdfviewer": "/pdfviewer",
                 "Progressbar": "/progress",
+                "Shell Demo": "/shell"
             }
 
             # Generate the HTML using the dictionary
@@ -937,6 +976,10 @@ class NiceGuiWidgetsDemoWebserver(InputWebserver):
         @ui.page("/progress")
         async def show_progress(client: Client):
             return await self.page(client, NiceGuiWidgetsDemo.show_progress)
+
+        @ui.page("/shell")
+        async def show_shell_demo(client: Client):
+            return await self.page(client, NiceGuiWidgetsDemo.show_shell_demo)
 
         @ui.page("/gpxviewer")
         async def show_gpxviewer(client: Client):

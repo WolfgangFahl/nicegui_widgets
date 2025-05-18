@@ -118,3 +118,12 @@ components:
     GPXViewer is a component for visualizing GPX (GPS Exchange Format) files using OpenStreetMap and Leaflet.
     It can display GPS tracks, routes and waypoints from URLs, with configurable zoom levels
     and map centering.
+- name: Shell
+  source: /ngwidgets/shell.py
+  issue: 84
+  demo_url: http://ngdemo.bitplan.com/shell
+  demo_image_url: https://github.com/WolfgangFahl/nicegui_widgets/assets/1336221/b39f7652-1cc6-4b59-8c3d-ef327aa5db4a
+  description: >
+    Shell provides structured subprocess execution with live output capturing (teeing) of
+    stdout and stderr. It includes StreamTee, SysTee, and StdTee classes to integrate
+    with NiceGUI ui output elements such as ui.html or ui.code.
