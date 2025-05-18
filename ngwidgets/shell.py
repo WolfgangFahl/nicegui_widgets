@@ -9,7 +9,8 @@ import os
 import subprocess
 import sys
 import threading
-
+from pathlib import Path
+from typing import Dict, List
 
 class StreamTee:
     """
@@ -202,3 +203,30 @@ class Shell:
             pass
 
         return process
+
+    def proc_stats(self, title: str, procs: Dict[Path, subprocess.CompletedProcess], ignores: List[str] = []):
+        """
+        Show process statistics with checkmark/crossmark and success/failure summary.
+
+        Args:
+            title (str): A short title to label the output section.
+            procs (Dict[Path, subprocess.CompletedProcess]): Mapping of input files to their process results.
+            ignores (List[str], optional): List of substrings. If any is found in stderr, the error is ignored.
+        """
+        total = len(procs)
+        failures = 0
+        print(f"\n{total} {title}:")
+        for idx, (path, result) in enumerate(procs.items(), start=1):
+            stderr = result.stderr or ""
+            stdout = result.stdout or ""
+            ignored = any(ignore in stderr for ignore in ignores)
+            has_error = (stderr and not ignored) or ("Error" in stdout)
+            if has_error:
+                symbol = "❌"
+                failures += 1
+            else:
+                symbol = "✅"
+            print(f"{symbol} {idx}/{total}: {path.name}")
+        percent_ok = ((total - failures) / total) * 100 if total > 0 else 0
+        print(f"\n✅ {total - failures}/{total} ({percent_ok:.1f}%), ❌ {failures}/{total} ({100 - percent_ok:.1f}%)")
+
