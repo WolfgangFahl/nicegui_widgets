@@ -25,7 +25,7 @@ class TestDemoWebserver(WebserverTest):
         test API docs access
         """
         # self.debug=True
-        html = self.getHtml("/docs")
+        html = self.get_html("/docs")
         self.assertTrue("Swagger" in html)
 
     def testApi(self):

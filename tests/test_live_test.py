@@ -6,7 +6,7 @@ Created on 18.05.2025
 
 import requests
 
-from ngwidgets.live_test import LiveWebTest, LiveCmd
+from ngwidgets.test_live import LiveWebTest, LiveCmd
 #from ngwidgets.basetest import Basetest
 
 #class TestLiveTest(Basetest):
@@ -33,13 +33,8 @@ class TestLiveTest(LiveWebTest):
         # Set the handler for this test
         self.set_test_handler(lambda: {"status": "ok", "message": "Basic test passed"})
 
-        # Make the request
-        test_url=self.get_test_url()
-        response = requests.get(test_url)
-
-        # Verify response
-        self.assertEqual(response.status_code, 200)
-        data = response.json()
+        # Make the request and verify response using the base class method
+        data = self.get_json(self.get_test_url().replace(self.base_url, ""))
         self.assertEqual(data["status"], "ok")
         self.assertEqual(data["message"], "Basic test passed")
 
@@ -61,12 +56,8 @@ class TestLiveTest(LiveWebTest):
             }
         )
 
-        # Make the request
-        response = requests.get(f"{self.base_url}/test")
-
-        # Verify response
-        self.assertEqual(response.status_code, 200)
-        data = response.json()
+        # Make the request and verify response using the base class method
+        data = self.get_json(self.get_test_url().replace(self.base_url, ""))
         self.assertEqual(data["status"], "ok")
         self.assertEqual(len(data["data"]["numbers"]), 5)
         self.assertEqual(data["data"]["nested"]["b"], "text")
@@ -80,12 +71,8 @@ class TestLiveTest(LiveWebTest):
             lambda: {"status": "error", "error": "Not found", "code": 404}
         )
 
-        # Make the request
-        response = requests.get(f"{self.base_url}/test")
-
-        # The HTTP status should still be 200 since we're just testing JSON content
-        self.assertEqual(response.status_code, 200)
-        data = response.json()
+        # Make the request and verify response using the base class method
+        data = self.get_json(self.get_test_url().replace(self.base_url, ""))
         self.assertEqual(data["status"], "error")
         self.assertEqual(data["error"], "Not found")
         self.assertEqual(data["code"], 404)
