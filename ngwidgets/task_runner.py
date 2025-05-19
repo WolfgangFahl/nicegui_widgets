@@ -7,10 +7,14 @@ Created on 2025-03-09
 import asyncio
 import inspect
 from typing import Callable, Optional
+
 from nicegui import background_tasks
+
+from ngwidgets.persistent_log import Log
+
 # optional generic Progressbar tqdm or nicegui.ui
 from ngwidgets.progress import Progressbar
-from ngwidgets.persistent_log import Log
+
 
 class TaskRunner:
     """
@@ -21,9 +25,7 @@ class TaskRunner:
     - Enforces timeouts and cancellation
     """
 
-    def __init__(self,
-        timeout: float = 20.0,
-        progress: Optional[Progressbar] = None):
+    def __init__(self, timeout: float = 20.0, progress: Optional[Progressbar] = None):
         self.task = None
         self.timeout = timeout
         self.progress = progress
@@ -57,7 +59,9 @@ class TaskRunner:
         Args:
             blocking_func: a regular function doing I/O or CPU-heavy work
         """
-        if inspect.iscoroutinefunction(blocking_func) or inspect.iscoroutine(blocking_func):
+        if inspect.iscoroutinefunction(blocking_func) or inspect.iscoroutine(
+            blocking_func
+        ):
             raise TypeError("run_blocking expects a sync function, not async.")
 
         async def wrapper():
@@ -73,7 +77,9 @@ class TaskRunner:
             coro_func: async function doing await to_thread(blocking_func)
         """
         if not inspect.iscoroutinefunction(coro_func):
-            raise TypeError("run_async_wrapping_blocking expects an async def function.")
+            raise TypeError(
+                "run_async_wrapping_blocking expects an async def function."
+            )
         self._start(coro_func)
 
     def _start(self, coro_func: Callable[[], asyncio.Future]):
@@ -86,7 +92,9 @@ class TaskRunner:
                     self.progress.set_description("Working...")
                 await asyncio.wait_for(coro_func(), timeout=self.timeout)
             except asyncio.TimeoutError:
-                self.log.log("❌", "timeout", "Task exceeded timeout — possible blocking code?")
+                self.log.log(
+                    "❌", "timeout", "Task exceeded timeout — possible blocking code?"
+                )
             except asyncio.CancelledError:
                 self.log.log("⚠️", "cancelled", "Task was cancelled.")
             except Exception as ex:
