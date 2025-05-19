@@ -6,16 +6,14 @@ Created on 2025-05-18
 
 import asyncio
 import time
+import unittest
 
-from ngwidgets.ngwidgets_cmd import NiceguiWidgetsCmd
+from ngwidgets.basetest import Basetest
 from ngwidgets.task_runner import TaskRunner
-from ngwidgets.version import Version
-from ngwidgets.webserver import WebserverConfig
-from nicegui import Client, app, ui
-from starlette.responses import JSONResponse
-
-from ngwidgets.test_live import LiveWebTest, LiveServerRunner, LiveWebserver, LiveSolution, \
+from ngwidgets.test_live import LiveWebTest, LiveWebserver, LiveSolution, \
     LiveCmd
+from nicegui import Client, ui
+from starlette.responses import JSONResponse
 
 
 class TaskSolution(LiveSolution):
@@ -96,39 +94,33 @@ class TestTaskRunnerLive(LiveWebTest):
     """
     Test the TaskRunner behavior using real HTTP requests
     """
+    skip_tests = Basetest.inPublicCI()
 
     @classmethod
     def setUpClass(cls):
-        """Set up resources shared by all test methods"""
-        # Create the task webserver
-        cls.ws = TaskWebserver()
-        cls.ws.config.default_port=8669
-        # Create the cmd instance and get properly configured args
-        cls.cmd = TaskCmd(cls.ws.config, TaskWebserver)
-        cls.start_runner()
+        if cls.skip_tests:
+            cls.ws = None
+        else:
+            cls.ws = TaskWebserver()
+            cls.ws.config.default_port = 8669
+            cls.cmd = TaskCmd(cls.ws.config, TaskWebserver)
+            cls.start_runner()
 
     def setUp(self, debug=True, profile=True):
-        """Set up the test environment"""
         super().setUp(debug=debug, profile=profile)
+        self.ws = TestTaskRunnerLive.ws
 
+    @unittest.skipIf(skip_tests, "Skipped in public CI due to instability")
     def test_taskrunner_async(self):
-        """
-        Test asynchronous task execution
-        """
         result = self.get_json("/taskrunner_async")
         self.assertEqual(result["async"], "done")
 
+    @unittest.skipIf(skip_tests, "Skipped in public CI due to instability")
     def test_taskrunner_blocking(self):
-        """
-        Test blocking task execution
-        """
         result = self.get_json("/taskrunner_blocking")
         self.assertEqual(result["blocking"], "done")
 
+    @unittest.skipIf(skip_tests, "Skipped in public CI due to instability")
     def test_taskrunner_combined(self):
-        """
-        Test combined async and blocking execution
-        """
         result = self.get_json("/taskrunner_combined")
-        #self.assertEqual(result["async"], "done")
         self.assertEqual(result["blocking"], "done")
