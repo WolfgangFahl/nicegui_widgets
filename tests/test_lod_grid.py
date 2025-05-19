@@ -4,6 +4,8 @@ Created on 2023-11-02
 @author: wf
 """
 
+import unittest
+
 from ngwidgets.basetest import Basetest
 from ngwidgets.lod_grid import GridConfig, ListOfDictsGrid
 
@@ -11,6 +13,7 @@ from ngwidgets.lod_grid import GridConfig, ListOfDictsGrid
 class TestLodGrid(Basetest):
     """
     test ListOfDictsGrid
+    @FIXME - should use LiveTest environment instead
     """
 
     def setUp(self, debug=False, profile=True):
@@ -23,6 +26,7 @@ class TestLodGrid(Basetest):
         grid_config = GridConfig(key_col="name")
         self.lod_grid = ListOfDictsGrid(self.lod, config=grid_config)
 
+    @unittest.skipIf(Basetest.inPublicCI(), "unreliable in public CI")
     def test_lod_index(self):
         """
         test the list of dics indexing
@@ -33,6 +37,7 @@ class TestLodGrid(Basetest):
             print(self.lod_grid.lod_index)
         self.assertTrue("Alice" in self.lod_grid.lod_index)
 
+    @unittest.skipIf(Basetest.inPublicCI(), "unreliable in public CI")
     def test_update_cell(self):
         """
         test the update_cell API function

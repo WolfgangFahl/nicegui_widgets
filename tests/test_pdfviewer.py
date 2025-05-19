@@ -4,6 +4,7 @@ Created on 2023-09-18
 @author: wf
 """
 
+import unittest
 from urllib import request
 
 from ngwidgets.basetest import Basetest
@@ -53,7 +54,7 @@ class TestPdfViewer(Basetest):
         self.assertTrue(self.check_content_type(index, urls.url["js_lib"], "js"))
         self.assertTrue(self.check_content_type(index, urls.url["js_viewer"], "js"))
 
-    # @unittest.skipIf(Basetest.inPublicCI(), "unreliable in public CI")
+    @unittest.skipIf(Basetest.inPublicCI(), "unreliable in public CI")
     def test_cdns(self):
         """
         test content delivery networks

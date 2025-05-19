@@ -6,13 +6,13 @@ Test suite for the nicegui_projects module in the ngwidgets package.
 @author: wf
 """
 
-import json
 from dataclasses import asdict
 from datetime import datetime
+import json
 from pathlib import Path
+import unittest
 
 from dateutil.parser import parse
-
 from ngwidgets.basetest import Basetest
 from ngwidgets.components import Components
 from ngwidgets.progress import TqdmProgressbar
@@ -36,6 +36,7 @@ class TestNiceguiProjects(Basetest):
             ("nicegui-extensions", "https://pypi.org/project/nicegui-extensions/"),
         ]
 
+    @unittest.skipIf(Basetest.inPublicCI(), "unreliable in public CI")
     def test_get_package_info(self):
         """
         Test getting detailed information about a package from PyPI.
@@ -56,6 +57,7 @@ class TestNiceguiProjects(Basetest):
             self.assertIn("summary", package_info["info"])
             self.assertEqual(url, project.pypi)
 
+    @unittest.skipIf(Basetest.inPublicCI(), "unreliable in public CI")
     def test_search_packages(self):
         """
         Test searching for nicegui packages on PyPI.
@@ -68,6 +70,7 @@ class TestNiceguiProjects(Basetest):
         self.assertIsNotNone(search_result)
         self.assertTrue(len(search_result) > 0)
 
+    @unittest.skipIf(Basetest.inPublicCI(), "unreliable in public CI")
     def test_search_projects(self):
         """
         Test searching for nicegui projects on PyPI.
@@ -80,6 +83,7 @@ class TestNiceguiProjects(Basetest):
         self.assertIsNotNone(search_result)
         self.assertTrue(len(search_result) > 0)
 
+    @unittest.skipIf(Basetest.inPublicCI(), "unreliable in public CI")
     def test_search_repositories_by_topic(self):
         """
         Test searching for repositories by a specific topic.
@@ -99,6 +103,7 @@ class TestNiceguiProjects(Basetest):
                 print(f"{index:4}: {repo.owner.login:40} → {repo_name}  ")
         self.assertIn("WolfgangFahl/nicegui_widgets", repositories)
 
+    @unittest.skipIf(Basetest.inPublicCI(), "unreliable in public CI")
     def test_project_from_github(self):
         """
         Test creating a Project instance from a GitHub repository.
@@ -186,6 +191,7 @@ class TestNiceguiProjects(Basetest):
                         f"found {len(components.components)} components for {project.name}"
                     )
 
+    @unittest.skipIf(Basetest.inPublicCI(), "unreliable in public CI")
     def test_update_save_and_load_projects(self):
         """
         Test updating, saving, and loading projects for a specific topic using the Projects class.
