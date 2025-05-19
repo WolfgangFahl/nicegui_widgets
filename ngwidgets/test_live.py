@@ -13,8 +13,6 @@ from typing import Any, Callable, Dict, List
 import requests
 from fastapi.responses import JSONResponse
 from nicegui import Client, app, ui
-
-from ngwidgets.basetest import Basetest
 from ngwidgets.cmd import WebserverCmd
 from ngwidgets.input_webserver import InputWebserver, InputWebSolution
 from ngwidgets.version import Version
@@ -193,7 +191,8 @@ class LiveWebTest(BaseWebserverTest):
     @classmethod
     def tearDownClass(cls):
         """Clean up resources used by all test methods"""
-        cls.runner.stop()
+        if hasattr(cls, "runner") and cls.runner:
+            cls.runner.stop()
 
     @classmethod
     def wait_until_ready(cls, secs: int):
