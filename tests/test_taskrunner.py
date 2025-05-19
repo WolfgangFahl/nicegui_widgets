@@ -102,7 +102,7 @@ class TestTaskRunnerLive(LiveWebTest):
         """Set up resources shared by all test methods"""
         # Create the task webserver
         cls.ws = TaskWebserver()
-
+        cls.ws.config.default_port=8669
         # Create the cmd instance and get properly configured args
         cls.cmd = TaskCmd(cls.ws.config, TaskWebserver)
         cls.start_runner()
