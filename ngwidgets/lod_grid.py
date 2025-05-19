@@ -9,7 +9,7 @@ import sys
 import traceback
 from dataclasses import dataclass, field
 from typing import Any, Callable, Dict, List, Optional
-
+import logging
 from nicegui import ui
 
 
@@ -193,16 +193,16 @@ class ListOfDictsGrid:
         Raises:
             Exception: Re-raises the exception in debug mode for further debugging.
         """
+        error_msg=f"Exception caught in ListOfDictsGrid: {str(ex)}"
         if self.config.debug:
             # Print a stack trace to stderr
-            print("Exception caught in ListOfDictsGrid:", file=sys.stderr)
+            print(error_msg, file=sys.stderr)
             traceback.print_exc()
-            # Optionally, re-raise the exception for further debugging.
-            raise ex
-        elif self.config.exception_callback:
+        if self.config.exception_callback:
             self.config.exception_callback(ex)
         else:
-            raise ex
+            logging.error(error_msg, exc_info=ex)
+            pass
 
     def get_index(self, lenient: bool = False, lod=None, key_col: str = None):
         """
