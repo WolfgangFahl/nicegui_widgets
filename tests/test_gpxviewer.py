@@ -4,6 +4,8 @@ Created on 2025-01-17
 @author: wf
 """
 
+import unittest
+
 from ngwidgets.basetest import Basetest
 from ngwidgets.gpxviewer import GPXViewer
 
@@ -16,6 +18,7 @@ class TestGPXViewer(Basetest):
     def setUp(self, debug=True, profile=True):
         Basetest.setUp(self, debug=debug, profile=profile)
 
+    @unittest.skipIf(Basetest.inPublicCI(), "external APIs might not be available")
     def test_gpx_viewer(self):
         """
         Test the GPX viewer functionality for all sample GPX files.

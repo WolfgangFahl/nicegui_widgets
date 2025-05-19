@@ -202,12 +202,7 @@ class ListOfDictsGrid:
         elif self.config.exception_callback:
             self.config.exception_callback(ex)
         else:
-            # If not in debug mode, notify the user with a general error message.
-            # Ensure that ui.notify or a similar method is available and properly configured.
-            ui.notify(
-                f"Unhandled exception {str(ex)} occurred in ListOfDictsGrid",
-                type="error",
-            )
+            raise ex
 
     def get_index(self, lenient: bool = False, lod=None, key_col: str = None):
         """
