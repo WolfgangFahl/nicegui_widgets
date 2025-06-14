@@ -21,7 +21,8 @@ class ShortUrl:
     def __init__(self, base_path: Path, suffix: str = ".txt", length: int = 8,
                  max_size: int = 32 * 1024,
                  required_keywords=None,
-                 blacklist=None):
+                 blacklist=None,
+                 lenient: bool = False):
         """
         Initialize the ShortUrl utility.
 
@@ -32,6 +33,7 @@ class ShortUrl:
             max_size (int): Maximum size in bytes of allowed code.
             required_keywords (List[str]): Keywords that must appear in the code.
             blacklist (List[str]): Keywords that must not appear in the code.
+            lenient (bool): If True, do not raise on validation failure.
         """
         self.base_path = base_path
         self.suffix = suffix
@@ -39,6 +41,7 @@ class ShortUrl:
         self.max_size = max_size
         self.required_keywords = required_keywords or []
         self.blacklist = blacklist or []
+        self.lenient=lenient
         self.base_path.mkdir(parents=True, exist_ok=True)
 
     def short_id_from_code(self, code: str) -> str:
@@ -72,36 +75,63 @@ class ShortUrl:
         """Check whether a file exists for the given short ID."""
         return self.path_for_id(short_id).exists()
 
-    def validate_code(self, code: str):
+    def validate_code(self, code: str) -> bool:
         """
-        Validates code against defined rules: size, blacklists, required keywords.
+        Validate the code against all constraints.
 
-        Raises:
-            ValueError: if the code violates any constraint.
+        Enforces:
+        - maximum size (in bytes)
+        - blacklist exclusion
+        - presence of all required keywords
+
+        Returns:
+            bool: True if valid, False otherwise or raises ValueError if lenient is False.
         """
-        if len(code.encode("utf-8")) > self.max_size:
-            raise ValueError(f"Code exceeds maximum allowed size of {self.max_size} bytes")
-        if self.blacklist and any(bad in code for bad in self.blacklist):
-            raise ValueError("Code contains blacklisted content")
-        if self.required_keywords and not any(req in code for req in self.required_keywords):
-            raise ValueError("Code does not contain required keywords")
+        msg = None
+        size = len(code.encode("utf-8"))
+        if size > self.max_size:
+            msg = f"Code size {size} exceeds maximum allowed size of {self.max_size} bytes"
+        if msg is None and self.blacklist:
+            for bad in self.blacklist:
+                if bad in code:
+                    msg = f"Code contains blacklisted content: '{bad}'"
+                    break
+        if msg is None and self.required_keywords:
+            missing = [req for req in self.required_keywords if req not in code]
+            if missing:
+                msg = f"Code is missing required keywords: {missing}"
 
-    def save(self, code: str) -> str:
+        if msg:
+            if self.lenient:
+                return False
+            else:
+                raise ValueError(msg)
+
+        return True
+
+    def save(self, code: str, with_validate: bool = True) -> str:
         """
         Save the code to a file named after its short ID.
 
         Args:
             code (str): The code content to save.
+            with_validate (bool): Whether to validate the code before saving.
 
         Returns:
-            str: The short ID.
+            str: The short ID if saved or already exists.
+
+        Raises:
+            ValueError: if validation fails and lenient is False.
         """
-        self.validate_code(code)
-        path = self.path_for_code(code)
-        short_id = path.stem
-        if not path.exists():
+        short_id = self.short_id_from_code(code)
+        path = self.path_for_id(short_id)
+        valid = True
+        if with_validate:
+            valid = self.validate_code(code)
+        if valid and not path.exists():
             path.write_text(code, encoding="utf-8")
         return short_id
+
 
     def load(self, short_id: str) -> str:
         """

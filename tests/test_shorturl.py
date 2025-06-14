@@ -26,7 +26,8 @@ class TestShortUrl(Basetest):
             length=8,
             max_size=1024,
             required_keywords=["cube", "translate"],
-            blacklist=["system(", "#include", "evil"]
+            blacklist=["system(", "#include", "evil"],
+            lenient=False
         )
         if self.debug:
             print(f"📁 Test directory: {self.temp_dir}")
