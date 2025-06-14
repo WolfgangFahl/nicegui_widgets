@@ -75,7 +75,7 @@ class ShortUrl:
         """Check whether a file exists for the given short ID."""
         return self.path_for_id(short_id).exists()
 
-    def validate_code(self, code: str) -> bool:
+    def validate_code(self, code: str) -> str:
         """
         Validate the code against all constraints.
 
@@ -85,7 +85,7 @@ class ShortUrl:
         - presence of all required keywords
 
         Returns:
-            bool: True if valid, False otherwise or raises ValueError if lenient is False.
+            str: None if valid, error message otherwise or raises ValueError if lenient is False.
         """
         msg = None
         size = len(code.encode("utf-8"))
@@ -101,13 +101,11 @@ class ShortUrl:
             if missing:
                 msg = f"Code is missing required keywords: {missing}"
 
-        if msg:
-            if self.lenient:
-                return False
-            else:
-                raise ValueError(msg)
 
-        return True
+        if not self.lenient and msg:
+            raise ValueError(msg)
+
+        return msg
 
     def save(self, code: str, with_validate: bool = True) -> str:
         """
@@ -125,10 +123,10 @@ class ShortUrl:
         """
         short_id = self.short_id_from_code(code)
         path = self.path_for_id(short_id)
-        valid = True
+        err_msg=None
         if with_validate:
-            valid = self.validate_code(code)
-        if valid and not path.exists():
+            err_msg = self.validate_code(code)
+        if not err_msg and not path.exists():
             path.write_text(code, encoding="utf-8")
         return short_id
 
