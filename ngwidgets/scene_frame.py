@@ -1,5 +1,5 @@
 """
-Created on 28.08.2024
+Created on 2024-08-28
 
 @author: wf
 """
@@ -12,7 +12,8 @@ from ngwidgets.axes_helper import AxesHelper
 
 class SceneFrame:
     """
-    a frame for a scene with a potentially to be colors stl object
+    a frame for a ui.scene with a potentially to be colors stl object
+    see https://nicegui.io/documentation/scene
     """
 
     def __init__(self, solution, stl_color: str = "#57B6A9"):
@@ -105,6 +106,20 @@ class SceneFrame:
         except Exception as ex:
             self.solution.handle_exception(ex)
         pass
+
+    def clear(self):
+        """
+        Remove all objects from the scene.
+        """
+        with self.scene:
+            self.scene.clear()
+
+    def update(self):
+        """
+        update my scene
+        """
+        with self.scene:
+            self.scene.update()
 
     def load_stl(
         self, stl_name: str, url: str, scale: float = 1.0, stl_color: str = "#57B6A9"
