@@ -117,7 +117,7 @@ class NiceGuiWidgetsDemo(InputWebSolution):
             with ui.row():
                 ui.button("--").on_click(lambda: update_progress(-1))
                 ui.button("++").on_click(lambda: update_progress(1))
-                ui.button("Auto", on_=toggle_auto)
+                ui.button("Auto", on_click=toggle_auto)
 
         await self.setup_content_div(show)
 
