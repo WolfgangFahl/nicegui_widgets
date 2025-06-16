@@ -162,6 +162,14 @@ class WebserverCmd(BaseCmd):
         apache_config = header_comment + ssl_config + http_config
         return apache_config
 
+    def cmd_main(self, argv: list = None) -> int:
+        """
+        Main entry point (legacy contract).
+        """
+        exit_code=self.run(argv)
+        return exit_code
+
+
     @classmethod
     def main(cls, config: WebserverConfig, webserver_cls, argv=None) -> int:
         """
