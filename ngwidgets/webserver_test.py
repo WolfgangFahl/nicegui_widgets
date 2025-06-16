@@ -3,8 +3,6 @@ Created on 2023-11-03
 
 @author: wf
 """
-
-import json
 from typing import Any
 from fastapi.testclient import TestClient
 from ngwidgets.basetest import Basetest
@@ -54,7 +52,7 @@ class WebserverTest(BaseWebserverTest):
             self.config, server_class
         )  # Instantiate the command class with config and server_class
         argv = []
-        args = self.cmd.cmd_parse(
+        args = self.cmd.parse_args(
             argv
         )  # Parse the command-line arguments with no arguments passed
 

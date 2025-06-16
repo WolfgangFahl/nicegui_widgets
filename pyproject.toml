@@ -20,7 +20,7 @@ dependencies = [
     # https://pypi.org/project/pybasemkit/
     # https://github.com/WolfgangFahl/pybasemkit
     # Python base module kit: YAML/JSON I/O, structured logging, CLI tooling, shell execution, and remote pydevd debug support.
-    "pybasemkit>=0.0.1",
+    "pybasemkit>=0.0.2",
  	# orjson
  	# https://pypi.org/project/orjson/
  	"orjson>=3.9.10",

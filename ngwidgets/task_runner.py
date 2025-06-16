@@ -9,8 +9,7 @@ import inspect
 from typing import Callable, Optional
 
 from nicegui import background_tasks
-
-from ngwidgets.persistent_log import Log
+from basemkit.persistent_log import Log
 
 # optional generic Progressbar tqdm or nicegui.ui
 from ngwidgets.progress import Progressbar
