@@ -115,8 +115,8 @@ class NiceGuiWidgetsDemo(InputWebSolution):
 
             # Buttons for controlling the progress bar
             with ui.row():
-                ui.button("--", on_=lambda: update_progress(-1))
-                ui.button("++", on_=lambda: update_progress(1))
+                ui.button("--").on_click(lambda: update_progress(-1))
+                ui.button("++").on_click(lambda: update_progress(1))
                 ui.button("Auto", on_=toggle_auto)
 
         await self.setup_content_div(show)
@@ -562,7 +562,7 @@ class NiceGuiWidgetsDemo(InputWebSolution):
 
         # run the selected command and display output
         def run_cmd(cmd_select):
-            from ngwidgets.shell import Shell
+            from basemkit.shell import Shell
 
             shell = Shell()
             cmd = commands[cmd_select.value]
