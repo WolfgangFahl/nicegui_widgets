@@ -4,11 +4,8 @@ Created on 2023-09-10
 @author: wf
 """
 
-
-import sys
-import traceback
 import webbrowser
-from argparse import ArgumentParser, RawDescriptionHelpFormatter
+from argparse import ArgumentParser
 from datetime import datetime
 from basemkit.base_cmd import BaseCmd
 from ngwidgets.webserver import WebserverConfig
@@ -78,6 +75,9 @@ class WebserverCmd(BaseCmd):
         )
 
     def handle_args(self, args):
+        """
+        handle the given command line arguments
+        """
         if super().handle_args(args):
             return True
         if args.apache:
