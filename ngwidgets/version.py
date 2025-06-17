@@ -5,7 +5,7 @@ Created on 2023-09-12
 """
 
 import ngwidgets
-from ngwidgets.yamlable import lod_storable
+from basemkit.yamlable import lod_storable
 
 
 @lod_storable
@@ -17,7 +17,7 @@ class Version:
     name = "ngwidgets"
     version = ngwidgets.__version__
     date = "2023-09-10"
-    updated = "2025-06-14"
+    updated = "2025-06-17"
     description = "NiceGUI widgets"
 
     authors = "Wolfgang Fahl"

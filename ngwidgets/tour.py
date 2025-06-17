@@ -11,7 +11,7 @@ Styling of Legs
 from dataclasses import field
 from typing import Dict, Optional, Tuple
 
-from ngwidgets.yamlable import lod_storable
+from basemkit.yamlable import lod_storable
 
 
 @lod_storable

@@ -18,7 +18,7 @@ from nicegui import Client, core, ui
 
 from ngwidgets.color_schema import ColorSchema
 from ngwidgets.version import Version
-from ngwidgets.yamlable import lod_storable
+from basemkit.yamlable import lod_storable
 
 
 @lod_storable

@@ -9,7 +9,7 @@ from dataclasses import field
 from datetime import datetime
 from typing import List, Optional
 
-from ngwidgets.yamlable import lod_storable
+from basemkit.yamlable import lod_storable
 
 
 @lod_storable

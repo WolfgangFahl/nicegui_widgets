@@ -6,7 +6,7 @@ for managing components of an online software components bazaar
 It was created for nicegui components but may be adapted to other
 context by modifying the topic,
 
-Prompts for LLM: 
+Prompts for LLM:
 - Create Python classes Component and Components for managing UI components, including loading and saving functionality.
 - Develop a data class in Python to represent a UI component with the attributes:
     name: The title or identifier of the component.
@@ -20,10 +20,10 @@ Prompts for LLM:
 Main author: OpenAI's language model (instructed by WF)
 """
 
-from dataclasses import dataclass, field
+from dataclasses import field
 from typing import List, Optional
 
-from ngwidgets.yamlable import lod_storable
+from basemkit.yamlable import lod_storable
 
 
 @lod_storable

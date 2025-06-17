@@ -52,7 +52,7 @@ from github import Github
 
 from ngwidgets.components import Components
 from ngwidgets.progress import Progressbar
-from ngwidgets.yamlable import lod_storable
+from basemkit.yamlable import lod_storable
 
 
 class GitHubAccess:
@@ -247,10 +247,10 @@ class Project:
                     file_path, cache_valid_secs
                 ):
                     load_from_url = False
-                    components = Components.load_from_yaml_file(str(file_path))
+                    components = Components.load_from_yaml_file(str(file_path)) # @UndefinedVariable
 
         if load_from_url:
-            components = Components.load_from_yaml_url(self.components_url)
+            components = Components.load_from_yaml_url(self.components_url)  # @UndefinedVariable
             if cache_directory:
                 components.save_to_yaml_file(str(file_path))
 
