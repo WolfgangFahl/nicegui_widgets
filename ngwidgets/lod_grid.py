@@ -23,7 +23,7 @@ class GridConfig:
     column_defs: Optional[List[Dict]] = None
     options: Dict = field(default_factory=dict)
     # optics
-    theme: str = "ag-theme-material"
+    theme: str = "material"
     classes: str = "h-screen overflow-auto"
     all_cols_html: bool = True
     # behavior
