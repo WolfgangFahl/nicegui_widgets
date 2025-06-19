@@ -74,24 +74,29 @@ class WebserverCmd(BaseCmd):
             help="start webserver"
         )
 
-    def handle_args(self, args):
+    def handle_args(self, args)->bool:
         """
-        handle the given command line arguments
+        Handle the given command line arguments.
+
+        Args:
+            args: The parsed command line arguments.
+
+        Returns:
+            bool: True if any argument was handled, False otherwise.
         """
-        if super().handle_args(args):
-            return True
+        handled=super().handle_args(args)
         if args.apache:
             print(self.to_apache_config(self.config, args.apache))
-            return True
+            handled=True
         if args.client:
             url = f"http://{args.host}:{args.port}"
             webbrowser.open(url)
-            return True
+            handled=True
         if args.serve:
             ws = self.webserver_cls()
             ws.run(args)
-            return True
-        return False
+            handled= True
+        return handled
 
     def to_apache_config(self, config: WebserverConfig, domain: str) -> str:
         """
