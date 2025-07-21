@@ -40,31 +40,32 @@ class TaskRunner:
         running = self.task and not self.task.done()
         return running
 
-    def run_async(self, coro_func: Callable[[], asyncio.Future]):
+    def run(self, func: Callable, *args, **kwargs):
         """
-        Run a pure async function in the background.
+        Automatically detect function type and run appropriately.
 
         Args:
-            coro_func: a non-blocking async function
+            func: async or sync function
+            *args, **kwargs: arguments to pass to func
         """
-        if not inspect.iscoroutinefunction(coro_func):
-            raise TypeError("run_async expects an async def function (not called yet).")
-        self._start(coro_func)
+        if inspect.iscoroutinefunction(func):
+            self.run_async(func, *args, **kwargs)
+        else:
+            self.run_blocking(func, *args, **kwargs)
 
-    def run_blocking(self, blocking_func: Callable[[], any]):
+    def run_blocking(self, blocking_func: Callable, *args, **kwargs):
         """
         Run a blocking (sync) function via asyncio.to_thread.
 
         Args:
             blocking_func: a regular function doing I/O or CPU-heavy work
+            *args, **kwargs: arguments to pass to blocking_func
         """
-        if inspect.iscoroutinefunction(blocking_func) or inspect.iscoroutine(
-            blocking_func
-        ):
+        if inspect.iscoroutinefunction(blocking_func) or inspect.iscoroutine(blocking_func):
             raise TypeError("run_blocking expects a sync function, not async.")
 
         async def wrapper():
-            await asyncio.to_thread(blocking_func)
+            await asyncio.to_thread(blocking_func, *args, **kwargs)
 
         self._start(wrapper)
 
@@ -81,7 +82,19 @@ class TaskRunner:
             )
         self._start(coro_func)
 
-    def _start(self, coro_func: Callable[[], asyncio.Future]):
+    def run_async(self, coro_func: Callable[..., asyncio.Future], *args, **kwargs):
+        """
+        Run a pure async function in the background.
+
+        Args:
+            coro_func: a non-blocking async function
+            *args, **kwargs: arguments to pass to coro_func
+        """
+        if not inspect.iscoroutinefunction(coro_func):
+            raise TypeError("run_async expects an async def function (not called yet).")
+        self._start(coro_func, *args, **kwargs)
+
+    def _start(self, coro_func: Callable[..., asyncio.Future], *args, **kwargs):
         self.cancel_running()
 
         async def wrapped():
@@ -89,11 +102,9 @@ class TaskRunner:
                 if self.progress:
                     self.progress.reset()
                     self.progress.set_description("Working...")
-                await asyncio.wait_for(coro_func(), timeout=self.timeout)
+                await asyncio.wait_for(coro_func(*args, **kwargs), timeout=self.timeout)
             except asyncio.TimeoutError:
-                self.log.log(
-                    "❌", "timeout", "Task exceeded timeout — possible blocking code?"
-                )
+                self.log.log("❌", "timeout", "Task exceeded timeout — possible blocking code?")
             except asyncio.CancelledError:
                 self.log.log("⚠️", "cancelled", "Task was cancelled.")
             except Exception as ex:
