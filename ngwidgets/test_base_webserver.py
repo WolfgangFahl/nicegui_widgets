@@ -70,7 +70,12 @@ class ThreadedServerRunner:
             # Mark the start time of the shutdown
             start_time = time.time()
             # call the shutdown see https://github.com/zauberzeug/nicegui/discussions/1957
-            app.shutdown()
+            try:
+                app.shutdown()
+            except Exception as e:
+                if self.debug:
+                    self.warn(f"Expected shutdown exception: {e}")
+
             # Initialize the timer for timeout
             end_time = start_time + self.shutdown_timeout
 
