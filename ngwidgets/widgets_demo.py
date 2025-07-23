@@ -598,6 +598,8 @@ class NiceGuiWidgetsDemo(InputWebSolution):
                     content.clear()
                 with content:
                     if not done:
+                        progress_bar.progress.visible = False
+                        progress_bar.reset()
                         ui.spinner()
                         marker=""
                     ui.markdown(title+marker)
@@ -641,11 +643,14 @@ class NiceGuiWidgetsDemo(InputWebSolution):
                 await asyncio.sleep(1)  # 1 second for quick demo
                 await hint(title,True)
 
-            def cancel_task():
+            async def cancel_task():
                 task_runner.cancel_running()
-                with content:
-                    content.clear()
-                    ui.markdown('⚠️ Task cancelled')
+                task_runner.progress.reset()
+                await hint("Task canceled",True,marker='⚠️')
+
+            async def clear():
+                await hint("",True,marker='️')
+                progress_bar.progress.visible = False
 
             with ui.card() as content:
                 ui.markdown('Ready to run tasks...')
@@ -659,6 +664,7 @@ class NiceGuiWidgetsDemo(InputWebSolution):
                 ui.button('Blocking Task (5s)', on_click=lambda: task_runner.run(blocking_task_5secs))
                 ui.button('Timeout Test (8s+)', on_click=lambda: task_runner.run(slow_load_10secs))
                 ui.button('Cancel', on_click=cancel_task)
+                ui.button('Clear', on_click=clear)
 
             with ui.row():
                 status_label = ui.label('')
