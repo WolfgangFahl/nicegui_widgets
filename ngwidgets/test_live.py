@@ -13,11 +13,13 @@ from typing import Any, Callable, Dict, List
 import requests
 from fastapi.responses import JSONResponse
 from nicegui import Client, app, ui
+
 from ngwidgets.cmd import WebserverCmd
 from ngwidgets.input_webserver import InputWebserver, InputWebSolution
+from ngwidgets.test_base_webserver import BaseWebserverTest
 from ngwidgets.version import Version
 from ngwidgets.webserver import WebserverConfig
-from ngwidgets.test_base_webserver import BaseWebserverTest
+
 
 class LiveSolution(InputWebSolution):
     """
@@ -112,17 +114,18 @@ class LiveWebserver(InputWebserver):
         """
         return self._test_handler
 
+
 class LiveCmd(WebserverCmd):
     """
     Minimal CLI cmd class with only --timeout
     """
 
-    def __init__(self,config=None,webserver_cls=None):
+    def __init__(self, config=None, webserver_cls=None):
         if config is None:
             # Get the config from the webserver class
             config = LiveWebserver.get_config()
         if webserver_cls is None:
-            webserver_cls=LiveWebserver
+            webserver_cls = LiveWebserver
         # Initialize with the config and webserver class
         super().__init__(config=config, webserver_cls=webserver_cls)
 
@@ -136,12 +139,13 @@ class LiveCmd(WebserverCmd):
         )
         return parser
 
+
 class LiveServerRunner:
     """
     Runs a NiceGUI Webserver in a thread
     """
 
-    def __init__(self, ws_cmd:WebserverCmd, args:List[str], timeout=5.0):
+    def __init__(self, ws_cmd: WebserverCmd, args: List[str], timeout=5.0):
         self.ws_cmd = ws_cmd
         self.timeout = timeout
         self.thread = threading.Thread(target=self.ws_cmd.cmd_main, args=(args,))

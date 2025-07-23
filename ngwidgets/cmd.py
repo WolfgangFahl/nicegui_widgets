@@ -7,7 +7,9 @@ Created on 2023-09-10
 import webbrowser
 from argparse import ArgumentParser
 from datetime import datetime
+
 from basemkit.base_cmd import BaseCmd
+
 from ngwidgets.webserver import WebserverConfig
 
 
@@ -35,46 +37,35 @@ class WebserverCmd(BaseCmd):
         """
         super().add_arguments(parser)
         parser.add_argument(
-            "--apache",
-            help="create an apache configuration file for the given domain"
+            "--apache", help="create an apache configuration file for the given domain"
         )
+        parser.add_argument("-c", "--client", action="store_true", help="start client")
         parser.add_argument(
-            "-c", "--client",
+            "-l",
+            "--local",
             action="store_true",
-            help="start client"
+            help="run with local file system access",
         )
+        parser.add_argument("-i", "--input", help="input file")
         parser.add_argument(
-            "-l", "--local",
-            action="store_true",
-            help="run with local file system access"
-        )
-        parser.add_argument(
-            "-i", "--input",
-            help="input file"
-        )
-        parser.add_argument(
-            "-rol", "--render_on_load",
-            action="store_true",
-            help="render on load"
+            "-rol", "--render_on_load", action="store_true", help="render on load"
         )
         parser.add_argument(
             "--host",
             default="localhost",
-            help="the host to serve / listen from (default: localhost)"
+            help="the host to serve / listen from (default: localhost)",
         )
         parser.add_argument(
             "--port",
             type=int,
             default=self.config.default_port,
-            help=f"the port to serve from (default: {self.config.default_port})"
+            help=f"the port to serve from (default: {self.config.default_port})",
         )
         parser.add_argument(
-            "-s", "--serve",
-            action="store_true",
-            help="start webserver"
+            "-s", "--serve", action="store_true", help="start webserver"
         )
 
-    def handle_args(self, args)->bool:
+    def handle_args(self, args) -> bool:
         """
         Handle the given command line arguments.
 
@@ -84,18 +75,18 @@ class WebserverCmd(BaseCmd):
         Returns:
             bool: True if any argument was handled, False otherwise.
         """
-        handled=super().handle_args(args)
+        handled = super().handle_args(args)
         if args.apache:
             print(self.to_apache_config(self.config, args.apache))
-            handled=True
+            handled = True
         if args.client:
             url = f"http://{args.host}:{args.port}"
             webbrowser.open(url)
-            handled=True
+            handled = True
         if args.serve:
             ws = self.webserver_cls()
             ws.run(args)
-            handled= True
+            handled = True
         return handled
 
     def to_apache_config(self, config: WebserverConfig, domain: str) -> str:
@@ -171,9 +162,8 @@ class WebserverCmd(BaseCmd):
         """
         Main entry point (legacy contract).
         """
-        exit_code=self.run(argv)
+        exit_code = self.run(argv)
         return exit_code
-
 
     @classmethod
     def main(cls, config: WebserverConfig, webserver_cls, argv=None) -> int:

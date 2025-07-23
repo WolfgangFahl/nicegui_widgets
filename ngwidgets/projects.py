@@ -47,12 +47,12 @@ from pathlib import Path
 from typing import Dict, List, Optional
 
 import yaml
+from basemkit.yamlable import lod_storable
 from bs4 import BeautifulSoup, ResultSet, Tag
 from github import Github
 
 from ngwidgets.components import Components
 from ngwidgets.progress import Progressbar
-from basemkit.yamlable import lod_storable
 
 
 class GitHubAccess:
@@ -247,10 +247,14 @@ class Project:
                     file_path, cache_valid_secs
                 ):
                     load_from_url = False
-                    components = Components.load_from_yaml_file(str(file_path)) # @UndefinedVariable
+                    components = Components.load_from_yaml_file(
+                        str(file_path)
+                    )  # @UndefinedVariable
 
         if load_from_url:
-            components = Components.load_from_yaml_url(self.components_url)  # @UndefinedVariable
+            components = Components.load_from_yaml_url(
+                self.components_url
+            )  # @UndefinedVariable
             if cache_directory:
                 components.save_to_yaml_file(str(file_path))
 

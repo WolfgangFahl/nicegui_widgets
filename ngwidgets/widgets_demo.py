@@ -4,6 +4,7 @@ Created on 2023-09-13
 @author: wf
 """
 
+import asyncio
 import logging
 import random
 from dataclasses import dataclass
@@ -27,6 +28,7 @@ from ngwidgets.progress import NiceguiProgressbar
 from ngwidgets.projects import Projects
 from ngwidgets.projects_view import ProjectsView
 from ngwidgets.sso_users_solution import SsoSolution
+from ngwidgets.task_runner import TaskRunner
 from ngwidgets.tristate import Tristate
 from ngwidgets.version import Version
 from ngwidgets.webserver import WebserverConfig
@@ -581,6 +583,59 @@ class NiceGuiWidgetsDemo(InputWebSolution):
 
         await self.setup_content_div(show)
 
+    async def show_taskrunner_demo(self):
+        """
+        Demonstrate the TaskRunner with timeout, progress, and cancellation
+        """
+
+        def show():
+            task_runner = TaskRunner(timeout=10.0)
+
+            async def load_data():
+                await asyncio.sleep(3)  # Simulate data loading
+                content.clear()
+                with content:
+                    ui.markdown("✅ Data loaded successfully!")
+
+            async def slow_load():
+                await asyncio.sleep(15)  # Will timeout
+                content.clear()
+                with content:
+                    ui.markdown("This should timeout!")
+
+            def blocking_task():
+                import time
+
+                time.sleep(2)  # Blocking operation
+                return "Blocking task completed"
+
+            async def handle_blocking():
+                result = await run.io_bound(blocking_task)
+                content.clear()
+                with content:
+                    ui.markdown(f"✅ {result}")
+
+            with ui.card() as content:
+                ui.spinner()
+                ui.markdown("Ready to run tasks...")
+
+            with ui.row():
+                ui.button("Load Data (3s)", on_click=lambda: task_runner.run(load_data))
+                ui.button(
+                    "Timeout Test (15s)", on_click=lambda: task_runner.run(slow_load)
+                )
+                ui.button(
+                    "Blocking Task", on_click=lambda: task_runner.run(handle_blocking)
+                )
+                ui.button("Cancel", on_click=task_runner.cancel_running)
+
+            with ui.row():
+                ui.label().bind_text_from(
+                    task_runner, "is_running", lambda running: f"Running: {running}"
+                )
+
+        await self.setup_content_div(show)
+
     async def show_tristate_demo(self):
         """
         Demonstrate the Tristate project.
@@ -904,6 +959,7 @@ class NiceGuiWidgetsDemo(InputWebSolution):
                 "Leaflet Map": "/leaflet",
                 "ListOfDictsGrid": "/grid",
                 "Log Element Handler Demo": "/log_handler",
+                "TaskRunner Demo": "/taskrunner",
                 "Tristate Demo": "/tristate",
                 "pdfviewer": "/pdfviewer",
                 "Progressbar": "/progress",
@@ -1014,6 +1070,10 @@ class NiceGuiWidgetsDemoWebserver(InputWebserver):
         @ui.page("/hideshow")
         async def show_hide_show(client: Client):
             return await self.page(client, NiceGuiWidgetsDemo.show_hide_show_demo)
+
+        @ui.page("/taskrunner")
+        async def show_taskrunner_demo(client: Client):
+            return await self.page(client, NiceGuiWidgetsDemo.show_taskrunner_demo)
 
         @ui.page("/tristate")
         async def show_tristate_demo(client: Client):

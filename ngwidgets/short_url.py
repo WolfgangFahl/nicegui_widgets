@@ -7,6 +7,7 @@ Created on 2025-06-14
 import hashlib
 from pathlib import Path
 
+
 class ShortUrl:
     """
     A utility for mapping arbitrary code snippets to short base36 IDs,
@@ -18,11 +19,16 @@ class ShortUrl:
     - blacklist keywords (must not be present)
     """
 
-    def __init__(self, base_path: Path, suffix: str = ".txt", length: int = 8,
-                 max_size: int = 32 * 1024,
-                 required_keywords=None,
-                 blacklist=None,
-                 lenient: bool = False):
+    def __init__(
+        self,
+        base_path: Path,
+        suffix: str = ".txt",
+        length: int = 8,
+        max_size: int = 32 * 1024,
+        required_keywords=None,
+        blacklist=None,
+        lenient: bool = False,
+    ):
         """
         Initialize the ShortUrl utility.
 
@@ -41,7 +47,7 @@ class ShortUrl:
         self.max_size = max_size
         self.required_keywords = required_keywords or []
         self.blacklist = blacklist or []
-        self.lenient=lenient
+        self.lenient = lenient
         self.base_path.mkdir(parents=True, exist_ok=True)
 
     def short_id_from_code(self, code: str) -> str:
@@ -61,7 +67,7 @@ class ShortUrl:
         while value > 0:
             value, rem = divmod(value, 36)
             result = chars[rem] + result
-        return result.zfill(self.length)[-self.length:]
+        return result.zfill(self.length)[-self.length :]
 
     def path_for_code(self, code: str) -> Path:
         """Get file path for the given code."""
@@ -101,7 +107,6 @@ class ShortUrl:
             if missing:
                 msg = f"Code is missing required keywords: {missing}"
 
-
         if not self.lenient and msg:
             raise ValueError(msg)
 
@@ -123,13 +128,12 @@ class ShortUrl:
         """
         short_id = self.short_id_from_code(code)
         path = self.path_for_id(short_id)
-        err_msg=None
+        err_msg = None
         if with_validate:
             err_msg = self.validate_code(code)
         if not err_msg and not path.exists():
             path.write_text(code, encoding="utf-8")
         return short_id
-
 
     def load(self, short_id: str) -> str:
         """

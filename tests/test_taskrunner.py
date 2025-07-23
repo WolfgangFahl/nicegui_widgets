@@ -8,12 +8,12 @@ import asyncio
 import time
 import unittest
 
-from ngwidgets.basetest import Basetest
-from ngwidgets.task_runner import TaskRunner
-from ngwidgets.test_live import LiveWebTest, LiveWebserver, LiveSolution, \
-    LiveCmd
 from nicegui import Client, ui
 from starlette.responses import JSONResponse
+
+from ngwidgets.basetest import Basetest
+from ngwidgets.task_runner import TaskRunner
+from ngwidgets.test_live import LiveCmd, LiveSolution, LiveWebserver, LiveWebTest
 
 
 class TaskSolution(LiveSolution):
@@ -94,6 +94,7 @@ class TestTaskRunnerLive(LiveWebTest):
     """
     Test the TaskRunner behavior using real HTTP requests
     """
+
     skip_tests = Basetest.inPublicCI()
 
     @classmethod

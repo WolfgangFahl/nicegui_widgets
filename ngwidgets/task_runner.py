@@ -8,8 +8,8 @@ import asyncio
 import inspect
 from typing import Callable, Optional
 
-from nicegui import background_tasks
 from basemkit.persistent_log import Log
+from nicegui import background_tasks
 
 # optional generic Progressbar tqdm or nicegui.ui
 from ngwidgets.progress import Progressbar
@@ -61,7 +61,9 @@ class TaskRunner:
             blocking_func: a regular function doing I/O or CPU-heavy work
             *args, **kwargs: arguments to pass to blocking_func
         """
-        if inspect.iscoroutinefunction(blocking_func) or inspect.iscoroutine(blocking_func):
+        if inspect.iscoroutinefunction(blocking_func) or inspect.iscoroutine(
+            blocking_func
+        ):
             raise TypeError("run_blocking expects a sync function, not async.")
 
         async def wrapper():
@@ -104,7 +106,9 @@ class TaskRunner:
                     self.progress.set_description("Working...")
                 await asyncio.wait_for(coro_func(*args, **kwargs), timeout=self.timeout)
             except asyncio.TimeoutError:
-                self.log.log("❌", "timeout", "Task exceeded timeout — possible blocking code?")
+                self.log.log(
+                    "❌", "timeout", "Task exceeded timeout — possible blocking code?"
+                )
             except asyncio.CancelledError:
                 self.log.log("⚠️", "cancelled", "Task was cancelled.")
             except Exception as ex:

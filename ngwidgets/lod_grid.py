@@ -5,11 +5,12 @@ Created on 2023-10-3
 """
 
 import datetime
+import logging
 import sys
 import traceback
 from dataclasses import dataclass, field
 from typing import Any, Callable, Dict, List, Optional
-import logging
+
 from nicegui import ui
 
 
@@ -193,7 +194,7 @@ class ListOfDictsGrid:
         Raises:
             Exception: Re-raises the exception in debug mode for further debugging.
         """
-        error_msg=f"Exception caught in ListOfDictsGrid: {str(ex)}"
+        error_msg = f"Exception caught in ListOfDictsGrid: {str(ex)}"
         if self.config.debug:
             # Print a stack trace to stderr
             print(error_msg, file=sys.stderr)

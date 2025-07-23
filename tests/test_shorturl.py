@@ -6,8 +6,10 @@ Created on 2025-06-14
 
 import tempfile
 from pathlib import Path
+
 from ngwidgets.basetest import Basetest
 from ngwidgets.short_url import ShortUrl
+
 
 class TestShortUrl(Basetest):
     """
@@ -27,7 +29,7 @@ class TestShortUrl(Basetest):
             max_size=1024,
             required_keywords=["cube", "translate"],
             blacklist=["system(", "#include", "evil"],
-            lenient=False
+            lenient=False,
         )
         if self.debug:
             print(f"📁 Test directory: {self.temp_dir}")

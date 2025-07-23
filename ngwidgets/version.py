@@ -4,8 +4,9 @@ Created on 2023-09-12
 @author: wf
 """
 
-import ngwidgets
 from basemkit.yamlable import lod_storable
+
+import ngwidgets
 
 
 @lod_storable

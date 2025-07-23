@@ -4,14 +4,18 @@ Refactored on 2025-05-19
 
 @author: wf
 """
+
 import json
 import sys
 import threading
 import time
 from argparse import Namespace
 from typing import Any, Optional
+
 from nicegui import app
+
 from ngwidgets.basetest import Basetest
+
 
 class ThreadedServerRunner:
     """
@@ -99,6 +103,7 @@ class ThreadedServerRunner:
                         f"Server shutdown completed in {shutdown_time_taken:.2f} seconds."
                     )
 
+
 class BaseWebserverTest(Basetest):
     """
     Common base class for both TestClient and real HTTP testing scenarios
@@ -136,7 +141,7 @@ class BaseWebserverTest(Basetest):
             The HTML content as a string
         """
         response = self.get_response(path, expected_status_code)
-        if hasattr(response, 'content'):
+        if hasattr(response, "content"):
             html = response.content.decode()
 
             if self.debug:
@@ -157,7 +162,7 @@ class BaseWebserverTest(Basetest):
         """
         response = self.get_response(path, expected_status_code)
         try:
-            if hasattr(response, 'json'):
+            if hasattr(response, "json"):
                 # Both requests.Response and TestClient responses have a json method
                 return response.json()
             else:

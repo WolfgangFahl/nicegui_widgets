@@ -6,10 +6,12 @@ Created on 18.05.2025
 
 import requests
 
-from ngwidgets.test_live import LiveWebTest, LiveCmd
-#from ngwidgets.basetest import Basetest
+from ngwidgets.test_live import LiveCmd, LiveWebTest
 
-#class TestLiveTest(Basetest):
+# from ngwidgets.basetest import Basetest
+
+
+# class TestLiveTest(Basetest):
 class TestLiveTest(LiveWebTest):
     """
     test a live test Environment
@@ -25,7 +27,7 @@ class TestLiveTest(LiveWebTest):
         """
         return
         cmd = LiveCmd()
-        args=["-d","-s"]
+        args = ["-d", "-s"]
         _exit_code = cmd.cmd_main(args)
 
     def test_basic_json(self):

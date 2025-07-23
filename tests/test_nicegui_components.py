@@ -6,13 +6,14 @@ Test suite for the nicegui_projects module in the ngwidgets package.
 @author: wf
 """
 
+import json
+import unittest
 from dataclasses import asdict
 from datetime import datetime
-import json
 from pathlib import Path
-import unittest
 
 from dateutil.parser import parse
+
 from ngwidgets.basetest import Basetest
 from ngwidgets.components import Components
 from ngwidgets.progress import TqdmProgressbar
