@@ -6,15 +6,15 @@ Created on 2025-03-09
 
 import asyncio
 import inspect
+import time
 from typing import Callable, Optional
 
 from basemkit.persistent_log import Log
+from ngwidgets.progress import Progressbar
 from nicegui import background_tasks
+from nicegui import run
 
 # optional generic Progressbar tqdm or nicegui.ui
-from ngwidgets.progress import Progressbar
-
-
 class TaskRunner:
     """
     A robust background task runner that supports:
@@ -29,12 +29,50 @@ class TaskRunner:
         self.timeout = timeout
         self.progress = progress
         self.log = Log()
+        self.start_time = None
+        self.stop_time = None
+        self.task_name = "?"
+
+    def set_name(self, func: Callable):
+        """Set task name from function"""
+        self.task_name = getattr(func, '__name__', '?')
+
+    def get_status(self) -> str:
+        """Get formatted status string with timing information"""
+        if not self.start_time:
+            status = 'Ready'
+        else:
+            elapsed = self.get_elapsed_time()
+            start_str = time.strftime('%H:%M:%S', time.localtime(self.start_time))
+
+            if self.is_running():
+                status = f'Running "{self.task_name}" for {elapsed:.1f}s since {start_str}'
+            elif self.stop_time:
+                stop_str = time.strftime('%H:%M:%S', time.localtime(self.stop_time))
+                status = f'Completed "{self.task_name}" in {elapsed:.1f}s ({start_str}-{stop_str})'
+            else:
+                status = f'Interrupted "{self.task_name}" after {elapsed:.1f}s from {start_str}'
+
+        return status
+
+    def get_elapsed_time(self) -> float:
+        """Get elapsed time in seconds since task started"""
+        elapsed = 0.0
+        if self.start_time:
+            if self.is_running():
+                elapsed = time.time() - self.start_time
+            elif self.stop_time:
+                elapsed = self.stop_time - self.start_time
+        return elapsed
 
     def cancel_running(self):
         if self.task and not self.task.done():
             self.task.cancel()
-            if self.progress:
-                self.progress.reset()
+        if self.progress:
+            self.progress.reset()
+        # Reset timing when cancelled
+        self.start_time = None
+        self.stop_time = None
 
     def is_running(self) -> bool:
         running = self.task and not self.task.done()
@@ -65,9 +103,12 @@ class TaskRunner:
             blocking_func
         ):
             raise TypeError("run_blocking expects a sync function, not async.")
-
+        self.set_name(blocking_func)
         async def wrapper():
-            await asyncio.to_thread(blocking_func, *args, **kwargs)
+            # this would be the native asyncio call
+            # await asyncio.to_thread(blocking_func, *args, **kwargs)
+            # we use nicegui managed threads
+            await run.io_bound(blocking_func, *args, **kwargs)
 
         self._start(wrapper)
 
@@ -82,6 +123,7 @@ class TaskRunner:
             raise TypeError(
                 "run_async_wrapping_blocking expects an async def function."
             )
+        self.set_name(coro_func)
         self._start(coro_func)
 
     def run_async(self, coro_func: Callable[..., asyncio.Future], *args, **kwargs):
@@ -94,10 +136,12 @@ class TaskRunner:
         """
         if not inspect.iscoroutinefunction(coro_func):
             raise TypeError("run_async expects an async def function (not called yet).")
+        self.set_name(coro_func)
         self._start(coro_func, *args, **kwargs)
 
     def _start(self, coro_func: Callable[..., asyncio.Future], *args, **kwargs):
         self.cancel_running()
+        self.start_time = time.time()
 
         async def wrapped():
             try:
@@ -116,5 +160,6 @@ class TaskRunner:
             finally:
                 if self.progress:
                     self.progress.update_value(self.progress.total)
+                self.stop_time = time.time()
 
         self.task = background_tasks.create(wrapped())

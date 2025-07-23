@@ -7,6 +7,7 @@ Created on 2023-09-13
 import asyncio
 import logging
 import random
+import time
 from dataclasses import dataclass
 from datetime import datetime
 
@@ -587,52 +588,83 @@ class NiceGuiWidgetsDemo(InputWebSolution):
         """
         Demonstrate the TaskRunner with timeout, progress, and cancellation
         """
-
         def show():
-            task_runner = TaskRunner(timeout=10.0)
+            # Create progress bar for TaskRunner
+            progress_bar = NiceguiProgressbar(total=100, desc="Task", unit="step")
+            task_runner = TaskRunner(timeout=8.0, progress=progress_bar)
 
-            async def load_data():
-                await asyncio.sleep(3)  # Simulate data loading
-                content.clear()
+            async def hint(title:str,done:bool=False,marker:str="✅"):
                 with content:
-                    ui.markdown("✅ Data loaded successfully!")
-
-            async def slow_load():
-                await asyncio.sleep(15)  # Will timeout
-                content.clear()
+                    content.clear()
                 with content:
-                    ui.markdown("This should timeout!")
+                    if not done:
+                        ui.spinner()
+                        marker=""
+                    ui.markdown(title+marker)
 
-            def blocking_task():
-                import time
+            async def load_data_5secs():
+                title='Loading data ... for 5 secs'
+                await hint(title)
 
-                time.sleep(2)  # Blocking operation
-                return "Blocking task completed"
+                # Simulate work with progress updates
+                for _i in range(50):
+                    await asyncio.sleep(0.1)  # 5 seconds total
+                    progress_bar.update(2)  # 2% per step
 
-            async def handle_blocking():
-                result = await run.io_bound(blocking_task)
-                content.clear()
+                await hint(title,True)
+
+            async def slow_load_10secs():
+                title='Loading 10 secs (this will timeout after 8 secs)...'
+                await hint(title)
+
+                # This will timeout at 8 seconds
+                for _i in range(100):
+                    await asyncio.sleep(0.1)  # 10 seconds total - will timeout
+                    progress_bar.update(1)
+
+                await hint('This should timeout!',True,marker="❌")
+
+            def blocking_task(secs:float=5):
+                time.sleep(secs)
+                return f"Blocking task  {secs} secs completed"
+
+            async def blocking_task_5secs():
+                title = 'Running blocking task for 5 secs'
+                await hint(title)
+                result = blocking_task(5)
+                await hint(result, True)
+
+            async def quick_task_1sec():
+                title='Quick task 1sec'
+                await hint(title)
+
+                await asyncio.sleep(1)  # 1 second for quick demo
+                await hint(title,True)
+
+            def cancel_task():
+                task_runner.cancel_running()
                 with content:
-                    ui.markdown(f"✅ {result}")
+                    content.clear()
+                    ui.markdown('⚠️ Task cancelled')
 
             with ui.card() as content:
-                ui.spinner()
-                ui.markdown("Ready to run tasks...")
+                ui.markdown('Ready to run tasks...')
+
+            # Show progress bar
+            progress_bar.progress.visible = True
 
             with ui.row():
-                ui.button("Load Data (3s)", on_click=lambda: task_runner.run(load_data))
-                ui.button(
-                    "Timeout Test (15s)", on_click=lambda: task_runner.run(slow_load)
-                )
-                ui.button(
-                    "Blocking Task", on_click=lambda: task_runner.run(handle_blocking)
-                )
-                ui.button("Cancel", on_click=task_runner.cancel_running)
+                ui.button('Load Data (5s)', on_click=lambda: task_runner.run(load_data_5secs))
+                ui.button('Quick Task (1s)', on_click=lambda: task_runner.run(quick_task_1sec))
+                ui.button('Blocking Task (5s)', on_click=lambda: task_runner.run(blocking_task_5secs))
+                ui.button('Timeout Test (8s+)', on_click=lambda: task_runner.run(slow_load_10secs))
+                ui.button('Cancel', on_click=cancel_task)
 
             with ui.row():
-                ui.label().bind_text_from(
-                    task_runner, "is_running", lambda running: f"Running: {running}"
-                )
+                status_label = ui.label('')
+
+                # Update status every 100ms using timer
+                ui.timer(0.1, lambda: status_label.set_text(task_runner.get_status()))
 
         await self.setup_content_div(show)
 
