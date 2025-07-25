@@ -38,7 +38,7 @@ class TestDemoWebserver(WebserverTest):
         for path in paths:
             response = self.get_response(path)
             yaml_str = response.text
-            projects = Projects.from_yaml(yaml_str)
+            projects = Projects.from_yaml(yaml_str) # @UndefinedVariable
             if debug:
                 for project in projects.projects:
                     print(project)

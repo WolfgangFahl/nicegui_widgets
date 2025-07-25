@@ -4,7 +4,7 @@ Refactored on 2025-05-19
 
 @author: wf
 """
-
+import asyncio
 import json
 import sys
 import threading
@@ -77,8 +77,8 @@ class ThreadedServerRunner:
             try:
                 app.shutdown()
             except Exception as e:
-                if self.debug:
-                    self.warn(f"Expected shutdown exception: {e}")
+                if self.debug and "CancelledError" not in str(e):
+                    self.warn(f"Shutdown exception: {e}")
 
             # Initialize the timer for timeout
             end_time = start_time + self.shutdown_timeout
@@ -102,7 +102,35 @@ class ThreadedServerRunner:
                     self.warn(
                         f"Server shutdown completed in {shutdown_time_taken:.2f} seconds."
                     )
+    def cancel_pending_tasks(self):
+        """Cancel pending async tasks to prevent loop closed errors - wait for graceful completion first"""
+        if not self.thread.is_alive():
+            return
 
+        try:
+            loop = getattr(self.ws, '_loop', None)
+            if not loop or loop.is_closed():
+                return
+
+            pending = [t for t in asyncio.all_tasks(loop) if not t.done()]
+            if not pending:
+                return
+
+            # Wait for graceful completion first
+            grace_period = min(2.0, self.shutdown_timeout * 0.4)
+            end_time = time.time() + grace_period
+
+            while pending and time.time() < end_time:
+                pending = [t for t in pending if not t.done()]
+                time.sleep(0.1)
+
+            # Cancel remaining tasks
+            for task in pending:
+                if not task.done():
+                    task.cancel()
+
+        except Exception as ex:
+            self.warn(f"cancel pending tasks failed: {ex}")
 
 class BaseWebserverTest(Basetest):
     """

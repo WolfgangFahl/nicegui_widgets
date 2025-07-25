@@ -74,6 +74,7 @@ class WebserverTest(BaseWebserverTest):
         """
         super().tearDown()
         # Stop the server using the ThreadedServerRunner
+        self.server_runner.cancel_pending_tasks()
         self.server_runner.stop()
 
     def get_response(self, path: str, expected_status_code: int = 200) -> Any:
