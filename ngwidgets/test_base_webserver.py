@@ -41,6 +41,10 @@ class ThreadedServerRunner:
         self.debug = debug
         self.ws = ws
         self.args = args
+        # notify the ws environment about the args early
+        # works around configure_run not being properly called in some cases
+        if args is not None:
+            self.ws.args = args
         self.shutdown_timeout = shutdown_timeout
         self.thread = threading.Thread(target=self._run_server)
         self.thread.daemon = True
