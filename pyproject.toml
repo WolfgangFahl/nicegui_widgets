@@ -16,11 +16,11 @@ readme = "README.md"
 license= "Apache-2.0"
 dependencies = [
 	# https://nicegui.io/
-    "nicegui>=2.20.0",
+    "nicegui>=3.2.0",
     # https://pypi.org/project/pybasemkit/
     # https://github.com/WolfgangFahl/pybasemkit
     # Python base module kit: YAML/JSON I/O, structured logging, CLI tooling, shell execution, and remote pydevd debug support.
-    "pybasemkit>=0.0.3",
+    "pybasemkit>=0.1.2",
  	# orjson
  	# https://pypi.org/project/orjson/
  	"orjson>=3.9.10",
@@ -49,11 +49,11 @@ dependencies = [
     #https://pypi.org/project/PyYAML/
     "PyYAML>=6.0.1",
     #https://pypi.org/project/openai/
-    "openai>=1.12.0",
+    "openai>=2.7.1",
     # https://pypi.org/project/colour/
 	"colour>=0.1.5",
 	# https://pypi.org/project/anthropic/
-	"anthropic>=0.49.0",
+	"anthropic>=0.72.0",
 	# gpxpy
 	# https://github.com/tkrajina/gpxpy
 	"gpxpy>=1.6.2"
@@ -64,7 +64,6 @@ classifiers=[
     "Development Status :: 4 - Beta",
     "Environment :: Console",
     "Programming Language :: Python :: 3 :: Only",
-    "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
@@ -100,7 +99,7 @@ mbus = [
 ]
 sso = [
   # https://pypi.org/project/py-3rdparty-mediawiki/
-  "py-3rdparty-mediawiki>=0.14.6",
+  "py-3rdparty-mediawiki>=0.17.0",
 ]
 
 
