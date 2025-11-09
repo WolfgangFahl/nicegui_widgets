@@ -18,7 +18,10 @@ class TestLLM(Basetest):
 
     def setUp(self, debug=True, profile=True):
         Basetest.setUp(self, debug=debug, profile=profile)
-        self.llms = {"openai": LLM(), "claude": ClaudeLLM()}
+        self.llms = {
+            "claude": ClaudeLLM(),
+            "openai": LLM()
+        }
 
     @unittest.skipIf(Basetest.inPublicCI(), "LLM tests with API cost")
     def testModelList(self):

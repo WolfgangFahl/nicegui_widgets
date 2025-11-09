@@ -16,7 +16,8 @@ readme = "README.md"
 license= "Apache-2.0"
 dependencies = [
 	# https://nicegui.io/
-    "nicegui>=3.2.0",
+	# forced pin of nicegui e.g. due to
+    "nicegui==2.24.2",
     # https://pypi.org/project/pybasemkit/
     # https://github.com/WolfgangFahl/pybasemkit
     # Python base module kit: YAML/JSON I/O, structured logging, CLI tooling, shell execution, and remote pydevd debug support.
