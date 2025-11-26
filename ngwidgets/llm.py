@@ -1,6 +1,6 @@
 """
 Created on 2023-06-23
-Updated on 2025-11-16 to support openrouter
+Updated on 2025-11-26 to support openrouter and clean up structure
 
 @author: wf
 """
@@ -56,30 +56,9 @@ class LLM(BaseLLM):
         self.token_size_limit = LLM.MODEL_SIZE_LIMITS.get(model, 4096)
         self.char_size_limit = self.token_size_limit * LLM.AVERAGE_TOKEN_CHAR_LEN
         self.base_url = base_url
-        self.api_key = api_key
 
-        # API Key Resolution
-        if not self.api_key:
-            # 1. Try standard OpenAI Env Var
-            self.api_key = os.getenv("OPENAI_API_KEY")
-
-            # 2. If OpenRouter, try specific Env Var
-            if not self.api_key and self._is_openrouter():
-                self.api_key = os.getenv("OPENROUTER_API_KEY")
-
-            # 3. Try standard OpenAI config file
-            if self.api_key is None:
-                json_file = Path.home() / ".openai" / "openai_api_key.json"
-                if json_file.is_file():
-                    with open(json_file, "r") as file:
-                        data = json.load(file)
-                        self.api_key = data.get("OPENAI_API_KEY")
-
-            # 4. If OpenRouter, try specific config file
-            if self.api_key is None and self._is_openrouter():
-                openrouter_file = Path.home() / ".openrouter" / "apikey.txt"
-                if openrouter_file.is_file():
-                    self.api_key = openrouter_file.read_text().strip()
+        # Resolve API Key
+        self.api_key = self.get_api_key(api_key)
 
         if self.api_key is None:
             if force_key:
@@ -93,24 +72,79 @@ class LLM(BaseLLM):
         self.client = OpenAI(api_key=self.api_key, base_url=self.base_url)
 
         # Setup Prompts Logging
-        if prompts_filepath is None:
-            date_str = datetime.now().strftime("%Y-%m-%d")
-            default_filename = f"prompts_{date_str}.yaml"
-            openai_dir = Path.home() / ".openai"
-            if not openai_dir.exists():
-                openai_dir.mkdir(parents=True, exist_ok=True)
-            prompts_filepath = openai_dir / default_filename
+        self.prompts_filepath = self._get_prompts_filepath(prompts_filepath)
 
-        self.prompts_filepath = prompts_filepath
-
-        if prompts_filepath.is_file():
-            self.prompts = Prompts.load_from_yaml_file(str(prompts_filepath)) # @UndefinedVariable
+        if self.prompts_filepath and self.prompts_filepath.is_file():
+            self.prompts = Prompts.load_from_yaml_file(str(self.prompts_filepath)) # @UndefinedVariable
         else:
             self.prompts = Prompts()
 
     def _is_openrouter(self) -> bool:
         """Check if current configuration is pointing to OpenRouter"""
         return self.base_url and "openrouter" in self.base_url
+
+    def get_api_key(self, api_key: str) -> str:
+        """
+        Resolve the API key from arguments, environment variables, or configuration files.
+        Prioritizes OpenRouter sources if base_url indicates OpenRouter usage.
+        """
+        if api_key:
+            return api_key
+
+        if self._is_openrouter():
+            return self._get_openrouter_key()
+
+        return self._get_openai_key()
+
+    def _get_openrouter_key(self) -> str:
+        """
+        Retrieve OpenRouter API key from environment or config file.
+        """
+        # Check Env
+        key = os.getenv("OPENROUTER_API_KEY")
+        if key:
+            return key
+
+        # Check File
+        key_file = Path.home() / ".openrouter" / "apikey.txt"
+        if key_file.is_file():
+            return key_file.read_text().strip()
+
+        return None
+
+    def _get_openai_key(self) -> str:
+        """
+        Retrieve Standard OpenAI API key from environment or config file.
+        """
+        # Check Env
+        key = os.getenv("OPENAI_API_KEY")
+        if key:
+            return key
+
+        # Check File
+        json_file = Path.home() / ".openai" / "openai_api_key.json"
+        if json_file.is_file():
+            try:
+                with open(json_file, "r") as file:
+                    data = json.load(file)
+                    return data.get("OPENAI_API_KEY")
+            except Exception:
+                pass
+        return None
+
+    def _get_prompts_filepath(self, filepath_arg: str) -> Path:
+        """
+        Determine the file path for logging prompts.
+        """
+        if filepath_arg:
+            return Path(filepath_arg)
+
+        date_str = datetime.now().strftime("%Y-%m-%d")
+        default_filename = f"prompts_{date_str}.yaml"
+        openai_dir = Path.home() / ".openai"
+        if not openai_dir.exists():
+            openai_dir.mkdir(parents=True, exist_ok=True)
+        return openai_dir / default_filename
 
     def _get_extra_headers(self) -> dict:
         """Get extra headers for OpenRouter if applicable"""
