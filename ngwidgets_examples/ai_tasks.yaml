@@ -1,0 +1,84 @@
+# AI tasks
+# WF 2025-12-08
+api:
+    base_url: https://openrouter.ai/api/v1
+models:
+    gemini2:
+        name: google/gemini-2.0-flash-001
+        provider: google
+        context_length: 1048576
+        price_per_mtoken: 0.25
+        input_types:
+            - vision
+            - text
+            - audio
+            - video
+
+    llama-vision:
+        name: meta-llama/llama-3.2-11b-vision-instruct
+        provider: meta-llama
+        context_length: 131072
+        price_per_mtoken: 0.049
+        input_types:
+            - vision
+            - text
+
+    gpt4o-mini:
+        name: openai/gpt-4o-mini
+        provider: openai
+        context_length: 128000
+        price_per_mtoken: 0.375
+        input_types:
+            - vision
+            - text
+
+    mistral-small:
+        name: mistralai/mistral-small-3.2-24b-instruct
+        provider: mistralai
+        context_length: 131072
+        price_per_mtoken: 0.12
+        input_types:
+            - vision
+            - text
+
+    claude-haiku:
+        name: anthropic/claude-3-haiku
+        provider: anthropic
+        context_length: 200000
+        price_per_mtoken: 0.75
+        input_types:
+            - vision
+            - text
+
+    grok-fast:
+        name: x-ai/grok-4.1-fast
+        provider: x-ai
+        context_length: 2000000
+        price_per_mtoken: 0.35
+        input_types:
+            - vision
+            - text
+
+    qwen-vision:
+        name: qwen/qwen3-vl-8b-instruct
+        provider: qwen
+        context_length: 131072
+        price_per_mtoken: 0.232
+        input_types:
+            - vision
+            - text
+
+tasks:
+    ocr4business:
+        description: |
+            OCR-Extractor with Summary for business
+        prompt: |
+            Please OCR the image and extract the relevant information. This should be for a business ledger.
+        input_type: vision
+
+    ocr4personal:
+        description: |
+            OCR-Extractor with Summary for personal use
+        prompt: |
+            Please OCR the image and extract the relevant information. This should be for a personal ledger.
+        input_type: vision
