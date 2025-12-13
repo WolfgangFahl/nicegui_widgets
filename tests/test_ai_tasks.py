@@ -14,8 +14,7 @@ from typing import Any, Dict, List, Union
 
 from basemkit.basetest import Basetest
 from ngwidgets.llm import LLM
-
-from scan.ai_tasks import AITasks, ModelConfig, TaskConfig
+from ngwidgets.ai_tasks import AITasks, ModelConfig, TaskConfig
 
 
 class Utf8Histogram:
