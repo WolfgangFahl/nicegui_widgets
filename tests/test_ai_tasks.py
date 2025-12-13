@@ -154,12 +154,12 @@ class TestAITasks(Basetest):
         self.assertGreater(len(ai_tasks.tasks), 0, "No tasks loaded")
 
         # Check for specific expected task (ocr4wiki)
-        self.assertIn("ocr4wiki", ai_tasks.tasks, "ocr4wiki task not found")
-        ocr_task = ai_tasks.tasks["ocr4wiki"]
+        self.assertIn("ocr4business", ai_tasks.tasks, "ocr4business task not found")
+        ocr_task = ai_tasks.tasks["ocr4business"]
         self.assertIsInstance(ocr_task, TaskConfig)
         self.assertIsNotNone(ocr_task.prompt)
         self.assertIn("OCR", ocr_task.prompt, "OCR not in prompt")
-        self.assertIn("OCR for MediaWiki", ocr_task.description)
+        self.assertIn("OCR-Extractor with Summary", ocr_task.description)
 
     def testModels(self):
         """
