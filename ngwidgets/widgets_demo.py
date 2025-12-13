@@ -8,9 +8,12 @@ import asyncio
 import logging
 import random
 import time
+import tempfile
+import os
 from dataclasses import dataclass
 from datetime import datetime
-
+from PIL import Image, ImageDraw
+from ngwidgets.image_cropper import ImageCropper
 from fastapi.responses import Response
 from nicegui import Client, app, run, ui
 
@@ -513,6 +516,38 @@ class NiceGuiWidgetsDemo(InputWebSolution):
 
         await self.setup_content_div(show)
 
+    async def show_image_cropper(self):
+        """
+        Demonstrate the ImageCropper class by creating a local sample image.
+        """
+        def show():
+            # Create a temporary file path for the demo
+            tmp_dir = tempfile.gettempdir()
+            img_filename = "ngdemo_cropper_sample.jpg"
+            img_path = os.path.join(tmp_dir, img_filename)
+
+            # Create a generated sample image if it doesn't exist
+            # We recreate it every time to 'reset' the demo if previous users cropped it heavily
+            img = Image.new('RGB', (600, 400), color=(73, 109, 137))
+            d = ImageDraw.Draw(img)
+            d.text((20, 20), "NiceGUI Image Cropper Demo", fill=(255, 255, 0))
+            d.rectangle([100, 100, 300, 300], outline="white", width=5)
+            d.ellipse([350, 150, 550, 350], outline="lightgreen", width=5)
+            img.save(img_path)
+
+            # Instructions
+            ui.markdown(f"**Instructions**: Drag on the image to select an area. Click the checkmark to crop. Use arrows to rotate.")
+            ui.label(f"Local file: {img_path}").classes("text-xs text-gray-500")
+
+            # Setup Cropper
+            with ui.card().classes("w-full") as container:
+                cropper = ImageCropper(self)
+                cropper.file_path = img_path
+                # Note: ui.interactive_image handles local file paths automatically
+                cropper.setup_ui(container, img_path)
+
+        await self.setup_content_div(show)
+
     async def show_log_element_handler_demo(self):
         """
         demonstrate logging via log_view
@@ -993,6 +1028,7 @@ class NiceGuiWidgetsDemo(InputWebSolution):
                 "DictEdit": "/dictedit",
                 "GPX-Viewer": "/gpxviewer",
                 "HideShow Demo": "/hideshow",
+                "Image Cropper": "/image_cropper",
                 "Lang": "/langs",
                 "Leaflet Map": "/leaflet",
                 "ListOfDictsGrid": "/grid",
@@ -1078,6 +1114,10 @@ class NiceGuiWidgetsDemoWebserver(InputWebserver):
         @ui.page("/gpxviewer")
         async def show_gpxviewer(client: Client):
             return await self.page(client, NiceGuiWidgetsDemo.show_gpxviewer)
+
+        @ui.page("/image_cropper")
+        async def show_image_cropper(client: Client):
+            return await self.page(client, NiceGuiWidgetsDemo.show_image_cropper)
 
         @ui.page("/langs")
         async def show_langs(client: Client):
