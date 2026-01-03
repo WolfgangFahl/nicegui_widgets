@@ -3,9 +3,6 @@ from dataclasses import dataclass
 from nicegui import ui
 from tqdm import tqdm
 
-from ngwidgets.color_schema import ColorSchema
-
-
 @dataclass
 class Progressbar:
     """
