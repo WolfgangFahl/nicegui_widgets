@@ -14,7 +14,7 @@ from ngwidgets.progress import Progressbar
 from nicegui import background_tasks
 from nicegui import run
 
-# optional generic Progressbar tqdm or nicegui.ui
+
 class TaskRunner:
     """
     A robust background task runner that supports:
@@ -22,6 +22,7 @@ class TaskRunner:
     - Enforces correct usage
     - Supports progress bar feedback
     - Enforces timeouts and cancellation
+    - Returns task references for external cancellation
     """
 
     def __init__(self, timeout: float = 20.0, progress: Optional[Progressbar] = None):
@@ -66,15 +67,23 @@ class TaskRunner:
         return elapsed
 
     def cancel_running(self):
+        """🆕 Cancel currently running task and record timing"""
         if self.task and not self.task.done():
-            self.task.cancel()
+            try:
+                self.task.cancel()
+                self.log.log("🔄", "cancel", f'Cancelled task "{self.task_name}"')
+            except Exception as ex:
+                self.log.log("⚠️", "cancel_error", f"Error cancelling task: {ex}")
+
         if self.progress:
             self.progress.reset()
-        # Reset timing when cancelled
-        self.start_time = None
-        self.stop_time = None
+
+        # 🆕 Record stop time when cancelled (instead of resetting timing)
+        if self.start_time and not self.stop_time:
+            self.stop_time = time.time()
 
     def is_running(self) -> bool:
+        """Check if task is currently running"""
         running = self.task and not self.task.done()
         return running
 
@@ -85,11 +94,14 @@ class TaskRunner:
         Args:
             func: async or sync function
             *args, **kwargs: arguments to pass to func
+
+        Returns:
+            asyncio.Task: The created background task
         """
         if inspect.iscoroutinefunction(func):
-            self.run_async(func, *args, **kwargs)
+            return self.run_async(func, *args, **kwargs)
         else:
-            self.run_blocking(func, *args, **kwargs)
+            return self.run_blocking(func, *args, **kwargs)
 
     def run_blocking(self, blocking_func: Callable, *args, **kwargs):
         """
@@ -98,19 +110,21 @@ class TaskRunner:
         Args:
             blocking_func: a regular function doing I/O or CPU-heavy work
             *args, **kwargs: arguments to pass to blocking_func
+
+        Returns:
+            asyncio.Task: The created background task
         """
         if inspect.iscoroutinefunction(blocking_func) or inspect.iscoroutine(
             blocking_func
         ):
             raise TypeError("run_blocking expects a sync function, not async.")
         self.set_name(blocking_func)
+
         async def wrapper():
-            # this would be the native asyncio call
-            # await asyncio.to_thread(blocking_func, *args, **kwargs)
-            # we use nicegui managed threads
+            # Use nicegui managed threads
             await run.io_bound(blocking_func, *args, **kwargs)
 
-        self._start(wrapper)
+        return self._start(wrapper)
 
     def run_async_wrapping_blocking(self, coro_func: Callable[[], asyncio.Future]):
         """
@@ -118,13 +132,16 @@ class TaskRunner:
 
         Args:
             coro_func: async function doing await to_thread(blocking_func)
+
+        Returns:
+            asyncio.Task: The created background task
         """
         if not inspect.iscoroutinefunction(coro_func):
             raise TypeError(
                 "run_async_wrapping_blocking expects an async def function."
             )
         self.set_name(coro_func)
-        self._start(coro_func)
+        return self._start(coro_func)
 
     def run_async(self, coro_func: Callable[..., asyncio.Future], *args, **kwargs):
         """
@@ -133,15 +150,25 @@ class TaskRunner:
         Args:
             coro_func: a non-blocking async function
             *args, **kwargs: arguments to pass to coro_func
+
+        Returns:
+            asyncio.Task: The created background task
         """
         if not inspect.iscoroutinefunction(coro_func):
             raise TypeError("run_async expects an async def function (not called yet).")
         self.set_name(coro_func)
-        self._start(coro_func, *args, **kwargs)
+        return self._start(coro_func, *args, **kwargs)
 
     def _start(self, coro_func: Callable[..., asyncio.Future], *args, **kwargs):
+        """
+        🆕 Internal method to start a task with proper error handling and timing.
+
+        Returns:
+            asyncio.Task: The created background task
+        """
         self.cancel_running()
         self.start_time = time.time()
+        self.stop_time = None  # 🆕 Reset stop time on new task
 
         async def wrapped():
             try:
@@ -151,15 +178,19 @@ class TaskRunner:
                 await asyncio.wait_for(coro_func(*args, **kwargs), timeout=self.timeout)
             except asyncio.TimeoutError:
                 self.log.log(
-                    "❌", "timeout", "Task exceeded timeout — possible blocking code?"
+                    "❌", "timeout",
+                    f'Task "{self.task_name}" exceeded {self.timeout}s timeout — possible blocking code?'
                 )
             except asyncio.CancelledError:
-                self.log.log("⚠️", "cancelled", "Task was cancelled.")
+                self.log.log("⚠️", "cancelled", f'Task "{self.task_name}" was cancelled.')
+                raise  # 🆕 Re-raise to properly propagate cancellation
             except Exception as ex:
-                self.log.log("❌", "exception", str(ex))
+                self.log.log("❌", "exception", f'Task "{self.task_name}": {str(ex)}')
+                raise  # 🆕 Re-raise to allow caller to handle
             finally:
                 if self.progress:
                     self.progress.update_value(self.progress.total)
                 self.stop_time = time.time()
 
         self.task = background_tasks.create(wrapped())
+        return self.task  # 🆕 Return task reference for external cancellation

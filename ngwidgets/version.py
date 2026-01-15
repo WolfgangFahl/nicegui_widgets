@@ -18,7 +18,7 @@ class Version:
     name = "ngwidgets"
     version = ngwidgets.__version__
     date = "2023-09-10"
-    updated = "2025-12-13"
+    updated = "2026-01-15"
     description = "NiceGUI widgets"
 
     authors = "Wolfgang Fahl"
@@ -27,7 +27,7 @@ class Version:
     chat_url = "https://github.com/WolfgangFahl/nicegui_widgets/discussions"
     cm_url = "https://github.com/WolfgangFahl/nicegui_widgets"
 
-    license = f"""Copyright 2023-2025 contributors. All rights reserved.
+    license = f"""Copyright 2023-2026 contributors. All rights reserved.
 
   Licensed under the Apache License 2.0
   http://www.apache.org/licenses/LICENSE-2.0
