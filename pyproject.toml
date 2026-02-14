@@ -31,8 +31,8 @@ dependencies = [
     "bcrypt>=4.0.1",
 	# https://pypi.org/project/tqdm/
 	# progress bar
-	"tdqm",
-    # for debugging
+	"tqdm",
+  # for debugging
 	# https://pypi.org/project/pydevd/
 	"pydevd>=2.10.0",
 	# dateutil
