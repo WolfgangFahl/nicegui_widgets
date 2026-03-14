@@ -3,6 +3,7 @@ from dataclasses import dataclass
 from nicegui import ui
 from tqdm import tqdm
 
+
 @dataclass
 class Progressbar:
     """
@@ -35,7 +36,7 @@ class NiceguiProgressbar(Progressbar):
     Nicegui progress bar wrapper.
     """
 
-    def __init__(self, total, desc: str, unit: str, label_color="#8D92C4 "):
+    def __init__(self, total, desc: str, unit: str, label_color="#8D92C4"):
         """
         Initialize the NiceguiProgressbar instance.
 
