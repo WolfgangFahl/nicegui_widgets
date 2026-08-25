@@ -50,6 +50,7 @@ import yaml
 from basemkit.yamlable import lod_storable
 from bs4 import BeautifulSoup, ResultSet, Tag
 from github import Github
+from github.GithubException import GithubException
 
 from ngwidgets.components import Components
 from ngwidgets.progress import Progressbar
@@ -618,11 +619,22 @@ class Projects:
                             f"Can't determine repo_name for {pypi.github} of pypi package {pypi.package}"
                         )
                     # Create a Project instance from GitHub
-                    repo = github_access.github.get_repo(repo_name)
-                    github_comp = Project.from_github(repo)
-                    # Merge PyPI data into the newly created GitHub project
-                    github_comp.merge_pypi(pypi)
-                    self.projects.append(github_comp)
+                    # the url is what pypi claims - the repo may be gone,
+                    # renamed or private, which must not end the whole update
+                    try:
+                        repo = github_access.github.get_repo(repo_name)
+                    except GithubException as ex:
+                        print(
+                            f"github repo {repo_name} of pypi package {pypi.package} unavailable: {ex.status}"
+                        )
+                        repo = None
+                    if repo:
+                        github_comp = Project.from_github(repo)
+                        # Merge PyPI data into the newly created GitHub project
+                        github_comp.merge_pypi(pypi)
+                        self.projects.append(github_comp)
+                    else:
+                        self.projects.append(pypi)
             else:
                 # PyPI project without a GitHub URL
                 self.projects.append(pypi)
