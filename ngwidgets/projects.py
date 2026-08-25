@@ -69,7 +69,10 @@ class GitHubAccess:
     """
 
     def __init__(
-        self, default_directory: str = None, access_token: Optional[str] = None
+        self,
+        default_directory: str = None,
+        access_token: Optional[str] = None,
+        per_page: int = 100,
     ):
         """
         Initialize the GitHub instance.
@@ -81,10 +84,13 @@ class GitHubAccess:
         Args:
             default_directory (str): Path to the directory where the access token file is stored.
             access_token (Optional[str]): A GitHub personal access token. Defaults to None.
+            per_page (int): Page size for API results. The search API returns at most 1000 results
+                and allows 30 requests per minute, so the PyGithub default of 30 needs 34 requests
+                and runs into 403 Forbidden with backoff; 100 - the GitHub maximum - needs 10.
         """
         if not access_token and default_directory:
             access_token = self._read_access_token(default_directory)
-        self.github = Github(access_token)
+        self.github = Github(access_token, per_page=per_page)
 
     def _read_access_token(self, default_directory: str) -> Optional[str]:
         """
