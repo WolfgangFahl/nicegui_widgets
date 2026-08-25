@@ -601,15 +601,31 @@ class Projects:
         projects_by_github_url = self.get_github_projects(repo_dict, progress_bar)
         self.projects = list(projects_by_github_url.values())
 
+        # index the github projects by their user/repo key so that a pypi url
+        # is matched to exactly one repository - a prefix match would let
+        # .../owner/repo-extras match the project .../owner/repo
+        projects_by_repo = {}
+        for github_url, github_project in projects_by_github_url.items():
+            repo_key = self.repo_key(github_url)
+            if repo_key:
+                projects_by_repo[repo_key] = github_project
+        # forks, mirrors and derived builds name the same repository as the
+        # package it is derived from, so the best ranked package is merged and
+        # the others stay visible as their own pypi entries
+        rank_by_repo = {}
+
         # Merge PyPI projects into the GitHub projects
         for pypi in pypi_projects:
-            matched_project = None  # Reset for each PyPI project
             if pypi.github:
-                for github_url in projects_by_github_url.keys():
-                    if pypi.github.startswith(github_url):
-                        matched_project = projects_by_github_url[github_url]
+                repo_key = self.repo_key(pypi.github)
+                matched_project = projects_by_repo.get(repo_key)
                 if matched_project:
-                    matched_project.merge_pypi(pypi)
+                    rank = self.merge_rank(pypi, repo_key)
+                    if rank > rank_by_repo.get(repo_key, (-1, -1)):
+                        rank_by_repo[repo_key] = rank
+                        matched_project.merge_pypi(pypi)
+                    else:
+                        self.projects.append(pypi)
                 else:
                     # we have github url but it was not in our search list
                     # check the gitub repo for more details
@@ -659,8 +675,50 @@ class Projects:
         # Assuming the URL format is https://github.com/user/repo
         parts = url.split("/")
         if len(parts) > 4 and parts[2] == "github.com":
-            return "/".join(parts[3:5])
+            repo_name = "/".join(parts[3:5])
+            # a clone url carries the .git suffix which the API does not know
+            if repo_name.endswith(".git"):
+                repo_name = repo_name[: -len(".git")]
+            return repo_name
         return None
+
+    def repo_key(self, url: str) -> Optional[str]:
+        """
+        Get the comparable user/repo key of a GitHub URL.
+
+        Args:
+            url (str): The GitHub URL.
+
+        Returns:
+            Optional[str]: user/repo in lower case without a .git suffix, or None.
+        """
+        repo_key = None
+        repo_name = self.extract_repo_name_from_url(url)
+        if repo_name:
+            repo_key = repo_name.lower()
+            if repo_key.endswith(".git"):
+                repo_key = repo_key[: -len(".git")]
+        return repo_key
+
+    def merge_rank(self, pypi, repo_key: str) -> tuple:
+        """
+        Rank a PyPI package as the representative of a repository.
+
+        The package named like the repository wins over every other package
+        pointing at it - nicegui over nicegui-evnchn-pyodide for
+        zauberzeug/nicegui - and downloads decide among the rest.
+
+        Args:
+            pypi (Project): The PyPI project.
+            repo_key (str): The user/repo key of the repository.
+
+        Returns:
+            tuple: The rank, higher is better.
+        """
+        repo_name = repo_key.split("/")[-1].replace("_", "-")
+        package = (pypi.package or "").lower().replace("_", "-")
+        name_match = 1 if package == repo_name else 0
+        return (name_match, pypi.downloads or 0)
 
 
 class PyPi:
