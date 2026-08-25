@@ -103,12 +103,19 @@ class TaskRunner:
         else:
             return self.run_blocking(func, *args, **kwargs)
 
-    def run_blocking(self, blocking_func: Callable, *args, **kwargs):
+    def run_blocking(
+        self,
+        blocking_func: Callable,
+        *args,
+        on_result: Optional[Callable] = None,
+        **kwargs,
+    ):
         """
         Run a blocking (sync) function via asyncio.to_thread.
 
         Args:
             blocking_func: a regular function doing I/O or CPU-heavy work
+            on_result: called with the return value of blocking_func when given
             *args, **kwargs: arguments to pass to blocking_func
 
         Returns:
@@ -122,16 +129,23 @@ class TaskRunner:
 
         async def wrapper():
             # Use nicegui managed threads
-            await run.io_bound(blocking_func, *args, **kwargs)
+            result = await run.io_bound(blocking_func, *args, **kwargs)
+            if on_result:
+                on_result(result)
 
         return self._start(wrapper)
 
-    def run_async_wrapping_blocking(self, coro_func: Callable[[], asyncio.Future]):
+    def run_async_wrapping_blocking(
+        self,
+        coro_func: Callable[[], asyncio.Future],
+        on_result: Optional[Callable] = None,
+    ):
         """
         Run an async function that internally handles blocking with to_thread.
 
         Args:
             coro_func: async function doing await to_thread(blocking_func)
+            on_result: called with the return value of coro_func when given
 
         Returns:
             asyncio.Task: The created background task
@@ -159,7 +173,13 @@ class TaskRunner:
         self.set_name(coro_func)
         return self._start(coro_func, *args, **kwargs)
 
-    def _start(self, coro_func: Callable[..., asyncio.Future], *args, **kwargs):
+    def _start(
+        self,
+        coro_func: Callable[..., asyncio.Future],
+        *args,
+        on_result: Optional[Callable] = None,
+        **kwargs,
+    ):
         """
         🆕 Internal method to start a task with proper error handling and timing.
 
@@ -175,7 +195,11 @@ class TaskRunner:
                 if self.progress:
                     self.progress.reset()
                     self.progress.set_description("Working...")
-                await asyncio.wait_for(coro_func(*args, **kwargs), timeout=self.timeout)
+                result = await asyncio.wait_for(
+                    coro_func(*args, **kwargs), timeout=self.timeout
+                )
+                if on_result:
+                    on_result(result)
             except asyncio.TimeoutError:
                 self.log.log(
                     "❌", "timeout",

@@ -18,6 +18,7 @@ from basemkit.yamlable import lod_storable
 from nicegui import Client, core, ui
 
 from ngwidgets.color_schema import ColorSchema
+from ngwidgets.task_runner import TaskRunner
 from ngwidgets.version import Version
 
 
@@ -343,6 +344,59 @@ class WebSolution:
         )
         icon_button.toggle_icon = toggle_icon
         return icon_button
+
+    def run_busy(
+        self,
+        func: callable,
+        status: ui.label = None,
+        button: ui.button = None,
+        spinner: ui.spinner = None,
+        on_result: callable = None,
+        busy_text: str = "working ...",
+        done_text: str = "done",
+        timeout: float = 20.0,
+    ):
+        """
+        run the given blocking function in the background while the user
+        interface shows that it is busy - see
+        https://github.com/WolfgangFahl/nicegui_widgets/issues/100
+
+        the busy state is shown at once, the work runs off the event loop
+        and every user interface update happens inside my container
+
+        Args:
+            func: the blocking function to run
+            status: the label to show the state in
+            button: the button to disable while busy
+            spinner: the spinner to show while busy
+            on_result: called with the return value of func
+            busy_text: the status text while busy
+            done_text: the status text when finished
+            timeout: the seconds after which the task is cancelled
+        """
+        runner = TaskRunner(timeout=timeout)
+
+        def set_busy(busy: bool, text: str):
+            with self.container:
+                if button:
+                    if busy:
+                        button.disable()
+                    else:
+                        button.enable()
+                if spinner:
+                    spinner.set_visibility(busy)
+                if status:
+                    status.set_text(text)
+
+        def handle_result(result):
+            set_busy(False, done_text)
+            if on_result:
+                with self.container:
+                    on_result(result)
+
+        set_busy(True, busy_text)
+        runner.run_blocking(func, on_result=handle_result)
+        return runner
 
     def toggle_icon(self, button: ui.button):
         """

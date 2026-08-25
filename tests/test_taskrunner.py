@@ -61,6 +61,22 @@ class TaskWebserver(LiveWebserver):
 
             return JSONResponse(content=result)
 
+        @ui.page("/taskrunner_result")
+        async def taskrunner_result(client: Client):
+            runner = TaskRunner(timeout=1)
+            result = {}
+
+            def blocking_task() -> str:
+                time.sleep(0.1)
+                return "42"
+
+            runner.run_blocking(
+                blocking_task, on_result=lambda value: result.update(value=value)
+            )
+            await asyncio.sleep(0.3)
+
+            return JSONResponse(content=result)
+
         @ui.page("/taskrunner_combined")
         async def taskrunner_combined(client: Client):
             runner = TaskRunner(timeout=1)
@@ -120,6 +136,15 @@ class TestTaskRunnerLive(LiveWebTest):
     def test_taskrunner_blocking(self):
         result = self.get_json("/taskrunner_blocking")
         self.assertEqual(result["blocking"], "done")
+
+    @unittest.skipIf(skip_tests, "Skipped in public CI due to instability")
+    def test_taskrunner_result(self):
+        """
+        the result of a blocking function is passed to on_result
+        see https://github.com/WolfgangFahl/nicegui_widgets/issues/100
+        """
+        result = self.get_json("/taskrunner_result")
+        self.assertEqual(result["value"], "42")
 
     @unittest.skipIf(skip_tests, "Skipped in public CI due to instability")
     def test_taskrunner_combined(self):
