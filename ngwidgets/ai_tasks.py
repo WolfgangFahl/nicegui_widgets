@@ -6,9 +6,10 @@ Created on 2025-12-08
 
 from dataclasses import field
 from pathlib import Path
-from typing import Dict, List, Optional, Any
+from typing import Any, Dict, List, Optional
 
 from basemkit.yamlable import lod_storable
+
 from ngwidgets.llm import LLM, VisionLLM
 
 
@@ -16,7 +17,9 @@ from ngwidgets.llm import LLM, VisionLLM
 class APIConfig:
     """API configuration for LLM services"""
 
-    base_url: str = "https://openrouter.ai/api/v1"  # The endpoint URL for the LLM API provider
+    base_url: str = (
+        "https://openrouter.ai/api/v1"  # The endpoint URL for the LLM API provider
+    )
 
 
 @lod_storable
@@ -25,7 +28,9 @@ class ModelConfig:
 
     name: str  # Full OpenRouter model ID (e.g., google/gemini-2.0-flash-001)
     provider: str  # The model provider organization (e.g., google, openai, anthropic)
-    description: Optional[str] = None  # A human-readable summary of the model's capabilities
+    description: Optional[str] = (
+        None  # A human-readable summary of the model's capabilities
+    )
     context_length: Optional[int] = None  # Maximum context window size in tokens
     price_per_mtoken: Optional[float] = None  # cost per million tokens in USD
     input_types: List[str] = field(
@@ -75,7 +80,9 @@ class TaskConfig:
     """Configuration for an AI task"""
 
     prompt: str  # The system or user prompt template to send to the model
-    model: Optional[str] = None  # Key reference to a specific entry in the models dictionary
+    model: Optional[str] = (
+        None  # Key reference to a specific entry in the models dictionary
+    )
     description: Optional[str] = None  # Description of what this specific task achieves
     input_type: str = "text"  # The required input modality (e.g., 'text', 'vision')
 
@@ -114,7 +121,7 @@ class AITasks:
         task_name: str,
         model_name: Optional[str] = None,
         prompt_override: Optional[str] = None,
-        params:Dict[str,Any]=None,
+        params: Dict[str, Any] = None,
     ) -> str:
         """
         Execute a configured AI task.
@@ -148,7 +155,9 @@ class AITasks:
         # 3. Validate model existence
         if target_model_name not in self.models:
             available = ", ".join(self.models.keys())
-            raise ValueError(f"Unknown model '{target_model_name}'. Available: {available}")
+            raise ValueError(
+                f"Unknown model '{target_model_name}'. Available: {available}"
+            )
 
         model = self.models[target_model_name]
 

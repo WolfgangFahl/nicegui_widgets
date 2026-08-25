@@ -13,8 +13,9 @@ from collections import Counter
 from typing import Any, Dict, List, Union
 
 from basemkit.basetest import Basetest
-from ngwidgets.llm import LLM
+
 from ngwidgets.ai_tasks import AITasks, ModelConfig, TaskConfig
+from ngwidgets.llm import LLM
 
 
 class Utf8Histogram:

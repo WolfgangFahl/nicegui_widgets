@@ -4,6 +4,7 @@ Updated on 2025-11-26 to support openrouter and clean up structure
 
 @author: wf
 """
+
 import base64
 import json
 import os
@@ -75,7 +76,9 @@ class LLM(BaseLLM):
         self.prompts_filepath = self._get_prompts_filepath(prompts_filepath)
 
         if self.prompts_filepath and self.prompts_filepath.is_file():
-            self.prompts = Prompts.load_from_yaml_file(str(self.prompts_filepath)) # @UndefinedVariable
+            self.prompts = Prompts.load_from_yaml_file(
+                str(self.prompts_filepath)
+            )  # @UndefinedVariable
         else:
             self.prompts = Prompts()
 

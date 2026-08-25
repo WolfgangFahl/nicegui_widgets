@@ -4,6 +4,7 @@ Refactored on 2025-05-19
 
 @author: wf
 """
+
 import asyncio
 import json
 import sys
@@ -106,13 +107,14 @@ class ThreadedServerRunner:
                     self.warn(
                         f"Server shutdown completed in {shutdown_time_taken:.2f} seconds."
                     )
+
     def cancel_pending_tasks(self):
         """Cancel pending async tasks to prevent loop closed errors - wait for graceful completion first"""
         if not self.thread.is_alive():
             return
 
         try:
-            loop = getattr(self.ws, '_loop', None)
+            loop = getattr(self.ws, "_loop", None)
             if not loop or loop.is_closed():
                 return
 
@@ -135,6 +137,7 @@ class ThreadedServerRunner:
 
         except Exception as ex:
             self.warn(f"cancel pending tasks failed: {ex}")
+
 
 class BaseWebserverTest(Basetest):
     """

@@ -3,10 +3,11 @@ Created on 2025-12-08
 
 @author: wf
 """
+
 import os
 
+from nicegui import background_tasks, events, ui
 from PIL import Image
-from nicegui import events, ui, background_tasks
 
 
 class ImageCropper:
@@ -15,8 +16,8 @@ class ImageCropper:
     Allows users to draw a box on an image to define crop coordinates.
     """
 
-    def __init__(self,solution):
-        self.solution=solution
+    def __init__(self, solution):
+        self.solution = solution
         # Crop State
         self.crop_x: int = 0
         self.crop_y: int = 0
@@ -50,28 +51,38 @@ class ImageCropper:
         with ui.row().classes("items-center"):
             ui.label("Crop Area:")
             with ui.row():
-                ui.number(label="X", value=0).bind_value(self, "crop_x").props("size=5 readonly")
-                ui.number(label="Y", value=0).bind_value(self, "crop_y").props("size=5 readonly")
-                ui.number(label="W", value=0).bind_value(self, "crop_width").props("size=5 readonly")
-                ui.number(label="H", value=0).bind_value(self, "crop_height").props("size=5 readonly")
+                ui.number(label="X", value=0).bind_value(self, "crop_x").props(
+                    "size=5 readonly"
+                )
+                ui.number(label="Y", value=0).bind_value(self, "crop_y").props(
+                    "size=5 readonly"
+                )
+                ui.number(label="W", value=0).bind_value(self, "crop_width").props(
+                    "size=5 readonly"
+                )
+                ui.number(label="H", value=0).bind_value(self, "crop_height").props(
+                    "size=5 readonly"
+                )
 
             # Reset button convenient to have nearby
-            ui.button(icon="crop_free", on_click=self.reset_crop).props("flat round color=warning").tooltip("Reset Crop")
+            ui.button(icon="crop_free", on_click=self.reset_crop).props(
+                "flat round color=warning"
+            ).tooltip("Reset Crop")
             # Crop button
             # Visibility is bound to crop_width. It appears only when width > 0.
-            ui.button(icon="check", on_click=self.on_crop_click) \
-                .props("flat round color=positive") \
-                .tooltip("Apply Crop") \
-                .bind_visibility_from(self, "crop_width", backward=lambda w: w > 0)
+            ui.button(icon="check", on_click=self.on_crop_click).props(
+                "flat round color=positive"
+            ).tooltip("Apply Crop").bind_visibility_from(
+                self, "crop_width", backward=lambda w: w > 0
+            )
 
             # Rotation buttons
-            ui.button(icon="rotate_left", on_click=lambda: self.on_rotate_click(left=True)) \
-                .props("flat round color=primary") \
-                .tooltip("Rotate Left 90°")
-            ui.button(icon="rotate_right", on_click=lambda: self.on_rotate_click(left=False)) \
-                .props("flat round color=primary") \
-                .tooltip("Rotate Right 90°")
-
+            ui.button(
+                icon="rotate_left", on_click=lambda: self.on_rotate_click(left=True)
+            ).props("flat round color=primary").tooltip("Rotate Left 90°")
+            ui.button(
+                icon="rotate_right", on_click=lambda: self.on_rotate_click(left=False)
+            ).props("flat round color=primary").tooltip("Rotate Right 90°")
 
         # Interactive Image implementation
         self.interactive_view = ui.interactive_image(
@@ -102,7 +113,6 @@ class ImageCropper:
         elif e.type == "mouseup":
             self.dragging = False
             self.update_crop_selection(e.image_x, e.image_y)
-
 
     def update_crop_selection(self, current_x: float, current_y: float):
         """
@@ -136,9 +146,9 @@ class ImageCropper:
         if self.interactive_view:
             self.interactive_view.content = ""
 
-    def notify_problem(self,msg:str):
+    def notify_problem(self, msg: str):
         with self.container:
-            ui.notify(msg, type='warning')
+            ui.notify(msg, type="warning")
 
     async def on_crop_click(self):
         """
@@ -158,14 +168,13 @@ class ImageCropper:
         else:
             self.notify_problem("No file path configured for rotation.")
 
-
     async def apply_crop(self):
         try:
-            path=self.file_path
-            x=self.crop_x
-            y=self.crop_y
-            w=self.crop_width
-            h=self.crop_height
+            path = self.file_path
+            x = self.crop_x
+            y = self.crop_y
+            w = self.crop_width
+            h = self.crop_height
 
             if not os.path.exists(path):
                 self.notify_problem(f"Image not found at {path}")
@@ -179,7 +188,7 @@ class ImageCropper:
                 # Save back to specific path (overwrite)
                 # We save specifically to maintain format
                 cropped_img.save(path)
-                msg=f"{path} cropped to {w}x{h}"
+                msg = f"{path} cropped to {w}x{h}"
                 with self.container:
                     ui.notify(msg)
                 with self.interactive_view:
@@ -200,7 +209,7 @@ class ImageCropper:
             if not os.path.exists(path):
                 self.notify_problem(f"Image not found at {path}")
                 return
-                        # Determine rotation angle constant
+                # Determine rotation angle constant
             # ROTATE_90 is Counter-Clockwise (Left)
             # ROTATE_270 is Counter-Clockwise 270 aka Clockwise 90 (Right)
             method = Image.Transpose.ROTATE_90 if left else Image.Transpose.ROTATE_270
@@ -213,7 +222,7 @@ class ImageCropper:
             msg = f"Rotated {direction} 90°"
             with self.container:
                 ui.notify(msg)
-                        # Reset crop markup as dimensions/orientation have changed
+                # Reset crop markup as dimensions/orientation have changed
             self.reset_crop()
 
             # Force browser to reload the image
@@ -221,5 +230,3 @@ class ImageCropper:
                 self.interactive_view.force_reload()
         except Exception as ex:
             self.solution.handle_exception(ex)
-
-

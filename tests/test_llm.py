@@ -7,6 +7,7 @@ Updated on 2025-11-26
 
 import unittest
 from pathlib import Path
+
 from ngwidgets.basetest import Basetest
 from ngwidgets.llm import LLM, VisionLLM
 
@@ -45,7 +46,9 @@ class TestLLM(Basetest):
         except Exception as ex:
             msg = str(ex).lower()
             # 401: Auth, 402: Payment, 429: Rate limit/Quota
-            if any(x in msg for x in ["quota", "insufficient_quota", "401", "402", "429"]):
+            if any(
+                x in msg for x in ["quota", "insufficient_quota", "401", "402", "429"]
+            ):
                 if self.debug:
                     print(f"  > Skipped due to API limit/auth: {str(ex)}")
                 return None
@@ -99,20 +102,13 @@ class TestLLM(Basetest):
         # Use the specific resource file
         image_path = Path(__file__).parent / "resources" / "ALDI-WarrantyCard.jpg"
 
-        self.assertTrue(
-            image_path.exists(),
-            f"Test image not found at {image_path}"
-        )
+        self.assertTrue(image_path.exists(), f"Test image not found at {image_path}")
 
         print(f"Testing Vision ({self.vision_llm.model}) with: {image_path}")
 
         # 2. Execute via helper
         prompt = "Extract the store brand, the product name, and the Article Number (Artikelnummer) from this image."
-        result = self._call_llm(
-            self.vision_llm.analyze_image,
-            str(image_path),
-            prompt
-        )
+        result = self._call_llm(self.vision_llm.analyze_image, str(image_path), prompt)
 
         # 3. Assert if we got a result
         if result:

@@ -6,16 +6,16 @@ Created on 2023-09-13
 
 import asyncio
 import logging
-import random
-import time
-import tempfile
 import os
+import random
+import tempfile
+import time
 from dataclasses import dataclass
 from datetime import datetime
-from PIL import Image, ImageDraw
-from ngwidgets.image_cropper import ImageCropper
+
 from fastapi.responses import Response
 from nicegui import Client, app, run, ui
+from PIL import Image, ImageDraw
 
 from ngwidgets.color_map import ColorMap
 from ngwidgets.combobox import ComboBox
@@ -23,6 +23,7 @@ from ngwidgets.components_view import ComponentsView
 from ngwidgets.debouncer import DebouncerUI
 from ngwidgets.dict_edit import DictEdit
 from ngwidgets.gpxviewer import GPXViewer
+from ngwidgets.image_cropper import ImageCropper
 from ngwidgets.input_webserver import InputWebserver, InputWebSolution
 from ngwidgets.leaflet_map import LeafletMap
 from ngwidgets.lod_grid import GridConfig, ListOfDictsGrid
@@ -520,6 +521,7 @@ class NiceGuiWidgetsDemo(InputWebSolution):
         """
         Demonstrate the ImageCropper class by creating a local sample image.
         """
+
         def show():
             # Create a temporary file path for the demo
             tmp_dir = tempfile.gettempdir()
@@ -528,7 +530,7 @@ class NiceGuiWidgetsDemo(InputWebSolution):
 
             # Create a generated sample image if it doesn't exist
             # We recreate it every time to 'reset' the demo if previous users cropped it heavily
-            img = Image.new('RGB', (600, 400), color=(73, 109, 137))
+            img = Image.new("RGB", (600, 400), color=(73, 109, 137))
             d = ImageDraw.Draw(img)
             d.text((20, 20), "NiceGUI Image Cropper Demo", fill=(255, 255, 0))
             d.rectangle([100, 100, 300, 300], outline="white", width=5)
@@ -536,7 +538,9 @@ class NiceGuiWidgetsDemo(InputWebSolution):
             img.save(img_path)
 
             # Instructions
-            ui.markdown(f"**Instructions**: Drag on the image to select an area. Click the checkmark to crop. Use arrows to rotate.")
+            ui.markdown(
+                f"**Instructions**: Drag on the image to select an area. Click the checkmark to crop. Use arrows to rotate."
+            )
             ui.label(f"Local file: {img_path}").classes("text-xs text-gray-500")
 
             # Setup Cropper
@@ -623,12 +627,13 @@ class NiceGuiWidgetsDemo(InputWebSolution):
         """
         Demonstrate the TaskRunner with timeout, progress, and cancellation
         """
+
         def show():
             # Create progress bar for TaskRunner
             progress_bar = NiceguiProgressbar(total=100, desc="Task", unit="step")
             task_runner = TaskRunner(timeout=8.0, progress=progress_bar)
 
-            async def hint(title:str,done:bool=False,marker:str="✅"):
+            async def hint(title: str, done: bool = False, marker: str = "✅"):
                 with content:
                     content.clear()
                 with content:
@@ -636,11 +641,11 @@ class NiceGuiWidgetsDemo(InputWebSolution):
                         progress_bar.progress.visible = False
                         progress_bar.reset()
                         ui.spinner()
-                        marker=""
-                    ui.markdown(title+marker)
+                        marker = ""
+                    ui.markdown(title + marker)
 
             async def load_data_5secs():
-                title='Loading data ... for 5 secs'
+                title = "Loading data ... for 5 secs"
                 await hint(title)
 
                 # Simulate work with progress updates
@@ -648,10 +653,10 @@ class NiceGuiWidgetsDemo(InputWebSolution):
                     await asyncio.sleep(0.1)  # 5 seconds total
                     progress_bar.update(2)  # 2% per step
 
-                await hint(title,True)
+                await hint(title, True)
 
             async def slow_load_10secs():
-                title='Loading 10 secs (this will timeout after 8 secs)...'
+                title = "Loading 10 secs (this will timeout after 8 secs)..."
                 await hint(title)
 
                 # This will timeout at 8 seconds
@@ -659,50 +664,60 @@ class NiceGuiWidgetsDemo(InputWebSolution):
                     await asyncio.sleep(0.1)  # 10 seconds total - will timeout
                     progress_bar.update(1)
 
-                await hint('This should timeout!',True,marker="❌")
+                await hint("This should timeout!", True, marker="❌")
 
-            def blocking_task(secs:float=5):
+            def blocking_task(secs: float = 5):
                 time.sleep(secs)
                 return f"Blocking task  {secs} secs completed"
 
             async def blocking_task_5secs():
-                title = 'Running blocking task for 5 secs'
+                title = "Running blocking task for 5 secs"
                 await hint(title)
                 result = blocking_task(5)
                 await hint(result, True)
 
             async def quick_task_1sec():
-                title='Quick task 1sec'
+                title = "Quick task 1sec"
                 await hint(title)
 
                 await asyncio.sleep(1)  # 1 second for quick demo
-                await hint(title,True)
+                await hint(title, True)
 
             async def cancel_task():
                 task_runner.cancel_running()
                 task_runner.progress.reset()
-                await hint("Task canceled",True,marker='⚠️')
+                await hint("Task canceled", True, marker="⚠️")
 
             async def clear():
-                await hint("",True,marker='️')
+                await hint("", True, marker="️")
                 progress_bar.progress.visible = False
 
             with ui.card() as content:
-                ui.markdown('Ready to run tasks...')
+                ui.markdown("Ready to run tasks...")
 
             # Show progress bar
             progress_bar.progress.visible = True
 
             with ui.row():
-                ui.button('Load Data (5s)', on_click=lambda: task_runner.run(load_data_5secs))
-                ui.button('Quick Task (1s)', on_click=lambda: task_runner.run(quick_task_1sec))
-                ui.button('Blocking Task (5s)', on_click=lambda: task_runner.run(blocking_task_5secs))
-                ui.button('Timeout Test (8s+)', on_click=lambda: task_runner.run(slow_load_10secs))
-                ui.button('Cancel', on_click=cancel_task)
-                ui.button('Clear', on_click=clear)
+                ui.button(
+                    "Load Data (5s)", on_click=lambda: task_runner.run(load_data_5secs)
+                )
+                ui.button(
+                    "Quick Task (1s)", on_click=lambda: task_runner.run(quick_task_1sec)
+                )
+                ui.button(
+                    "Blocking Task (5s)",
+                    on_click=lambda: task_runner.run(blocking_task_5secs),
+                )
+                ui.button(
+                    "Timeout Test (8s+)",
+                    on_click=lambda: task_runner.run(slow_load_10secs),
+                )
+                ui.button("Cancel", on_click=cancel_task)
+                ui.button("Clear", on_click=clear)
 
             with ui.row():
-                status_label = ui.label('')
+                status_label = ui.label("")
 
                 # Update status every 100ms using timer
                 ui.timer(0.1, lambda: status_label.set_text(task_runner.get_status()))
@@ -773,14 +788,12 @@ class NiceGuiWidgetsDemo(InputWebSolution):
                         color = color_map.get_color(row, col)
                         with grid:
                             button = ui.button(color.hex_l, color=f"{color.hex_l}")
-                            button.style(
-                                f"""
+                            button.style(f"""
                                 width: 50px;
                                 height: 50px;
                                 font-size: 8px;
                                 padding: 2px;
-                                """
-                            )
+                                """)
 
         def create_slider(label, min_val, max_val, value, step, on_change):
             ui.label(f"{label}:")

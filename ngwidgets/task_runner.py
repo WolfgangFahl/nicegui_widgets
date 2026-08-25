@@ -10,9 +10,9 @@ import time
 from typing import Callable, Optional
 
 from basemkit.persistent_log import Log
+from nicegui import background_tasks, run
+
 from ngwidgets.progress import Progressbar
-from nicegui import background_tasks
-from nicegui import run
 
 
 class TaskRunner:
@@ -36,20 +36,22 @@ class TaskRunner:
 
     def set_name(self, func: Callable):
         """Set task name from function"""
-        self.task_name = getattr(func, '__name__', '?')
+        self.task_name = getattr(func, "__name__", "?")
 
     def get_status(self) -> str:
         """Get formatted status string with timing information"""
         if not self.start_time:
-            status = 'Ready'
+            status = "Ready"
         else:
             elapsed = self.get_elapsed_time()
-            start_str = time.strftime('%H:%M:%S', time.localtime(self.start_time))
+            start_str = time.strftime("%H:%M:%S", time.localtime(self.start_time))
 
             if self.is_running():
-                status = f'Running "{self.task_name}" for {elapsed:.1f}s since {start_str}'
+                status = (
+                    f'Running "{self.task_name}" for {elapsed:.1f}s since {start_str}'
+                )
             elif self.stop_time:
-                stop_str = time.strftime('%H:%M:%S', time.localtime(self.stop_time))
+                stop_str = time.strftime("%H:%M:%S", time.localtime(self.stop_time))
                 status = f'Completed "{self.task_name}" in {elapsed:.1f}s ({start_str}-{stop_str})'
             else:
                 status = f'Interrupted "{self.task_name}" after {elapsed:.1f}s from {start_str}'
@@ -202,11 +204,14 @@ class TaskRunner:
                     on_result(result)
             except asyncio.TimeoutError:
                 self.log.log(
-                    "❌", "timeout",
-                    f'Task "{self.task_name}" exceeded {self.timeout}s timeout — possible blocking code?'
+                    "❌",
+                    "timeout",
+                    f'Task "{self.task_name}" exceeded {self.timeout}s timeout — possible blocking code?',
                 )
             except asyncio.CancelledError:
-                self.log.log("⚠️", "cancelled", f'Task "{self.task_name}" was cancelled.')
+                self.log.log(
+                    "⚠️", "cancelled", f'Task "{self.task_name}" was cancelled.'
+                )
                 raise  # 🆕 Re-raise to properly propagate cancellation
             except Exception as ex:
                 self.log.log("❌", "exception", f'Task "{self.task_name}": {str(ex)}')
