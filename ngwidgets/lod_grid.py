@@ -75,9 +75,10 @@ class ListOfDictsGrid:
         try:
             if self.config.with_buttons:
                 self.setup_button_row(self.config.button_names)
-            # Update options to include onGridReady event handling
-            self.config.options[":onGridReady"] = (
-                "(params) => params.columnApi.autoSizeAllColumns()"
+            # size the columns to their content once data has been rendered;
+            # ag-grid 32 (nicegui 2.24.2) has no params.columnApi any more, see #102
+            self.config.options[":onFirstDataRendered"] = (
+                "(params) => params.api.autoSizeAllColumns()"
             )
 
             self.ag_grid = ui.aggrid(
@@ -368,6 +369,20 @@ class ListOfDictsGrid:
                 # Set html_columns based on all_rows_html flag
                 html_columns = list(range(len(columnDefs)))
                 self.html_columns = html_columns
+                # the html renderer of nicegui hands the raw value to the DOM;
+                # a list or dict value is no Node and breaks the row rendering
+                # of ag-grid 32, so render non scalar values as text, see #102
+                for columnDef in columnDefs:
+                    if (
+                        "cellRenderer" not in columnDef
+                        and ":cellRenderer" not in columnDef
+                    ):
+                        columnDef[":cellRenderer"] = (
+                            "(params) => params.value === null || params.value === undefined ? '' "
+                            ": Array.isArray(params.value) ? params.value.join(', ') "
+                            ": typeof params.value === 'object' ? JSON.stringify(params.value) "
+                            ": params.value"
+                        )
         except Exception as ex:
             self.handle_exception(ex)
 
