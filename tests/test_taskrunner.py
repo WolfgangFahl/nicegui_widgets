@@ -119,7 +119,6 @@ class TestTaskRunnerLive(LiveWebTest):
             cls.ws = None
         else:
             cls.ws = TaskWebserver()
-            cls.ws.config.default_port = 8669
             cls.cmd = TaskCmd(cls.ws.config, TaskWebserver)
             cls.start_runner()
 

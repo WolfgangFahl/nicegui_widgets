@@ -13,7 +13,7 @@ import time
 from argparse import Namespace
 from typing import Any, Optional
 
-from nicegui import app
+from nicegui import app, core
 
 from ngwidgets.basetest import Basetest
 
@@ -47,22 +47,21 @@ class ThreadedServerRunner:
         if args is not None:
             self.ws.args = args
         self.shutdown_timeout = shutdown_timeout
+        # nicegui allows a single ui.run per process - a server started
+        # earlier in this process e.g. by a LiveWebTest is reused and left alone
+        self.joined = core.is_loop_running()
         self.thread = threading.Thread(target=self._run_server)
         self.thread.daemon = True
 
     def _run_server(self) -> None:
         """Internal method to run the server."""
-        # prevent middleware error if app already started
-        if hasattr(app, "_already_running"):
-            self.ws.run = lambda _args: None  # avoid double run
-        else:
-            app._already_running = True  # mark NiceGUI as started
         # The run method will be called with the stored argparse.Namespace
         self.ws.run(self.args)
 
     def start(self) -> None:
-        """Start the web server thread."""
-        self.thread.start()
+        """Start the web server thread unless a server is already running."""
+        if not self.joined:
+            self.thread.start()
 
     def warn(self, msg: str):
         """

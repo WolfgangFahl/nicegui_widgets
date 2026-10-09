@@ -3,16 +3,18 @@ LiveTest
 Minimal live environment using Webserver/WebSolution/WebCmd
 of nicegui_widgets environment
 WF 2025-05-18
+WF 2026-10-09 - one live server per process, nicegui 3 lifecycle
 
 """
 
+import atexit
 import threading
 import time
-from typing import Any, Callable, Dict, List
+from argparse import Namespace
+from typing import Any, Callable, ClassVar, Dict, Optional
 
 import requests
-from fastapi.responses import JSONResponse
-from nicegui import Client, app, ui
+from nicegui import Client, app, core, ui
 
 from ngwidgets.cmd import WebserverCmd
 from ngwidgets.input_webserver import InputWebserver, InputWebSolution
@@ -60,7 +62,12 @@ class LiveSolution(InputWebSolution):
 class LiveWebserver(InputWebserver):
     """
     Minimal InputWebserver setup with configurable test handler
+
+    the handler is shared by all instances of the process since the first
+    registered /live-testhandler route answers for the whole process
     """
+
+    test_handler: ClassVar[Callable[[], Dict[str, Any]]] = lambda: {"status": "ok"}
 
     @classmethod
     def get_config(cls) -> WebserverConfig:
@@ -77,9 +84,6 @@ class LiveWebserver(InputWebserver):
         constructor for Webserver
         """
         super().__init__(config=self.get_config())
-
-        # Default test handler returns a simple status message
-        self._test_handler = lambda: {"status": "ok"}
 
         # Register the UI route for connectivity testing
         @ui.page("/live-htmltest")
@@ -103,7 +107,7 @@ class LiveWebserver(InputWebserver):
         Args:
             handler: Function that returns a dictionary to be converted to JSON
         """
-        self._test_handler = handler
+        LiveWebserver.test_handler = handler
 
     def get_test_handler(self) -> Callable[[], Dict[str, Any]]:
         """
@@ -112,7 +116,8 @@ class LiveWebserver(InputWebserver):
         Returns:
             The current handler function
         """
-        return self._test_handler
+        handler = LiveWebserver.test_handler
+        return handler
 
 
 class LiveCmd(WebserverCmd):
@@ -142,22 +147,80 @@ class LiveCmd(WebserverCmd):
 
 class LiveServerRunner:
     """
-    Runs a NiceGUI Webserver in a thread
+    Runs the one NiceGUI server of this test process in a thread.
+
+    nicegui allows a single ui.run per process: a second run fails with
+    "Cannot add middleware after an application has started". Therefore the
+    first LiveWebTest subclass starts the server and every later subclass
+    reuses it - routes registered by their webservers are added to the
+    running app. The server is shut down when the process exits.
     """
 
-    def __init__(self, ws_cmd: WebserverCmd, args: List[str], timeout=5.0):
-        self.ws_cmd = ws_cmd
+    instance: ClassVar[Optional["LiveServerRunner"]] = None
+
+    def __init__(self, ws: Any, args: Namespace, timeout: float = 5.0):
+        """
+        constructor
+
+        Args:
+            ws: the webserver whose run method starts the server
+            args: the parsed command line arguments for the run
+            timeout: seconds to wait for the server thread on stop
+        """
+        self.ws = ws
+        self.args = args
         self.timeout = timeout
-        self.thread = threading.Thread(target=self.ws_cmd.cmd_main, args=(args,))
+        self.base_url = f"http://127.0.0.1:{args.port}"
+        self.thread = threading.Thread(target=self.ws.run, args=(args,))
         self.thread.daemon = True
 
+    @classmethod
+    def get_instance(
+        cls, ws: Any, args: Namespace, timeout: float = 5.0
+    ) -> "LiveServerRunner":
+        """
+        get the running server of this process - started on first call
+
+        Args:
+            ws: the webserver to run if no server is running yet
+            args: the parsed command line arguments for the run
+            timeout: seconds to wait for the server thread on stop
+
+        Returns:
+            LiveServerRunner: the one runner of this process
+        """
+        if cls.instance is None:
+            runner = cls(ws, args, timeout=timeout)
+            runner.start()
+            atexit.register(runner.stop)
+            cls.instance = runner
+        return cls.instance
+
+    def leave_script_mode(self):
+        """
+        nicegui 3 refuses ui.run with pages once UI was created in the
+        global scope - which widget tests run earlier in the same process do.
+        The script client they filled is deleted and the core state reset
+        before the server starts; the routes registered on app stay.
+        """
+        if core.script_client is not None:
+            core.script_client.delete()
+        core.reset()
+
     def start(self):
-        app._already_running = True
+        """
+        start the server thread
+        """
+        self.leave_script_mode()
         self.thread.start()
 
     def stop(self):
-        app.shutdown()
-        self.thread.join(timeout=self.timeout)
+        """
+        shut the server down and wait for the thread
+        """
+        if self.thread.is_alive():
+            app.shutdown()
+            self.thread.join(timeout=self.timeout)
 
 
 class LiveWebTest(BaseWebserverTest):
@@ -182,21 +245,22 @@ class LiveWebTest(BaseWebserverTest):
 
     @classmethod
     def start_runner(cls):
-        # Parse minimal arguments - just --serve is needed for testing
-        args = ["--serve"]
-
-        # Create runner with proper args
-        cls.runner = LiveServerRunner(cls.cmd, args=args)
-        cls.runner.start()
-        cls.base_url = f"http://127.0.0.1:{cls.ws.config.default_port}"
+        """
+        start the live server of this process or reuse the running one
+        """
+        args = cls.cmd.parse_args(["--serve"])
+        # a webserver joining the running server is never run and
+        # therefore gets its args here, solutions read them on page requests
+        cls.ws.args = args
+        cls.runner = LiveServerRunner.get_instance(cls.ws, args, timeout=args.timeout)
+        cls.base_url = cls.runner.base_url
         cls.max_secs_to_wait = 5
         cls.wait_until_ready(cls.max_secs_to_wait)
 
     @classmethod
     def tearDownClass(cls):
-        """Clean up resources used by all test methods"""
-        if hasattr(cls, "runner") and cls.runner:
-            cls.runner.stop()
+        """the server is shared by all test classes and stops with the process"""
+        pass
 
     @classmethod
     def wait_until_ready(cls, secs: int):
