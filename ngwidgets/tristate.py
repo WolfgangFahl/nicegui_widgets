@@ -103,6 +103,9 @@ class Tristate(Element, component="tristate.js"):
         self.icon_set_name = icon_set_name
         self.icon_set = Tristate.ICON_SETS[icon_set_name]
         self.current_icon_index = 0
+        # the style string goes to the input element of the component;
+        # self.style is the Style object of the element in nicegui 3
+        self.input_style = style
         self.style(style)
         self.user_on_change = on_change
         self.on("change", self.on_change)
@@ -124,7 +127,7 @@ class Tristate(Element, component="tristate.js"):
         """Updates the component properties with the current icon and style."""
         self.utf8_icon = self.icon_set[self.current_icon_index]
         self._props["value"] = self.utf8_icon
-        self._props["style"] = self.style
+        self._props["style"] = self.input_style
         self.update()
 
     # Additional methods as needed

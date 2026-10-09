@@ -102,7 +102,7 @@ class SsoSolution(WebSolution):
             self.logout_button = ui.button(
                 "logout", icon="logout", on_click=self.logout
             )
-            ui.html(self.as_html())
+            ui.html(self.as_html(), sanitize=False)
 
         await self.setup_content_div(show)
 

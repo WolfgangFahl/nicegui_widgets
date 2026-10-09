@@ -227,7 +227,8 @@ class About(ui.element):
             html = add(html, "docs", doc_link)
             html = add(html, "chat", disc_link)
             html = add(html, "source", cm_link)
-            ui.html(html)
+            # own markup with style and target attributes - not sanitized
+            ui.html(html, sanitize=False)
 
 
 class HideShow:

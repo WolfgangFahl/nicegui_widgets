@@ -106,7 +106,7 @@ class ComponentView:
                         link = Link.create(url, f"#{self.component.issue}")
                         html_markup += delim + link
                         delim = " "
-                    ui.html(html_markup)
+                    ui.html(html_markup, sanitize=False)
                     if self.component.demo_image_url:
                         ui.image(self.component.demo_image_url)
                     if self.component.description:

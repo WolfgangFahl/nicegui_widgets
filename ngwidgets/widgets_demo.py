@@ -472,7 +472,8 @@ class NiceGuiWidgetsDemo(InputWebSolution):
                         for result in results:
                             link = Link.create(result["url"], result["title"])
                             html = f"{link}:{result['summary']}<br>"
-                            ui.html(html)
+                            # the summary comes from Wikipedia - sanitized
+                            ui.html(html, sanitize=True)
                     else:
                         ui.label("No results found.")
 
@@ -600,7 +601,7 @@ class NiceGuiWidgetsDemo(InputWebSolution):
         # display a labeled preformatted text block
         def labeled_pre(label: str, value: str, color: str = "black"):
             ui.label(f"{label}:").style("font-weight: bold")
-            ui.html(f"<pre>{value}</pre>").style(f"color: {color}")
+            ui.html(f"<pre>{value}</pre>", sanitize=True).style(f"color: {color}")
 
         # run the selected command and display output
         def run_cmd(cmd_select):
@@ -788,12 +789,14 @@ class NiceGuiWidgetsDemo(InputWebSolution):
                         color = color_map.get_color(row, col)
                         with grid:
                             button = ui.button(color.hex_l, color=f"{color.hex_l}")
-                            button.style(f"""
+                            button.style(
+                                f"""
                                 width: 50px;
                                 height: 50px;
                                 font-size: 8px;
                                 padding: 2px;
-                                """)
+                                """
+                            )
 
         def create_slider(label, min_val, max_val, value, step, on_change):
             ui.label(f"{label}:")
@@ -1060,7 +1063,7 @@ class NiceGuiWidgetsDemo(InputWebSolution):
             html_content += "</ul>"
 
             # html_content now contains the HTML code to render the list of links
-            ui.html(html_content)
+            ui.html(html_content, sanitize=False)
 
         await self.setup_content_div(setup_home)
 

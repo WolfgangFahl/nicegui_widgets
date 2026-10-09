@@ -73,7 +73,7 @@ class ProjectView:
                             self.project.pypi, f"{pypi_icon}{self.project.package}"
                         )
                         html_markup = pypi_link
-                        self.pypi_html = ui.html(html_markup)
+                        self.pypi_html = ui.html(html_markup, sanitize=False)
                     if self.project.github:
                         github_icon = "<img src='https://upload.wikimedia.org/wikipedia/commons/thumb/9/91/Octicons-mark-github.svg/32px-Octicons-mark-github.svg.png' alt='github' title='github'/>"
                         github_name = self.project.github_repo_name
@@ -82,7 +82,7 @@ class ProjectView:
                             self.project.github, github_html_markup
                         )
                         html_markup = f"{github_link}"
-                        self.github_html = ui.html(html_markup)
+                        self.github_html = ui.html(html_markup, sanitize=False)
                         html_markup = ""
                         if self.project.github_author:
                             author = self.project.github_author
@@ -95,7 +95,7 @@ class ProjectView:
                                 author_url, f"{avatar_icon}{author}"
                             )
                             html_markup = f"{author_link}"
-                        self.project_html = ui.html(html_markup)
+                        self.project_html = ui.html(html_markup, sanitize=False)
                         # components (if any)
                         html_markup = ""
                         if self.project.components_url:
@@ -111,7 +111,7 @@ class ProjectView:
                                 components_restful_url, components_icon
                             )
                             html_markup += f" {components_link} {components_count}"
-                            self.components_html = ui.html(html_markup)
+                            self.components_html = ui.html(html_markup, sanitize=False)
                 html_markup = ""
                 if self.project.pypi:
                     if self.project.pypi_description:
@@ -120,7 +120,8 @@ class ProjectView:
                     inst_html = f"<pre>{self.project.install_instructions}</pre>"
                     html_markup = f"{html_markup}\n{inst_html}"
 
-                self.desc_html = ui.html(html_markup)
+                # the description comes from PyPI - sanitized
+                self.desc_html = ui.html(html_markup, sanitize=True)
             return self.card
 
 
