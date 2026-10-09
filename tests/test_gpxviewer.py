@@ -6,6 +6,8 @@ Created on 2025-01-17
 
 import unittest
 
+import requests
+
 from ngwidgets.basetest import Basetest
 from ngwidgets.gpxviewer import GPXViewer
 
@@ -17,6 +19,24 @@ class TestGPXViewer(Basetest):
 
     def setUp(self, debug=True, profile=True):
         Basetest.setUp(self, debug=debug, profile=profile)
+
+    def check_gpx_available(self, gpx_url: str) -> None:
+        """
+        skip the current (sub)test when the given url does not deliver GPX
+        e.g. because the host answers with an HTML login page
+
+        Args:
+            gpx_url: the url of the GPX file
+        """
+        try:
+            response = requests.get(gpx_url, timeout=10)
+            content_type = response.headers.get("content-type", "")
+            if response.status_code != 200 or "html" in content_type:
+                self.skipTest(
+                    f"{gpx_url} answers {response.status_code} {content_type} instead of GPX"
+                )
+        except requests.RequestException as ex:
+            self.skipTest(f"{gpx_url} not reachable: {ex}")
 
     @unittest.skipIf(Basetest.inPublicCI(), "external APIs might not be available")
     def test_gpx_viewer(self):
@@ -36,6 +56,7 @@ class TestGPXViewer(Basetest):
 
         for sample_name, gpx_url in GPXViewer.samples.items():
             with self.subTest(sample_name=sample_name):
+                self.check_gpx_available(gpx_url)
                 # Create viewer instance and load GPX file
                 viewer = GPXViewer.from_url(gpx_url)
 

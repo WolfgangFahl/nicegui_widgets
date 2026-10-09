@@ -28,6 +28,11 @@ class WikipediaSearch:
         self.session = (
             requests.Session()
         )  # Using a session for connection pooling to enhance performance.
+        # Wikimedia answers 403 to requests without a descriptive User-Agent
+        # see https://w.wiki/4wJS and https://phabricator.wikimedia.org/T400119
+        self.session.headers["User-Agent"] = (
+            "ngwidgets (https://github.com/WolfgangFahl/nicegui_widgets)"
+        )
 
     def search(self, query, limit=10, explain_text=False):
         """

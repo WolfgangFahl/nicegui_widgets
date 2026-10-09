@@ -38,21 +38,30 @@ class TestLLM(Basetest):
 
     def _call_llm(self, func, *args, **kwargs):
         """
-        Execute LLM call and handle expected API errors gracefully.
-        Returns None if an API/Quota error occurs, otherwise returns result or raises exception.
+        Execute LLM call and skip the test when the provider is not usable.
+
+        Returns:
+            the result of func, the test is skipped on an
+            auth (401), payment (402), model not found (404) or quota (429) error
         """
         try:
-            return func(*args, **kwargs)
+            result = func(*args, **kwargs)
         except Exception as ex:
             msg = str(ex).lower()
-            # 401: Auth, 402: Payment, 429: Rate limit/Quota
             if any(
-                x in msg for x in ["quota", "insufficient_quota", "401", "402", "429"]
+                x in msg
+                for x in [
+                    "quota",
+                    "insufficient_quota",
+                    "401",
+                    "402",
+                    "404",
+                    "429",
+                ]
             ):
-                if self.debug:
-                    print(f"  > Skipped due to API limit/auth: {str(ex)}")
-                return None
+                self.skipTest(f"LLM provider not usable: {str(ex)}")
             raise ex
+        return result
 
     @unittest.skipIf(Basetest.inPublicCI(), "LLM tests with API cost")
     def testModelList(self):
