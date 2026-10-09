@@ -56,6 +56,10 @@ class ListOfDictsGrid:
 
     see https://nicegui.io/documentation/ag_grid
     see https://github.com/zauberzeug/nicegui/discussions/1833
+
+    lod is the single source of truth: nicegui 3 copies rowData into
+    observable collections, so the rows the grid holds are not the rows
+    handed in. Every change goes to lod and is pushed with update().
     """
 
     def __init__(
@@ -84,9 +88,9 @@ class ListOfDictsGrid:
             self.ag_grid = ui.aggrid(
                 options=self.config.options,
                 html_columns=self.config.html_columns,
+                theme=self.config.theme,
+                auto_size_columns=self.config.auto_size_columns,
             ).classes(self.config.classes)
-            self.ag_grid.theme = self.config.theme
-            self.auto_size_columns = self.config.auto_size_columns
             self.setDefaultColDef()
             if lod is not None:
                 self.load_lod(lod, self.config.column_defs)
@@ -94,28 +98,31 @@ class ListOfDictsGrid:
             self.handle_exception(ex)
 
     @property
-    def options(self):
-        return self.ag_grid._props.get("options", {})
+    def options(self) -> Dict:
+        """the options of my ag_grid"""
+        return self.ag_grid.options
 
     @options.setter
-    def options(self, value):
-        self.ag_grid._props["options"] = value
+    def options(self, value: Dict):
+        self.ag_grid.options = value
 
     @property
-    def html_columns(self):
-        return self.ag_grid._props.get("html_columns", [])
+    def html_columns(self) -> List[int]:
+        """the indices of the columns rendered as html"""
+        return self.ag_grid.html_columns
 
     @html_columns.setter
-    def html_columns(self, value):
-        self.ag_grid._props["html_columns"] = value
+    def html_columns(self, value: List[int]):
+        self.ag_grid.html_columns = value
 
     @property
-    def auto_size_columns(self):
-        return self.ag_grid._props.get("auto_size_columns", True)
+    def auto_size_columns(self) -> bool:
+        """whether the columns are sized automatically"""
+        return self.ag_grid.auto_size_columns
 
     @auto_size_columns.setter
-    def auto_size_columns(self, value):
-        self.ag_grid._props["auto_size_columns"] = value
+    def auto_size_columns(self, value: bool):
+        self.ag_grid.auto_size_columns = value
 
     def get_column_def(self, col: str) -> Dict:
         """
@@ -257,7 +264,7 @@ class ListOfDictsGrid:
 
         Args:
             key_value (Any): The value of the key column for the row to update.
-            row_key (str): The column key of the cell to update.
+            col_key (str): The column key of the cell.
 
         Returns:
             Any: the value of the cell or None if the row doesn't exist
@@ -271,11 +278,11 @@ class ListOfDictsGrid:
 
     def update_cell(self, key_value: Any, col_key: str, value: Any) -> None:
         """
-        Update a cell in the grid.
+        Update a cell in lod and push the change to the grid.
 
         Args:
             key_value (Any): The value of the key column for the row to update.
-            row_key (str): The column key of the cell to update.
+            col_key (str): The column key of the cell to update.
             value (Any): The new value for the specified cell.
 
         """
@@ -283,12 +290,13 @@ class ListOfDictsGrid:
         row = rows_by_key.get(key_value, None)
         if row:
             row[col_key] = value
+            self.update()
 
-    def get_row_data(self):
+    def get_row_data(self) -> List[Dict]:
         """
-        get the complete row data
+        get the complete row data - the lod that is the source of the grid rows
         """
-        row_data = self.ag_grid.options["rowData"]
+        row_data = self.lod if self.lod is not None else []
         return row_data
 
     def get_rows_by_key(self) -> Dict[Any, Dict[str, Any]]:
@@ -362,9 +370,6 @@ class ListOfDictsGrid:
                         else:
                             col_filter = True  # Use default filter
                         columnDefs.append(dict({"field": key, "filter": col_filter}))
-            self.ag_grid.options["columnDefs"] = columnDefs
-            self.ag_grid.options["rowData"] = lod
-            self.update_index(lenient=self.config.lenient)
             if self.config.all_cols_html:
                 # Set html_columns based on all_rows_html flag
                 html_columns = list(range(len(columnDefs)))
@@ -383,14 +388,21 @@ class ListOfDictsGrid:
                             ": typeof params.value === 'object' ? JSON.stringify(params.value) "
                             ": params.value"
                         )
+            # the column definitions are complete before the grid copies them
+            self.ag_grid.options["columnDefs"] = columnDefs
+            self.lod = lod
+            self.update()
         except Exception as ex:
             self.handle_exception(ex)
 
     def update(self):
         """
-        update my aggrid
+        push my lod to the aggrid as its row data, refresh the index
+        and update the aggrid
         """
         if self.ag_grid:
+            self.ag_grid.options["rowData"] = self.get_row_data()
+            self.update_index(lenient=self.config.lenient)
             self.ag_grid.update()
 
     async def get_selected_rows(self):
